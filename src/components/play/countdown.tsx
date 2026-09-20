@@ -1,22 +1,7 @@
 "use client";
 
 import * as React from "react";
-
-/**
- * A bare duration — "12 דק'", "3 ש' 20 דק'", "2 ימים 4 ש'" — with no framing
- * word, so each caller supplies its own ("נשארו …", "מתחיל בעוד …"). Returns
- * null once the clock runs out.
- */
-function remaining(toMs: number, now: number): string | null {
-  const diff = toMs - now;
-  if (diff <= 0) return null;
-  const mins = Math.floor(diff / 60_000);
-  if (mins < 60) return `${mins} דק'`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} ש' ${mins % 60} דק'`;
-  const days = Math.floor(hours / 24);
-  return `${days} ${days === 1 ? "יום" : "ימים"} ${hours % 24} ש'`;
-}
+import { durationLeft } from "@/lib/format";
 
 /**
  * Re-renders a countdown string on its own schedule: every second inside the
@@ -35,7 +20,7 @@ export function useCountdown(toMs: number | null): string | null {
     return () => window.clearInterval(id);
   }, [toMs, now]);
 
-  return toMs === null ? null : remaining(toMs, now);
+  return toMs === null ? null : durationLeft(toMs, now);
 }
 
 export function Countdown({

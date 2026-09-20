@@ -63,3 +63,6 @@ storage-debug.log
 # service account keys — never commit
 *firebase-adminsdk*.json
 serviceAccount*.json
+
+# scratch scripts agents leave at the repo root
+/_*.mjs

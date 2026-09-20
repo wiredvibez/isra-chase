@@ -1,5 +1,6 @@
 "use client";
 
+import { countdown } from "@/lib/format";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import type {
@@ -69,19 +70,9 @@ export function durationLabel(ms: number): string {
 
 /** "נשארו 2 ימים 4 שע'" — the ticking label beside a live chase. */
 export function countdownLabel(toMs: number | null, now = Date.now()): string {
-  if (toMs === null) return "";
-  const diff = toMs - now;
-  if (diff <= 0) return "הסתיים";
-  const mins = Math.floor(diff / MINUTE);
-  if (mins < 1) return "נשארה פחות מדקה";
-  if (mins < 60) return mins === 1 ? "נשארה דקה" : `נשארו ${mins} דק'`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `נשארו ${hours} שע' ${mins % 60} דק'`;
-  const days = Math.floor(hours / 24);
-  return days === 1
-    ? `נשארו יום ו-${hours % 24} שע'`
-    : `נשארו ${days} ימים ו-${hours % 24} שע'`;
+  return countdown(toMs, now);
 }
+
 
 /** "250 מ'" / "5 ק"מ" — the accept radius of a GPS mission. */
 export function radiusLabel(metres: number): string {

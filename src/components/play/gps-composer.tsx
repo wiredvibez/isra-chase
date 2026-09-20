@@ -150,14 +150,9 @@ export function GpsComposer({
         >
           <p className="font-display text-base font-bold">יש לנו את המיקום שלכם</p>
           <p className="mt-1 text-sm text-muted-foreground tabular-nums">
-            {fix.accuracyM !== null ? (
-              <>
-                דיוק של בערך <span dir="ltr">±{fmtDistance(fix.accuracyM)}</span>
-                .
-              </>
-            ) : (
-              "רמת הדיוק לא ידועה."
-            )}{" "}
+            {fix.accuracyM !== null
+              ? `דיוק של בערך ${fmtDistance(fix.accuracyM)}.`
+              : "רמת הדיוק לא ידועה."}{" "}
             {fix.accuracyM !== null && fix.accuracyM > radiusM
               ? "זה רחב יותר מטווח המשימה, אז אם הצ'ק-אין ייכשל — עברו למקום עם קליטה טובה יותר."
               : ""}

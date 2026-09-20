@@ -57,29 +57,50 @@ export function points(n: number, signed = false): string {
   return `${n < 0 ? "−" : "+"}${formatted}`;
 }
 
-/** "נשארו יומיים ו-4 שעות", "נשארו 12 דק'", or "הסתיים". */
-export function countdown(toMs: number | null, now = Date.now()): string {
-  if (toMs === null) return "";
+/**
+ * Hebrew counts two of a thing with a dedicated dual form, so "2 days" is
+ * יומיים and never "2 ימים". Everything that prints a duration goes through
+ * here, so the Studio header and a mission card can never disagree.
+ */
+function hebrewCount(n: number, one: string, two: string, many: string): string {
+  if (n === 1) return one;
+  if (n === 2) return two;
+  return `${n} ${many}`;
+}
+
+const MINUTES = (n: number) => hebrewCount(n, "דקה", "שתי דקות", "דק'");
+const HOURS = (n: number) => hebrewCount(n, "שעה", "שעתיים", "שע'");
+const DAYS = (n: number) => hebrewCount(n, "יום", "יומיים", "ימים");
+
+/**
+ * A bare duration with no framing word — "12 דק'", "3 שע' ו-20 דק'",
+ * "יומיים ו-4 שע'" — so each caller supplies its own ("נשארו …", "מתחיל
+ * בעוד …"). Returns null once the clock has run out.
+ */
+export function durationLeft(toMs: number, now = Date.now()): string | null {
   const diff = toMs - now;
-  if (diff <= 0) return "הסתיים";
+  if (diff <= 0) return null;
 
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return "נשארו פחות מדקה";
-  if (mins < 60) return `נשארו ${mins} דק'`;
+  if (mins < 1) return "פחות מדקה";
+  if (mins < 60) return MINUTES(mins);
 
   const hours = Math.floor(mins / 60);
   const restMins = mins % 60;
   if (hours < 24) {
-    const h = hours === 1 ? "שעה" : hours === 2 ? "שעתיים" : `${hours} שעות`;
-    return restMins ? `נשארו ${h} ו-${restMins} דק'` : `נשארו ${h}`;
+    return restMins ? `${HOURS(hours)} ו-${MINUTES(restMins)}` : HOURS(hours);
   }
 
   const days = Math.floor(hours / 24);
   const restHours = hours % 24;
-  const d = days === 1 ? "יום" : days === 2 ? "יומיים" : `${days} ימים`;
-  if (!restHours) return `נשארו ${d}`;
-  const h = restHours === 1 ? "שעה" : restHours === 2 ? "שעתיים" : `${restHours} שעות`;
-  return `נשארו ${d} ו-${h}`;
+  return restHours ? `${DAYS(days)} ו-${HOURS(restHours)}` : DAYS(days);
+}
+
+/** The framed form used in headers: "נשארו 12 דק'", or "הסתיים". */
+export function countdown(toMs: number | null, now = Date.now()): string {
+  if (toMs === null) return "";
+  const left = durationLeft(toMs, now);
+  return left === null ? "הסתיים" : `נשארו ${left}`;
 }
 
 export function distance(metres: number): string {
