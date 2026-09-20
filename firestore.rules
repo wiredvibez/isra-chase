@@ -1,0 +1,192 @@
+rules_version = '2';
+
+/**
+ * Isra Chase security model
+ * =========================
+ * Every mutation that can affect scoring, membership or moderation runs
+ * server-side through Next.js route handlers using the Admin SDK, which
+ * bypasses these rules entirely. Clients therefore get NO write access to
+ * game data at all — the only thing a client may write is its own user
+ * profile document.
+ *
+ * That leaves these rules to do one job well: scope reads so that a
+ * participant can subscribe to live data (feed, leaderboard, notifications)
+ * without being able to read anything they should not see — other teams'
+ * hidden submissions, unreleased missions, or the answer key.
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function chase(chaseId) {
+      return get(/databases/$(database)/documents/chases/$(chaseId)).data;
+    }
+
+    function isOrganizer(chaseId) {
+      let c = chase(chaseId);
+      return signedIn() &&
+        (c.ownerUid == uid() || (c.collaborators != null && uid() in c.collaborators));
+    }
+
+    function isParticipant(chaseId) {
+      return signedIn() && exists(
+        /databases/$(database)/documents/chases/$(chaseId)/participants/$(uid())
+      );
+    }
+
+    function myTeamId(chaseId) {
+      return get(
+        /databases/$(database)/documents/chases/$(chaseId)/participants/$(uid())
+      ).data.teamId;
+    }
+
+    function inChase(chaseId) {
+      return isOrganizer(chaseId) || isParticipant(chaseId);
+    }
+
+    /* ---------------------------------------------------------- users --- */
+
+    match /users/{userId} {
+      // Profiles are readable by any signed-in user so teammate names and
+      // avatars render; only the owner may write, and only their own fields.
+      allow read: if signedIn();
+      allow create, update: if signedIn() && uid() == userId;
+      allow delete: if false;
+    }
+
+    /* --------------------------------------------------------- chases --- */
+
+    match /chases/{chaseId} {
+      // The chase document carries no secrets: the join password lives in
+      // the private/ subcollection below, never here.
+      allow read: if signedIn();
+      allow write: if false;
+
+      // Organizer-only settings (password, notes).
+      match /private/{docId} {
+        allow read: if isOrganizer(chaseId);
+        allow write: if false;
+      }
+
+      /**
+       * Missions are ORGANIZER-ONLY here on purpose. Participants never read
+       * this collection directly, because these documents contain the text
+       * answer key and the GPS target coordinates, and because unreleased
+       * missions must stay invisible. Participants get an availability-
+       * resolved, secret-stripped mission list from
+       * GET /api/chases/{chaseId}/missions instead.
+       */
+      match /missions/{missionId} {
+        allow read: if isOrganizer(chaseId);
+        allow write: if false;
+      }
+
+      match /teams/{teamId} {
+        // Names, avatars and point totals are public within the chase — the
+        // leaderboard needs them. Passcodes are stripped before write.
+        allow read: if inChase(chaseId);
+        allow write: if false;
+      }
+
+      match /participants/{participantId} {
+        allow read: if inChase(chaseId);
+        allow write: if false;
+      }
+
+      match /submissions/{submissionId} {
+        // Visible if: the organizer is asking; it's your own team's; or it is
+        // an approved, unhidden submission on a mission shown in the feed.
+        allow read: if isOrganizer(chaseId) || (
+          isParticipant(chaseId) && (
+            resource.data.teamId == myTeamId(chaseId) || (
+              resource.data.status == 'approved' &&
+              resource.data.hidden == false &&
+              resource.data.feedVisible == true
+            )
+          )
+        );
+        allow write: if false;
+
+        match /likes/{likeId} {
+          allow read: if inChase(chaseId);
+          allow write: if false;
+        }
+      }
+
+      // Bonus / manual score history. A team may audit its own entries;
+      // organizers see everything.
+      match /adjustments/{adjustmentId} {
+        allow read: if isOrganizer(chaseId) || (
+          isParticipant(chaseId) && resource.data.teamId == myTeamId(chaseId)
+        );
+        allow write: if false;
+      }
+
+      // Scheduled broadcasts are organizer-only until they are sent; a sent
+      // broadcast is readable by its audience.
+      match /broadcasts/{broadcastId} {
+        allow read: if isOrganizer(chaseId) || (
+          isParticipant(chaseId) &&
+          resource.data.status == 'sent' && (
+            resource.data.teamIds == null ||
+            myTeamId(chaseId) in resource.data.teamIds
+          )
+        );
+        allow write: if false;
+      }
+
+      match /notifications/{notificationId} {
+        allow read: if isOrganizer(chaseId) || (
+          isParticipant(chaseId) && (
+            resource.data.teamId == null ||
+            resource.data.teamId == myTeamId(chaseId)
+          )
+        );
+        allow write: if false;
+      }
+
+      match /reports/{reportId} {
+        allow read: if isOrganizer(chaseId);
+        allow write: if false;
+      }
+    }
+
+    /* ------------------------------------------------------ join codes --- */
+
+    // Resolving a code to a chase id is a public lookup; joining still runs
+    // through the server, which enforces the password and capacity rules.
+    match /joinCodes/{code} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    /* -------------------------------------------- library and templates --- */
+
+    match /missionLibrary/{ownerUid}/items/{itemId} {
+      allow read: if signedIn() && uid() == ownerUid;
+      allow write: if false;
+    }
+
+    match /templates/{templateId} {
+      allow read: if signedIn() && resource.data.shareable == true;
+      allow write: if false;
+    }
+
+    match /workspaces/{workspaceId} {
+      allow read: if signedIn() && uid() in resource.data.members;
+      allow write: if false;
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

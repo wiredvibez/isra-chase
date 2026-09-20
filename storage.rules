@@ -1,0 +1,72 @@
+rules_version = '2';
+
+/**
+ * Storage layout
+ *   users/{uid}/avatar/...                  profile pictures
+ *   chases/{chaseId}/cover/...              organizer artwork
+ *   chases/{chaseId}/missions/{missionId}/  mission attachment images
+ *   chases/{chaseId}/teams/{teamId}/        team photos
+ *   chases/{chaseId}/submissions/{uid}/     participant media
+ *
+ * Uploads go direct from the browser (resumable, with progress), so unlike
+ * Firestore these rules do real work. Reads are open to signed-in users;
+ * the Firestore rules above are what actually gate whether a viewer ever
+ * learns a given submission's URL.
+ */
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isMedia() {
+      return request.resource.contentType.matches('image/.*')
+          || request.resource.contentType.matches('video/.*')
+          || request.resource.contentType.matches('audio/.*');
+    }
+
+    function underSize(mb) {
+      return request.resource.size < mb * 1024 * 1024;
+    }
+
+    match /users/{uid}/avatar/{file} {
+      allow read: if signedIn();
+      allow write: if isOwner(uid) && isImage() && underSize(8);
+    }
+
+    match /chases/{chaseId}/cover/{file} {
+      allow read: if signedIn();
+      allow write: if signedIn() && isImage() && underSize(8);
+    }
+
+    match /chases/{chaseId}/missions/{missionId}/{file} {
+      allow read: if signedIn();
+      allow write: if signedIn() && isImage() && underSize(8);
+    }
+
+    match /chases/{chaseId}/teams/{teamId}/{file} {
+      allow read: if signedIn();
+      allow write: if signedIn() && isImage() && underSize(8);
+    }
+
+    // Participants upload only under their own uid, which is what lets the
+    // server trust the path when it records the submission.
+    match /chases/{chaseId}/submissions/{uid}/{file} {
+      allow read: if signedIn();
+      allow write: if isOwner(uid) && isMedia() && underSize(200);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
