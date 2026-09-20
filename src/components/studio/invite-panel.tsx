@@ -124,7 +124,9 @@ export function InvitePanel({
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      {/* Stacked rather than side by side: in the console's narrow sidebar a
+          row left the download button too little width and clipped its label. */}
+      <div className="flex flex-col items-center gap-2 text-center">
         <div
           ref={qrRef}
           className="rounded-md bg-white p-2"
@@ -133,13 +135,19 @@ export function InvitePanel({
         >
           <QRCodeSVG value={link || chase.joinCode} size={104} level="M" />
         </div>
-        <div className="space-y-2 text-xs text-muted-foreground">
-          <p>השחקנים סורקים אותו, או מקלידים את הקוד באפליקציה.</p>
-          <Button type="button" size="sm" variant="outline" onClick={downloadQr}>
-            <Download className="size-4" aria-hidden />
-            הורדת QR
-          </Button>
-        </div>
+        <p className="text-xs text-muted-foreground">
+          השחקנים סורקים אותו, או מקלידים את הקוד באפליקציה.
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={downloadQr}
+          className="w-full whitespace-nowrap"
+        >
+          <Download className="size-4" aria-hidden />
+          הורדת QR
+        </Button>
       </div>
 
       {chase.hasPassword && (
