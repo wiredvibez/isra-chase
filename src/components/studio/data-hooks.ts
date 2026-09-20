@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { collection, limit, orderBy, query } from "firebase/firestore";
 import { getDb } from "@/lib/firebase/client";
 import { useLiveQuery } from "@/lib/hooks/use-firestore";
@@ -30,10 +31,19 @@ export function useTeams(chaseId: string) {
 }
 
 export function useParticipants(chaseId: string) {
-  return useLiveQuery<Participant>(
+  const live = useLiveQuery<Participant & { id: string }>(
     query(sub(chaseId, "participants"), orderBy("joinedAt", "asc")),
     [chaseId],
   );
+  // A participant document is keyed BY the uid, so the field is not stored
+  // inside it. Firestore surfaces the document id as `id`; republish it under
+  // the name the domain model uses, or every `participant.uid` read — React
+  // keys, and the remove/move endpoints' URLs — silently becomes undefined.
+  const data = React.useMemo(
+    () => live.data.map((p) => ({ ...p, uid: p.uid ?? p.id })),
+    [live.data],
+  );
+  return { ...live, data };
 }
 
 /** Newest first — the feed, the judging queue and the stats all want this. */

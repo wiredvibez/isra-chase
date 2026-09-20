@@ -73,10 +73,17 @@ export function MeView() {
         : null,
     [chaseId, teamId],
   );
-  const { data: members } = useLiveQuery<Participant>(membersQuery, [
-    chaseId,
-    teamId,
-  ]);
+  const { data: memberDocs } = useLiveQuery<Participant & { id: string }>(
+    membersQuery,
+    [chaseId, teamId],
+  );
+  // The participant document is keyed by uid, so that field is not stored in
+  // the document — Firestore hands it back as `id`. Restore it, otherwise the
+  // "this is you" check below never matches anyone.
+  const members = React.useMemo(
+    () => memberDocs.map((m) => ({ ...m, uid: m.uid ?? m.id })),
+    [memberDocs],
+  );
 
   const submissionsQuery = React.useMemo(
     () =>

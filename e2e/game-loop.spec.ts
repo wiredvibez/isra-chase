@@ -297,6 +297,24 @@ test("organizer builds a chase, players compete, organizer moderates", async ({
   expect(soloJoin.status, "a solo join must be accepted").toBe(200);
   expect(soloJoin.data.team.mode).toBe("solo");
 
+  /* ------------------------ organizer moves a participant between teams */
+  // Beyond Goosechase, which cannot do this at all. It is also the regression
+  // guard for participant ids: the document is keyed BY uid, so the field is
+  // absent from the document body and a client that reads `participant.uid`
+  // off a snapshot gets undefined — which silently POSTed to
+  // /participants/undefined before this was fixed.
+  const roster = await org.get<{ participants: Array<{ uid: string; displayName: string; teamId: string }> }>(
+    `/api/chases/${chaseId}/stats`,
+  );
+  expect(roster.status).toBe(200);
+
+  const moved = await org.post<{ participant: { teamId: string } }>(
+    `/api/chases/${chaseId}/participants/${solo.localId}/move`,
+    { teamId: teamB },
+  );
+  expect(moved.status, "moving a participant must accept a real uid").toBe(200);
+  expect(moved.data.participant.teamId).toBe(teamB);
+
   /* ------------------------------------------- players cannot moderate */
   const playerModerating = await aliceApi.post(`/api/chases/${chaseId}/adjustments`, {
     teamId: teamA,

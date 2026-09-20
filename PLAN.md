@@ -246,6 +246,13 @@ assumptions above. Recorded here so the behaviour is deliberate, not accidental.
   numbering**, because it rewards play rather than team naming. This is
   asserted in `leaderboard.test.ts`.
 
+- **We show players the GPS radius; Goosechase does not.** The mission card
+  reads "within 250 m". The target coordinates stay hidden either way — that
+  is the part that would spoil the mission — and the check-in failure message
+  already has to say "you're 340 m away, get within 250 m" for the feedback to
+  mean anything. Hiding the number in the list while printing it on failure
+  would be inconsistent, so we show it in both places.
+
 ### Known limitations
 
 - **The activity feed is not unlock-gated.** Goosechase hides feed items for

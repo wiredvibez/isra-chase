@@ -29,12 +29,9 @@ interface StatsResponse {
     submissions?: number;
     missionCompletionPct?: number;
   };
-  popularMissions?: Array<{
-    missionId?: string;
-    name?: string;
-    count?: number;
-  }>;
-  engagedTeams?: Array<{ teamId?: string; name?: string; count?: number }>;
+  // GET /api/chases/[id]/stats returns chart rows already shaped for display.
+  popularMissions?: BarRow[];
+  engagedTeams?: BarRow[];
 }
 
 function Tile({ label, value }: { label: string; value: string }) {
@@ -146,21 +143,12 @@ export function StatsTab() {
       remote?.tiles?.missionCompletionPct ?? derived.completionPct,
   };
 
-  const popularMissions: BarRow[] = remote?.popularMissions?.length
-    ? remote.popularMissions.map((row, i) => ({
-        id: row.missionId ?? String(i),
-        label: row.name ?? "Mission",
-        value: row.count ?? 0,
-      }))
-    : derived.popularMissions;
-
-  const engagedTeams: BarRow[] = remote?.engagedTeams?.length
-    ? remote.engagedTeams.map((row, i) => ({
-        id: row.teamId ?? String(i),
-        label: row.name ?? "Team",
-        value: row.count ?? 0,
-      }))
-    : derived.engagedTeams;
+  // Prefer the server's rows; fall back to deriving them from the live
+  // submission snapshot while the request is still in flight.
+  const popularMissions =
+    remote?.popularMissions?.length ? remote.popularMissions : derived.popularMissions;
+  const engagedTeams =
+    remote?.engagedTeams?.length ? remote.engagedTeams : derived.engagedTeams;
 
   const recent: Submission[] = submissions.slice(0, 50);
 
