@@ -1,18 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito, Baloo_2 } from "next/font/google";
+import { Rubik, Secular_One } from "next/font/google";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth/auth-provider";
 import "./globals.css";
 
-const sans = Nunito({
+// Rubik and Secular One both ship real Hebrew glyphs and a matching Latin set,
+// so mixed strings like "TLV24X" inside a Hebrew sentence stay on one typeface.
+const sans = Rubik({
   variable: "--font-app-sans",
-  subsets: ["latin"],
+  subsets: ["hebrew", "latin"],
   display: "swap",
 });
 
-const display = Baloo_2({
+const display = Secular_One({
   variable: "--font-app-display",
-  subsets: ["latin"],
+  subsets: ["hebrew", "latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -26,11 +29,11 @@ export const metadata: Metadata = {
         : "http://localhost:3000"),
   ),
   title: {
-    default: "Isra Chase — scavenger hunts that actually get people moving",
+    default: "Isra Chase — ציד מטמון שמזיז אנשים באמת",
     template: "%s · Isra Chase",
   },
   description:
-    "Build photo, video, GPS and quiz missions, run live leaderboards, and moderate every submission from one place.",
+    "בונים משימות צילום, טקסט ומיקום, מריצים טבלת מובילים חיה, ושולטים בכל הגשה ממקום אחד.",
   applicationName: "Isra Chase",
   appleWebApp: { capable: true, title: "Isra Chase", statusBarStyle: "default" },
   manifest: "/manifest.webmanifest",
@@ -48,13 +51,15 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="he"
+      dir="rtl"
       className={`${sans.variable} ${display.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <AuthProvider>{children}</AuthProvider>
         <Toaster
           position="top-center"
+          dir="rtl"
           toastOptions={{
             style: {
               background: "var(--surface)",

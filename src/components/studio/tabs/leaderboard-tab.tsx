@@ -121,23 +121,23 @@ export function LeaderboardTab() {
               Team leaderboard, ranked by total points
             </caption>
             <thead>
-              <tr className="border-b border-border text-left">
+              <tr className="border-b border-border text-start">
                 <th scope="col" className="px-4 py-3 font-semibold">
                   Rank
                 </th>
                 <th scope="col" className="px-4 py-3 font-semibold">
                   Team
                 </th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                <th scope="col" className="px-4 py-3 text-end font-semibold">
                   Base
                 </th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                <th scope="col" className="px-4 py-3 text-end font-semibold">
                   Bonus
                 </th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                <th scope="col" className="px-4 py-3 text-end font-semibold">
                   Total
                 </th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                <th scope="col" className="px-4 py-3 text-end font-semibold">
                   Submissions
                 </th>
                 <th scope="col" className="px-4 py-3 font-semibold">
@@ -154,27 +154,27 @@ export function LeaderboardTab() {
                   <td className="px-4 py-3 font-bold tabular-nums">
                     {ordinal(rank)}
                     {tied && (
-                      <Badge tone="neutral" className="ml-1.5">
+                      <Badge tone="neutral" className="ms-1.5">
                         tied
                       </Badge>
                     )}
                   </td>
-                  <th scope="row" className="px-4 py-3 text-left font-semibold">
+                  <th scope="row" className="px-4 py-3 text-start font-semibold">
                     <span className="flex items-center gap-2">
                       <Avatar name={team.name} src={team.photoUrl} size="sm" />
                       {team.name}
                     </span>
                   </th>
-                  <td className="px-4 py-3 text-right tabular-nums">
+                  <td className="px-4 py-3 text-end tabular-nums">
                     {formatPoints(team.basePoints ?? 0)}
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums">
+                  <td className="px-4 py-3 text-end tabular-nums">
                     {formatPoints(team.bonusPoints ?? 0, true)}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold tabular-nums">
+                  <td className="px-4 py-3 text-end font-bold tabular-nums">
                     {formatPoints(team.points ?? 0)}
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums">
+                  <td className="px-4 py-3 text-end tabular-nums">
                     {team.submissionCount ?? 0}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
@@ -182,7 +182,7 @@ export function LeaderboardTab() {
                       ? shortDateTime(team.lastSubmissionAt)
                       : "—"}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-end">
                     <Menu
                       label={`Actions for ${team.name}`}
                       items={[

@@ -59,7 +59,7 @@ export function JoinCodeForm({ initialCode = "" }: { initialCode?: string }) {
               disabled={!code.trim()}
             >
               Continue
-              <ArrowRight className="size-5" aria-hidden />
+              <ArrowRight className="size-5 flip-rtl" aria-hidden />
             </Button>
           </form>
         </CardContent>

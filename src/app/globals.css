@@ -198,6 +198,12 @@ html {
   outline-offset: 2px;
 }
 
+/* Arrows and chevrons that mean "back" or "next" must point the other way in
+   an RTL document. Icons that are symmetric or bidirectional are left alone. */
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
+
 /* Utility: hide scrollbars on horizontal chip rails */
 .no-scrollbar {
   scrollbar-width: none;

@@ -89,7 +89,7 @@ export function Menu({
           onKeyDown={onListKeyDown}
           className={cn(
             "absolute z-40 mt-1 min-w-52 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-pop",
-            align === "end" ? "right-0" : "left-0",
+            align === "end" ? "end-0" : "start-0",
           )}
         >
           {items.map((item) => (
@@ -103,7 +103,7 @@ export function Menu({
                 item.onSelect();
               }}
               className={cn(
-                "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm font-medium hover:bg-surface-muted disabled:opacity-50",
+                "flex w-full items-center gap-2.5 px-3 py-2 text-start text-sm font-medium hover:bg-surface-muted disabled:opacity-50",
                 item.tone === "danger" ? "text-danger" : "text-foreground",
               )}
             >

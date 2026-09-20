@@ -180,7 +180,7 @@ export function LeaderboardMock({ className }: { className?: string }) {
             </span>
             <Avatar name={row.team} size="sm" />
             <span className="truncate text-sm font-semibold">{row.team}</span>
-            <span className="ml-auto text-sm font-bold tabular-nums">
+            <span className="ms-auto text-sm font-bold tabular-nums">
               {row.points}
             </span>
           </li>
@@ -225,7 +225,7 @@ export function ActivityFeedMock({ className }: { className?: string }) {
               <span className="font-semibold">{row.team}</span> {row.text}
               <span className="block text-muted-foreground">{row.when} ago</span>
             </p>
-            <span className="ml-auto shrink-0 rounded-full bg-gold-400/25 px-2 py-0.5 text-xs font-bold tabular-nums">
+            <span className="ms-auto shrink-0 rounded-full bg-gold-400/25 px-2 py-0.5 text-xs font-bold tabular-nums">
               {row.points}
             </span>
           </li>
@@ -264,15 +264,15 @@ export function ReviewQueueMock({ className }: { className?: string }) {
       <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
         <span className="inline-flex items-center gap-1.5 rounded-sm bg-success px-2.5 py-1.5 text-xs font-semibold text-white">
           <Check className="size-3.5" /> Approve
-          <kbd className="ml-1 rounded-xs bg-black/20 px-1 font-mono text-[10px]">A</kbd>
+          <kbd className="ms-1 rounded-xs bg-black/20 px-1 font-mono text-[10px]">A</kbd>
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-strong px-2.5 py-1.5 text-xs font-semibold">
           Reject
-          <kbd className="ml-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">R</kbd>
+          <kbd className="ms-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">R</kbd>
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-strong px-2.5 py-1.5 text-xs font-semibold">
           <Undo2 className="size-3.5" /> Ask again
-          <kbd className="ml-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">S</kbd>
+          <kbd className="ms-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">S</kbd>
         </span>
       </div>
     </MockFrame>

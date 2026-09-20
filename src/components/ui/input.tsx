@@ -35,11 +35,12 @@ export const Select = React.forwardRef<
   return (
     <select
       ref={ref}
-      className={cn(fieldBase, "h-10 pr-8 appearance-none bg-no-repeat", className)}
+      className={cn(fieldBase, "h-10 ps-8 pe-3 appearance-none bg-no-repeat", className)}
       style={{
         backgroundImage:
           "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235a6672' stroke-width='2.5' stroke-linecap='round'><path d='m6 9 6 6 6-6'/></svg>\")",
-        backgroundPosition: "right 0.6rem center",
+        // The document is RTL, so the chevron sits on the left edge.
+        backgroundPosition: "left 0.6rem center",
         ...props.style,
       }}
       {...props}

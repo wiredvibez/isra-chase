@@ -50,7 +50,7 @@ export function SubmissionSuccess({
       ) : (
         <p className="font-display text-4xl font-bold text-success tabular-nums">
           +{fmtPoints(earned)}
-          <span className="ml-1 text-base font-bold">points</span>
+          <span className="ms-1 text-base font-bold">points</span>
         </p>
       )}
 

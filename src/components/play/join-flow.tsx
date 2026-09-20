@@ -99,7 +99,7 @@ function GuestGate({ code }: { code: string }) {
               loading={busy}
             >
               Continue as guest
-              <ArrowRight className="size-5" aria-hidden />
+              <ArrowRight className="size-5 flip-rtl" aria-hidden />
             </Button>
           </form>
         </CardContent>
@@ -141,7 +141,7 @@ function TeamRow({
         disabled={full}
         aria-pressed={selected}
         className={cn(
-          "flex w-full min-h-14 items-center gap-3 rounded-lg border bg-surface p-3 text-left transition-colors",
+          "flex w-full min-h-14 items-center gap-3 rounded-lg border bg-surface p-3 text-start transition-colors",
           selected ? "border-primary ring-2 ring-primary" : "border-border",
           full && "cursor-not-allowed opacity-60",
         )}
@@ -401,9 +401,9 @@ export function JoinFlow({ code }: { code: string }) {
         <button
           type="button"
           onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
-          className="mb-2 -ml-2 inline-flex h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+          className="mb-2 -ms-2 inline-flex h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="size-[1.125rem]" aria-hidden />
+          <ArrowLeft className="size-[1.125rem] flip-rtl" aria-hidden />
           Back
         </button>
       )}
@@ -508,7 +508,7 @@ export function JoinFlow({ code }: { code: string }) {
                     onClick={() => setChosenMode(option.id)}
                     aria-pressed={active}
                     className={cn(
-                      "flex min-h-14 items-start gap-3 rounded-lg border bg-surface p-4 text-left",
+                      "flex min-h-14 items-start gap-3 rounded-lg border bg-surface p-4 text-start",
                       active ? "border-primary ring-2 ring-primary" : "border-border",
                     )}
                   >
@@ -725,7 +725,7 @@ export function JoinFlow({ code }: { code: string }) {
           }}
         >
           {isLast ? "Join the chase" : "Continue"}
-          {!isLast && <ArrowRight className="size-5" aria-hidden />}
+          {!isLast && <ArrowRight className="size-5 flip-rtl" aria-hidden />}
         </Button>
       </div>
     </main>

@@ -130,7 +130,7 @@ export function HeroArt({ className }: { className?: string }) {
         <MapDrawing />
       </div>
 
-      <FloatingChip className="-top-4 right-2 sm:right-6">
+      <FloatingChip className="-top-4 end-2 sm:end-6">
         <span className="flex size-7 items-center justify-center rounded-full bg-gold-400/20 text-gold-500">
           <Trophy className="size-4" aria-hidden />
         </span>
@@ -140,7 +140,7 @@ export function HeroArt({ className }: { className?: string }) {
         </span>
       </FloatingChip>
 
-      <FloatingChip className="-bottom-5 left-2 sm:left-6">
+      <FloatingChip className="-bottom-5 start-2 sm:start-6">
         <span className="flex size-7 items-center justify-center rounded-full bg-brand-400/20 text-primary">
           <Users className="size-4" aria-hidden />
         </span>

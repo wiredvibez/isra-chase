@@ -21,7 +21,7 @@ export function SiteHeader() {
           <span className="sr-only sm:hidden">Isra Chase</span>
         </Link>
 
-        <nav aria-label="Page sections" className="ml-4 hidden lg:block">
+        <nav aria-label="Page sections" className="ms-4 hidden lg:block">
           <ul className="flex items-center gap-1">
             {sections.map((item) => (
               <li key={item.href}>
@@ -36,7 +36,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <div className="ms-auto flex items-center gap-1.5 sm:gap-2">
           <Link
             href="/signin"
             className="inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold hover:bg-surface-muted"

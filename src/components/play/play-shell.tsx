@@ -118,7 +118,7 @@ function PlayHeader() {
         >
           <Bell className="size-5" />
           {unread > 0 && (
-            <span className="absolute right-1 top-1 min-w-[1.125rem] rounded-full bg-accent px-1 text-[10px] font-bold leading-[1.125rem] text-accent-foreground">
+            <span className="absolute end-1 top-1 min-w-[1.125rem] rounded-full bg-accent px-1 text-[10px] font-bold leading-[1.125rem] text-accent-foreground">
               {unread > 9 ? "9+" : unread}
             </span>
           )}

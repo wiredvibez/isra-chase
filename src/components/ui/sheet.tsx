@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Bottom sheet on phones, right-side drawer from `sm` up.
+ * Bottom sheet on phones, end-side drawer from `sm` up.
  * Native <dialog> again, so Esc + focus trap are free.
  */
 export function Sheet({
@@ -59,9 +59,9 @@ export function Sheet({
         "bg-surface text-foreground shadow-pop backdrop:bg-black/50",
         "open:flex open:flex-col",
         // phone: docked to the bottom, full width
-        "mt-auto mb-0 ml-0 mr-0 max-h-[85dvh] w-full max-w-none rounded-t-xl border-t border-border",
+        "mt-auto mb-0 ms-0 me-0 max-h-[85dvh] w-full max-w-none rounded-t-xl border-t border-border",
         // tablet+: right drawer, full height
-        "sm:mt-0 sm:ml-auto sm:h-dvh sm:max-h-none sm:w-[26rem] sm:rounded-none sm:rounded-l-xl sm:border-l sm:border-t-0",
+        "sm:mt-0 sm:ms-auto sm:h-dvh sm:max-h-none sm:w-[26rem] sm:rounded-none sm:rounded-s-xl sm:border-s sm:border-t-0",
       )}
     >
       <header className="flex items-center gap-3 border-b border-border p-4">

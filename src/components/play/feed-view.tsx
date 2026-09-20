@@ -63,7 +63,7 @@ function FeedItem({
             <p className="truncate text-sm font-bold">
               {submission.teamName}
               {mine && (
-                <span className="ml-1.5 text-xs font-semibold text-primary">
+                <span className="ms-1.5 text-xs font-semibold text-primary">
                   you
                 </span>
               )}
@@ -135,7 +135,7 @@ function FeedItem({
               type="button"
               onClick={() => onReport(submission.id)}
               aria-label="Report this submission"
-              className="ml-auto flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-muted hover:text-danger"
+              className="ms-auto flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-muted hover:text-danger"
             >
               <Flag className="size-[1.125rem]" aria-hidden />
             </button>

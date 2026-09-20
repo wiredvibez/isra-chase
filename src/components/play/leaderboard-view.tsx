@@ -141,7 +141,7 @@ export function LeaderboardView() {
                 {mine.team.name}
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <p className="font-display text-xl font-bold tabular-nums">
                 {fmtPoints(mine.team.points)}
               </p>

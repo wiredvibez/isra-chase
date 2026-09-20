@@ -69,7 +69,7 @@ export function DownloadPanel({
           <h2 className="font-display text-base font-bold">Download media</h2>
           <Select
             aria-label="Group downloads by"
-            className="ml-auto max-w-44"
+            className="ms-auto max-w-44"
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value as "team" | "mission")}
           >

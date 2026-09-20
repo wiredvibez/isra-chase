@@ -72,7 +72,7 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
             href="/studio"
             className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="size-3.5" aria-hidden />
+            <ArrowLeft className="size-3.5 flip-rtl" aria-hidden />
             All chases
           </Link>
           <div className="mt-1 flex flex-wrap items-center gap-2">

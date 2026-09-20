@@ -106,7 +106,7 @@ export function ReviewQueue({
           <p aria-live="polite" className="text-sm font-semibold">
             {safeIndex + 1} of {submissions.length}
           </p>
-          <p className="ml-auto hidden text-xs text-muted-foreground sm:block">
+          <p className="ms-auto hidden text-xs text-muted-foreground sm:block">
             <kbd className="rounded border border-border px-1">A</kbd> approve ·{" "}
             <kbd className="rounded border border-border px-1">R</kbd> reject ·{" "}
             <kbd className="rounded border border-border px-1">←</kbd>
@@ -154,7 +154,7 @@ export function ReviewQueue({
             <X className="size-5" aria-hidden />
             Reject
           </Button>
-          <div className="ml-auto flex gap-1">
+          <div className="ms-auto flex gap-1">
             <Button
               variant="outline"
               size="icon"
@@ -162,7 +162,7 @@ export function ReviewQueue({
               disabled={safeIndex === 0}
               onClick={() => setIndex((i) => step(i, -1, last))}
             >
-              <ChevronLeft className="size-4" aria-hidden />
+              <ChevronLeft className="size-4 flip-rtl" aria-hidden />
             </Button>
             <Button
               variant="outline"
@@ -171,7 +171,7 @@ export function ReviewQueue({
               disabled={safeIndex >= last}
               onClick={() => setIndex((i) => step(i, 1, last))}
             >
-              <ChevronRight className="size-4" aria-hidden />
+              <ChevronRight className="size-4 flip-rtl" aria-hidden />
             </Button>
           </div>
         </div>

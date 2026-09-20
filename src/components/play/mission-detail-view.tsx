@@ -134,7 +134,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
           aria-label="Back to missions"
           className="flex size-11 items-center justify-center rounded-full text-foreground hover:bg-surface-muted"
         >
-          <ArrowLeft className="size-5" />
+          <ArrowLeft className="size-5 flip-rtl" />
         </Link>
         <p className="min-w-0 flex-1 truncate font-display text-base font-bold">
           {mission.name}

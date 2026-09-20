@@ -69,7 +69,7 @@ function NotificationRow({
         <p className="mt-1 text-xs text-muted-foreground">
           {timeAgo(notification.createdAt)}
           {unread && (
-            <span className="ml-2 font-bold text-primary">New</span>
+            <span className="ms-2 font-bold text-primary">New</span>
           )}
         </p>
       </div>

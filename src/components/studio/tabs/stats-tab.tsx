@@ -198,11 +198,11 @@ export function StatsTab() {
         <table className="w-full min-w-[40rem] text-sm">
           <caption className="sr-only">Participants and their activity</caption>
           <thead>
-            <tr className="border-b border-border text-left">
+            <tr className="border-b border-border text-start">
               <th scope="col" className="px-4 py-3 font-semibold">Name</th>
               <th scope="col" className="px-4 py-3 font-semibold">Team</th>
               <th scope="col" className="px-4 py-3 font-semibold">Email</th>
-              <th scope="col" className="px-4 py-3 text-right font-semibold">
+              <th scope="col" className="px-4 py-3 text-end font-semibold">
                 Submissions
               </th>
               <th scope="col" className="px-4 py-3 font-semibold">Joined</th>
@@ -211,7 +211,7 @@ export function StatsTab() {
           <tbody>
             {participants.map((person) => (
               <tr key={person.uid} className="border-b border-border last:border-0">
-                <th scope="row" className="px-4 py-2 text-left font-semibold">
+                <th scope="row" className="px-4 py-2 text-start font-semibold">
                   {person.displayName}
                 </th>
                 <td className="px-4 py-2">
@@ -220,7 +220,7 @@ export function StatsTab() {
                 <td className="px-4 py-2 text-muted-foreground">
                   {person.email ?? "—"}
                 </td>
-                <td className="px-4 py-2 text-right tabular-nums">
+                <td className="px-4 py-2 text-end tabular-nums">
                   {person.submissionCount ?? 0}
                 </td>
                 <td className="px-4 py-2 text-muted-foreground">
@@ -256,12 +256,12 @@ export function StatsTab() {
           <table className="w-full min-w-[44rem] text-sm">
             <caption className="sr-only">Most recent submissions</caption>
             <thead>
-              <tr className="border-b border-border text-left">
+              <tr className="border-b border-border text-start">
                 <th scope="col" className="px-4 py-3 font-semibold">Mission</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Team</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Player</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Status</th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
+                <th scope="col" className="px-4 py-3 text-end font-semibold">
                   Points
                 </th>
                 <th scope="col" className="px-4 py-3 font-semibold">When</th>
@@ -270,13 +270,13 @@ export function StatsTab() {
             <tbody>
               {recent.map((submission) => (
                 <tr key={submission.id} className="border-b border-border last:border-0">
-                  <th scope="row" className="px-4 py-2 text-left font-semibold">
+                  <th scope="row" className="px-4 py-2 text-start font-semibold">
                     {submission.missionName}
                   </th>
                   <td className="px-4 py-2">{submission.teamName}</td>
                   <td className="px-4 py-2">{submission.participantName}</td>
                   <td className="px-4 py-2 capitalize">{submission.status}</td>
-                  <td className="px-4 py-2 text-right tabular-nums">
+                  <td className="px-4 py-2 text-end tabular-nums">
                     {submission.points + (submission.bonusPoints ?? 0)}
                   </td>
                   <td className="px-4 py-2 text-muted-foreground">

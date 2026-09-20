@@ -206,7 +206,7 @@ export function CameraComposer({
             onClick={() => replacePicked(null)}
             disabled={sending}
             aria-label="Remove this file and pick another"
-            className="absolute right-2 top-2 flex size-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm disabled:opacity-50"
+            className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm disabled:opacity-50"
           >
             <X className="size-5" />
           </button>

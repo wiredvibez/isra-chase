@@ -91,7 +91,7 @@ export function LocationPicker({
             <li key={`${hit.lat},${hit.lon}`}>
               <button
                 type="button"
-                className="w-full px-3 py-2 text-left text-sm hover:bg-surface-muted"
+                className="w-full px-3 py-2 text-start text-sm hover:bg-surface-muted"
                 onClick={() => {
                   onChange({
                     label: hit.display_name,

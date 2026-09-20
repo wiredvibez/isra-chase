@@ -229,7 +229,7 @@ export function SubmissionsTab() {
             <Button
               size="sm"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto"
               onClick={() =>
                 setSelected((current) => {
                   const next = new Set(current);

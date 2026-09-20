@@ -222,7 +222,7 @@ export function MeView() {
                   <p className="truncate text-sm font-bold">
                     {member.displayName}
                     {member.uid === uid && (
-                      <span className="ml-1.5 text-xs font-semibold text-primary">
+                      <span className="ms-1.5 text-xs font-semibold text-primary">
                         you
                       </span>
                     )}
