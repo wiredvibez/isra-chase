@@ -12,7 +12,7 @@ import { Select } from "@/components/ui/input";
 import { SkeletonList } from "@/components/ui/skeleton";
 import { apiPatch } from "@/lib/api-client";
 import type { Chase, Team } from "@/lib/domain/types";
-import { ordinal, rankTeams } from "@/lib/domain/leaderboard";
+import { rankTeams } from "@/lib/domain/leaderboard";
 import { points as formatPoints, shortDateTime } from "@/lib/format";
 import { useLoadedChase } from "../chase-context";
 import { useAdjustments, useTeams } from "../data-hooks";
@@ -26,10 +26,11 @@ import { TabHeader } from "../section";
 import { toastError } from "../studio-utils";
 
 const VISIBILITY_HINT: Record<Chase["leaderboardVisibility"], string> = {
-  visible: "Players can see the full leaderboard right now.",
+  visible: "השחקנים רואים עכשיו את טבלת המובילים המלאה.",
   hidden_until_reveal:
-    "Players only see their own total until you press Reveal.",
-  hidden_until_end: "The leaderboard unlocks for players when the chase ends.",
+    "השחקנים רואים רק את סך הנקודות של עצמם, עד שתחשפו את הטבלה.",
+  hidden_until_end:
+    "טבלת המובילים תיפתח לשחקנים כשהמרדף יסתיים. עד אז כל קבוצה רואה רק את הסך שלה.",
 };
 
 export function LeaderboardTab() {
@@ -49,7 +50,7 @@ export function LeaderboardTab() {
     try {
       await apiPatch(`/api/chases/${chaseId}`, patch);
     } catch (error) {
-      toastError(error, "Couldn't update the leaderboard settings.");
+      toastError(error, "לא הצלחנו לעדכן את הגדרות הטבלה.");
     } finally {
       setBusy(false);
     }
@@ -58,8 +59,8 @@ export function LeaderboardTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Leaderboard"
-        description="Olympic-style ranking: teams tied on points and timing share a place."
+        title="טבלת המובילים"
+        description="דירוג בשיטה האולימפית: קבוצות עם אותן נקודות ואותו תזמון חולקות מקום."
       />
 
       <Card className="flex flex-wrap items-end gap-3 p-4">
@@ -68,7 +69,7 @@ export function LeaderboardTab() {
             htmlFor="leaderboard-visibility"
             className="text-sm font-semibold"
           >
-            Visibility
+            מי רואה את הטבלה
           </label>
           <Select
             id="leaderboard-visibility"
@@ -81,9 +82,9 @@ export function LeaderboardTab() {
               })
             }
           >
-            <option value="visible">Visible to players</option>
-            <option value="hidden_until_reveal">Hidden until I reveal it</option>
-            <option value="hidden_until_end">Hidden until the chase ends</option>
+            <option value="visible">גלויה לשחקנים</option>
+            <option value="hidden_until_reveal">מוסתרת עד שאחשוף אותה</option>
+            <option value="hidden_until_end">מוסתרת עד שהמרדף יסתיים</option>
           </Select>
           <p className="mt-1 text-xs text-muted-foreground">
             {VISIBILITY_HINT[chase.leaderboardVisibility]}
@@ -95,11 +96,11 @@ export function LeaderboardTab() {
             disabled={chase.leaderboardRevealed}
             onClick={() => {
               void patchChase({ leaderboardRevealed: true });
-              toast.success("Leaderboard revealed.");
+              toast.success("טבלת המובילים נחשפה.");
             }}
           >
             <Eye className="size-4" aria-hidden />
-            {chase.leaderboardRevealed ? "Revealed" : "Reveal now"}
+            {chase.leaderboardRevealed ? "נחשפה" : "לחשוף עכשיו"}
           </Button>
         )}
       </Card>
@@ -109,8 +110,8 @@ export function LeaderboardTab() {
       {!loading && !ranked.length && (
         <EmptyState
           icon={<Trophy className="size-6" aria-hidden />}
-          title="No teams on the board yet"
-          description="Once players join and start submitting, they will rank up here in real time."
+          title="עוד אין קבוצות בטבלה"
+          description="ברגע שהשחקנים יצטרפו ויתחילו לשלוח הגשות, הקבוצות יטפסו לכאן בזמן אמת."
         />
       )}
 
@@ -118,33 +119,33 @@ export function LeaderboardTab() {
         <Card className="overflow-x-auto">
           <table className="w-full min-w-[46rem] text-sm">
             <caption className="sr-only">
-              Team leaderboard, ranked by total points
+              טבלת המובילים, מדורגת לפי סך הנקודות
             </caption>
             <thead>
               <tr className="border-b border-border text-start">
                 <th scope="col" className="px-4 py-3 font-semibold">
-                  Rank
+                  מקום
                 </th>
                 <th scope="col" className="px-4 py-3 font-semibold">
-                  Team
+                  קבוצה
                 </th>
                 <th scope="col" className="px-4 py-3 text-end font-semibold">
-                  Base
+                  בסיס
                 </th>
                 <th scope="col" className="px-4 py-3 text-end font-semibold">
-                  Bonus
+                  בונוס
                 </th>
                 <th scope="col" className="px-4 py-3 text-end font-semibold">
-                  Total
+                  {'סה"כ'}
                 </th>
                 <th scope="col" className="px-4 py-3 text-end font-semibold">
-                  Submissions
+                  הגשות
                 </th>
                 <th scope="col" className="px-4 py-3 font-semibold">
-                  Last submission
+                  הגשה אחרונה
                 </th>
                 <th scope="col" className="px-4 py-3">
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">פעולות</span>
                 </th>
               </tr>
             </thead>
@@ -152,10 +153,10 @@ export function LeaderboardTab() {
               {ranked.map(({ team, rank, tied }) => (
                 <tr key={team.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 font-bold tabular-nums">
-                    {ordinal(rank)}
+                    {rank}
                     {tied && (
                       <Badge tone="neutral" className="ms-1.5">
-                        tied
+                        תיקו
                       </Badge>
                     )}
                   </td>
@@ -184,23 +185,23 @@ export function LeaderboardTab() {
                   </td>
                   <td className="px-4 py-3 text-end">
                     <Menu
-                      label={`Actions for ${team.name}`}
+                      label={`פעולות על הקבוצה ${team.name}`}
                       items={[
                         {
                           id: "adjust",
-                          label: "Adjust score",
+                          label: "לעדכן ניקוד",
                           icon: <Scale className="size-4" aria-hidden />,
                           onSelect: () => setAdjustTeam(team),
                         },
                         {
                           id: "history",
-                          label: "Bonus history",
+                          label: "היסטוריית בונוסים",
                           icon: <History className="size-4" aria-hidden />,
                           onSelect: () => setHistoryTeam(team),
                         },
                         {
                           id: "broadcast",
-                          label: "Send a broadcast",
+                          label: "לשלוח הודעה",
                           icon: <Megaphone className="size-4" aria-hidden />,
                           onSelect: () => setMessageTeam(team),
                         },

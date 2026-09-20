@@ -151,7 +151,7 @@ export function SubmissionsTab() {
           >
             <option value="mission">קיבוץ לפי משימה</option>
             <option value="team_points">קיבוץ לפי קבוצה — לפי נקודות</option>
-            <option value="team_alpha">קיבוץ לפי קבוצה — לפי א"ב</option>
+            <option value="team_alpha">{'קיבוץ לפי קבוצה — לפי א"ב'}</option>
           </Select>
 
           <label htmlFor="status-filter" className="sr-only">

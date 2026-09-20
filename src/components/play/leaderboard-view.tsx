@@ -10,9 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ordinal, rankTeams } from "@/lib/domain/leaderboard";
+import { rankTeams } from "@/lib/domain/leaderboard";
 import { points as fmtPoints } from "@/lib/format";
-import { cn, plural } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Team } from "@/lib/domain/types";
 import { usePlay } from "./play-provider";
 
@@ -50,12 +50,12 @@ function hiddenExplanation(
   revealed: boolean,
 ): string {
   if (visibility === "hidden_until_end") {
-    return "The full ranking is under wraps until the chase ends. Your own total is right here in the meantime.";
+    return "הדירוג המלא נחשף רק כשהמרדף נגמר. בינתיים הסכום שלכם כאן למעלה.";
   }
   if (visibility === "hidden_until_reveal" && !revealed) {
-    return "The organizer is keeping the ranking hidden until they reveal it. Your own total is right here in the meantime.";
+    return "הטבלה מוסתרת עד שהמארגן יחשוף אותה. בינתיים הסכום שלכם כאן למעלה.";
   }
-  return "The ranking isn't visible right now.";
+  return "הדירוג לא גלוי כרגע.";
 }
 
 export function LeaderboardView() {
@@ -94,20 +94,22 @@ export function LeaderboardView() {
         <Card>
           <CardContent className="space-y-2 p-5 text-center">
             <p className="text-sm font-semibold text-muted-foreground">
-              {team?.name ?? "Your team"}
+              {team?.name ?? "הקבוצה שלכם"}
             </p>
             <p className="font-display text-5xl font-bold tabular-nums text-primary">
               {fmtPoints(team?.points ?? 0)}
             </p>
             <p className="text-sm text-muted-foreground">
-              {plural(team?.points ?? 0, "point")} so far
+              {(team?.points ?? 0) === 0
+                ? "עוד לא נפתחתם. יאללה"
+                : "נקודות עד עכשיו"}
             </p>
           </CardContent>
         </Card>
 
         <EmptyState
           icon={<EyeOff className="size-5" />}
-          title="The leaderboard is hidden"
+          title="הטבלה מוסתרת"
           description={hiddenExplanation(
             chase.leaderboardVisibility,
             chase.leaderboardRevealed,
@@ -121,8 +123,8 @@ export function LeaderboardView() {
     return (
       <EmptyState
         icon={<Trophy className="size-5" />}
-        title="No teams yet"
-        description="The board fills up as teams join and start scoring."
+        title="עדיין אין קבוצות"
+        description="הטבלה תתמלא ברגע שקבוצות יצטרפו ויתחילו לצבור נקודות."
       />
     );
   }
@@ -135,7 +137,7 @@ export function LeaderboardView() {
             <RankMark rank={mine.rank} />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Your team
+                הקבוצה שלכם
               </p>
               <p className="truncate font-display text-base font-bold">
                 {mine.team.name}
@@ -146,8 +148,8 @@ export function LeaderboardView() {
                 {fmtPoints(mine.team.points)}
               </p>
               <p className="text-xs text-muted-foreground">
-                {mine.tied ? "tied " : ""}
-                {ordinal(mine.rank)}
+                מקום {mine.rank}
+                {mine.tied ? " · שוויון" : ""}
               </p>
             </div>
           </CardContent>
@@ -177,12 +179,13 @@ export function LeaderboardView() {
                   {row.team.name}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {row.team.submissionCount}{" "}
-                  {plural(row.team.submissionCount, "submission")}
-                  {row.tied && " · tied"}
+                  {row.team.submissionCount === 1
+                    ? "הגשה אחת"
+                    : `${row.team.submissionCount} הגשות`}
+                  {row.tied && " · שוויון"}
                 </p>
               </div>
-              {isMine && <Badge tone="brand">You</Badge>}
+              {isMine && <Badge tone="brand">אתם</Badge>}
               <p className="font-display text-lg font-bold tabular-nums">
                 {fmtPoints(row.team.points)}
               </p>

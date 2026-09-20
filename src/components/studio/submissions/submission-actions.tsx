@@ -49,7 +49,7 @@ export function useSubmissionActions(chaseId: string) {
           { action, note: note ?? null },
         );
       } catch (error) {
-        toastError(error, "Couldn't update that submission.");
+        toastError(error, "לא הצלחנו לעדכן את ההגשה.");
         throw error;
       }
     },
@@ -60,7 +60,7 @@ export function useSubmissionActions(chaseId: string) {
     if (!bonusFor) return;
     const value = Math.round(Number(bonusPoints));
     if (!Number.isFinite(value) || value === 0) {
-      toast.error("Bonus points can't be zero.");
+      toast.error("נקודות בונוס לא יכולות להיות 0.");
       return;
     }
     setBusy(true);
@@ -69,11 +69,15 @@ export function useSubmissionActions(chaseId: string) {
         points: value,
         reason: bonusReason.trim() || null,
       });
-      toast.success(`${value > 0 ? "Awarded" : "Deducted"} ${Math.abs(value)} points.`);
+      toast.success(
+        value > 0
+          ? `נוספו ${Math.abs(value)} נקודות בונוס.`
+          : `ירדו ${Math.abs(value)} נקודות.`,
+      );
       setBonusFor(null);
       setBonusReason("");
     } catch (error) {
-      toastError(error, "Couldn't apply those bonus points.");
+      toastError(error, "לא הצלחנו להחיל את נקודות הבונוס.");
     } finally {
       setBusy(false);
     }
@@ -86,11 +90,11 @@ export function useSubmissionActions(chaseId: string) {
       await apiDelete(`/api/chases/${chaseId}/submissions/${deleteFor.id}`, {
         reason: deleteReason.trim() || null,
       });
-      toast.success("Submission deleted and its points reversed.");
+      toast.success("ההגשה נמחקה והנקודות שלה ירדו.");
       setDeleteFor(null);
       setDeleteReason("");
     } catch (error) {
-      toastError(error, "Couldn't delete that submission.");
+      toastError(error, "לא הצלחנו למחוק את ההגשה.");
     } finally {
       setBusy(false);
     }
@@ -100,8 +104,8 @@ export function useSubmissionActions(chaseId: string) {
     const url = `${window.location.origin}/studio/${chaseId}/feed?submission=${submission.id}`;
     void navigator.clipboard
       .writeText(url)
-      .then(() => toast.success("Link copied."))
-      .catch(() => toast.error("Your browser blocked the clipboard."));
+      .then(() => toast.success("הקישור הועתק."))
+      .catch(() => toast.error("הדפדפן חסם את ההעתקה."));
   }
 
   const items = React.useCallback(
@@ -110,7 +114,7 @@ export function useSubmissionActions(chaseId: string) {
       if (submission.status !== "approved") {
         list.push({
           id: "approve",
-          label: "Approve",
+          label: "לאשר",
           icon: <Check className="size-4" aria-hidden />,
           onSelect: () => void moderate(submission, "approve"),
         });
@@ -118,7 +122,7 @@ export function useSubmissionActions(chaseId: string) {
       if (submission.status !== "rejected") {
         list.push({
           id: "reject",
-          label: "Reject",
+          label: "לדחות",
           icon: <X className="size-4" aria-hidden />,
           onSelect: () => void moderate(submission, "reject"),
         });
@@ -126,7 +130,7 @@ export function useSubmissionActions(chaseId: string) {
       list.push(
         {
           id: "bonus",
-          label: "Assign bonus points",
+          label: "נקודות בונוס",
           icon: <Sparkles className="size-4" aria-hidden />,
           onSelect: () => {
             setBonusPoints("10");
@@ -136,7 +140,7 @@ export function useSubmissionActions(chaseId: string) {
         },
         {
           id: "hide",
-          label: submission.hidden ? "Unhide from feed" : "Hide from feed",
+          label: submission.hidden ? "להחזיר לפיד" : "להסתיר מהפיד",
           icon: submission.hidden ? (
             <Eye className="size-4" aria-hidden />
           ) : (
@@ -147,20 +151,20 @@ export function useSubmissionActions(chaseId: string) {
         },
         {
           id: "flag",
-          label: submission.flagged ? "Remove flag" : "Flag for review",
+          label: submission.flagged ? "לבטל סימון" : "לסמן לבדיקה",
           icon: <Flag className="size-4" aria-hidden />,
           onSelect: () =>
             void moderate(submission, submission.flagged ? "unflag" : "flag"),
         },
         {
           id: "copy",
-          label: "Copy link",
+          label: "להעתיק קישור",
           icon: <Link2 className="size-4" aria-hidden />,
           onSelect: () => copyLink(submission),
         },
         {
           id: "delete",
-          label: "Delete submission",
+          label: "למחוק הגשה",
           icon: <Trash2 className="size-4" aria-hidden />,
           tone: "danger",
           onSelect: () => {
@@ -181,21 +185,21 @@ export function useSubmissionActions(chaseId: string) {
         open={Boolean(bonusFor)}
         onClose={() => setBonusFor(null)}
         size="sm"
-        title="Assign bonus points"
-        description={`To ${bonusFor?.teamName ?? "this team"} for “${bonusFor?.missionName ?? ""}”. Use a negative amount to take points away.`}
+        title="נקודות בונוס"
+        description={`הבונוס יינתן לקבוצה ${bonusFor?.teamName ?? "הזו"} על "${bonusFor?.missionName ?? ""}". מספר שלילי מוריד נקודות.`}
         footer={
           <>
             <Button variant="ghost" onClick={() => setBonusFor(null)}>
-              Cancel
+              ביטול
             </Button>
             <Button onClick={() => void submitBonus()} loading={busy}>
-              Apply bonus
+              להוסיף בונוס
             </Button>
           </>
         }
       >
         <div className="space-y-4">
-          <Field label="Points" htmlFor="bonus-points" required>
+          <Field label="נקודות" htmlFor="bonus-points" required>
             <Input
               id="bonus-points"
               type="number"
@@ -204,7 +208,11 @@ export function useSubmissionActions(chaseId: string) {
               onChange={(e) => setBonusPoints(e.target.value)}
             />
           </Field>
-          <Field label="Reason" htmlFor="bonus-reason" hint="Optional, but players see it.">
+          <Field
+            label="סיבה"
+            htmlFor="bonus-reason"
+            hint="לא חובה — אבל מה שתכתבו יגיע לשחקנים."
+          >
             <Textarea
               id="bonus-reason"
               value={bonusReason}
@@ -219,20 +227,24 @@ export function useSubmissionActions(chaseId: string) {
         open={Boolean(deleteFor)}
         onClose={() => setDeleteFor(null)}
         size="sm"
-        title="Delete this submission?"
-        description="Its points come straight off the team's total and the mission reopens for resubmission. The team is notified with your reason."
+        title="למחוק את ההגשה?"
+        description="הנקודות יורדות מהסך של הקבוצה, והמשימה נפתחת שוב להגשה. הקבוצה מקבלת התראה עם הסיבה שתכתבו."
         footer={
           <>
             <Button variant="ghost" onClick={() => setDeleteFor(null)}>
-              Cancel
+              ביטול
             </Button>
             <Button variant="danger" onClick={() => void submitDelete()} loading={busy}>
-              Delete submission
+              למחוק הגשה
             </Button>
           </>
         }
       >
-        <Field label="Reason" htmlFor="delete-reason" hint="Optional. Sent to the team.">
+        <Field
+          label="סיבה"
+          htmlFor="delete-reason"
+          hint="לא חובה. ההודעה נשלחת כהתראה לשחקנים — כתבו אותה כך שגם בן 13 יבין מה קרה."
+        >
           <Textarea
             id="delete-reason"
             value={deleteReason}

@@ -38,17 +38,17 @@ export function expiryToInput(rule: ExpiryRule | undefined): ExpiryInput {
 }
 
 const RELEASE_OPTIONS: Array<{ value: ReleaseInput["kind"]; label: string }> = [
-  { value: "chase_start", label: "When the chase starts" },
-  { value: "relative", label: "Relative to the start or end" },
-  { value: "specific", label: "At a specific time" },
-  { value: "mission", label: "When another mission is completed" },
-  { value: "points", label: "When the team reaches a point total" },
+  { value: "chase_start", label: "עם תחילת המרדף" },
+  { value: "relative", label: "ביחס לתחילת המרדף או לסיומו" },
+  { value: "specific", label: "בשעה מסוימת" },
+  { value: "mission", label: "כשמשימה אחרת הושלמה" },
+  { value: "points", label: "כשהקבוצה מגיעה לניקוד מסוים" },
 ];
 
 const EXPIRY_OPTIONS: Array<{ value: ExpiryInput["kind"]; label: string }> = [
-  { value: "chase_end", label: "When the chase ends" },
-  { value: "relative", label: "Relative to the start or end" },
-  { value: "specific", label: "At a specific time" },
+  { value: "chase_end", label: "עם סיום המרדף" },
+  { value: "relative", label: "ביחס לתחילת המרדף או לסיומו" },
+  { value: "specific", label: "בשעה מסוימת" },
 ];
 
 function AnchorRow({
@@ -72,7 +72,7 @@ function AnchorRow({
       />
       <div className="flex flex-wrap gap-2">
         <Select
-          aria-label="Before or after"
+          aria-label="לפני או אחרי"
           value={before ? "before" : "after"}
           onChange={(e) =>
             onChange({
@@ -85,19 +85,19 @@ function AnchorRow({
           }
           className="max-w-32"
         >
-          <option value="after">after</option>
-          <option value="before">before</option>
+          <option value="after">אחרי</option>
+          <option value="before">לפני</option>
         </Select>
         <Select
-          aria-label="Anchor"
+          aria-label="נקודת ייחוס"
           value={anchor}
           onChange={(e) =>
             onChange({ anchor: e.target.value as "start" | "end", offsetMs })
           }
           className="max-w-40"
         >
-          <option value="start">the chase start</option>
-          <option value="end">the chase end</option>
+          <option value="start">תחילת המרדף</option>
+          <option value="end">סיום המרדף</option>
         </Select>
       </div>
     </div>
@@ -165,12 +165,12 @@ export function AvailabilityEditor({
   return (
     <div className="space-y-5">
       <fieldset className="space-y-2">
-        <legend className="text-sm font-semibold">Release</legend>
+        <legend className="text-sm font-semibold">פתיחה</legend>
         <p className="text-xs text-muted-foreground">
-          A mission is either unlocked by progress or by the clock — never both.
+          משימה נפתחת או לפי התקדמות או לפי השעון — אף פעם לא לפי שניהם.
         </p>
         <Select
-          aria-label="Release rule"
+          aria-label="כלל פתיחה"
           value={release.kind}
           onChange={(e) =>
             changeReleaseKind(e.target.value as ReleaseInput["kind"])
@@ -195,7 +195,7 @@ export function AvailabilityEditor({
         {release.kind === "specific" && (
           <Input
             type="datetime-local"
-            aria-label="Release time"
+            aria-label="שעת הפתיחה"
             value={toLocalInput(release.atMs)}
             onChange={(e) =>
               onRelease({ kind: "specific", atMs: fromLocalInput(e.target.value) })
@@ -207,7 +207,7 @@ export function AvailabilityEditor({
           <div className="space-y-2">
             {candidates.length ? (
               <Select
-                aria-label="Trigger mission"
+                aria-label="המשימה שפותחת"
                 value={release.missionId}
                 onChange={(e) =>
                   onRelease({ ...release, missionId: e.target.value })
@@ -221,18 +221,18 @@ export function AvailabilityEditor({
               </Select>
             ) : (
               <p className="text-xs text-danger">
-                Create another mission first — there is nothing to unlock from.
+                צרו קודם משימה נוספת — אין ממה לפתוח.
               </p>
             )}
             <Switch
               checked={release.requireCorrect && !correctnessBlocked}
               disabled={correctnessBlocked}
               onChange={(v) => onRelease({ ...release, requireCorrect: v })}
-              label="Requires a correct answer"
+              label="דורש תשובה נכונה"
               description={
                 correctnessBlocked
-                  ? "Camera missions have no correct answer to wait for."
-                  : "Otherwise any submission to that mission unlocks this one."
+                  ? "למשימת צילום אין תשובה נכונה לחכות לה."
+                  : "אחרת כל הגשה למשימה ההיא פותחת את זו."
               }
             />
           </div>
@@ -242,7 +242,7 @@ export function AvailabilityEditor({
           <Input
             type="number"
             min={1}
-            aria-label="Points needed"
+            aria-label="נקודות נדרשות"
             value={release.points}
             onChange={(e) =>
               onRelease({
@@ -256,9 +256,9 @@ export function AvailabilityEditor({
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="text-sm font-semibold">Expiry</legend>
+        <legend className="text-sm font-semibold">סגירה</legend>
         <Select
-          aria-label="Expiry rule"
+          aria-label="כלל סגירה"
           value={expiry.kind}
           onChange={(e) => changeExpiryKind(e.target.value as ExpiryInput["kind"])}
         >
@@ -281,7 +281,7 @@ export function AvailabilityEditor({
         {expiry.kind === "specific" && (
           <Input
             type="datetime-local"
-            aria-label="Expiry time"
+            aria-label="שעת הסגירה"
             value={toLocalInput(expiry.atMs)}
             onChange={(e) =>
               onExpiry({ kind: "specific", atMs: fromLocalInput(e.target.value) })

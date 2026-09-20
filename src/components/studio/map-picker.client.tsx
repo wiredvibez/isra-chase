@@ -49,7 +49,7 @@ export function MapPickerClient({
   radiusM,
   onPick,
   height = 280,
-  ariaLabel = "Map. Click to place the pin.",
+  ariaLabel = "מפה. לוחצים כדי למקם את הסימון.",
 }: MapPickerProps) {
   const center: [number, number] =
     lat !== null && lng !== null ? [lat, lng] : FALLBACK;

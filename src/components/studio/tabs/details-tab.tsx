@@ -81,7 +81,7 @@ export function DetailsTab() {
 
   async function onSave() {
     if (!form.name.trim()) {
-      toast.error("A chase needs a name.");
+      toast.error("למרדף צריך שם.");
       return;
     }
     save.markSaving();
@@ -105,20 +105,20 @@ export function DetailsTab() {
       save.markSaved();
     } catch (error) {
       save.markFailed();
-      toastError(error, "Couldn't save those details.");
+      toastError(error, "לא הצלחנו לשמור את הפרטים.");
     }
   }
 
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Details"
-        description="The basics players see, plus how submissions are moderated."
+        title="פרטים"
+        description="מה שהשחקנים רואים, ואיך ההגשות נבדקות."
       />
 
       <Card>
         <CardContent className="pt-5">
-          <SettingRow label="Chase name" htmlFor="details-name">
+          <SettingRow label="שם המרדף" htmlFor="details-name">
             <Input
               id="details-name"
               value={form.name}
@@ -128,8 +128,8 @@ export function DetailsTab() {
           </SettingRow>
 
           <SettingRow
-            label="Description"
-            hint="Shown on the join screen."
+            label="תיאור"
+            hint="מוצג במסך ההצטרפות."
             htmlFor="details-description"
           >
             <Textarea
@@ -150,13 +150,13 @@ export function DetailsTab() {
                   : "mt-1 text-xs text-muted-foreground"
               }
             >
-              {form.description.length}/{DESCRIPTION_MAX} characters
+              {form.description.length}/{DESCRIPTION_MAX} תווים
             </p>
           </SettingRow>
 
-          <SettingRow label="Cover image" hint="16:9 works best.">
+          <SettingRow label="תמונת נושא" hint="יחס 16:9 עובד הכי טוב.">
             <ImageUpload
-              label="Cover image"
+              label="תמונת נושא"
               folder={`chases/${chaseId}/cover`}
               value={form.imageUrl}
               onChange={(url) => set("imageUrl", url)}
@@ -165,8 +165,8 @@ export function DetailsTab() {
           </SettingRow>
 
           <SettingRow
-            label="Location"
-            hint="Optional. Helps players know where the chase happens."
+            label="מיקום"
+            hint="לא חובה. עוזר לשחקנים לדעת איפה המרדף מתרחש."
           >
             <LocationPicker
               value={form.location}
@@ -179,11 +179,11 @@ export function DetailsTab() {
       <Card>
         <CardContent className="pt-5">
           <SettingRow
-            label="Chase password"
+            label="סיסמת המרדף"
             hint={
               chase.hasPassword && !passwordLoaded
-                ? "A password is set. Type a new one to replace it."
-                : "Leave blank for no password. Team passcodes bypass it."
+                ? "יש סיסמה. הקלידו סיסמה חדשה כדי להחליף אותה."
+                : "שדה ריק = בלי סיסמה. קוד קבוצה עוקף אותה."
             }
             htmlFor="details-password"
           >
@@ -192,14 +192,14 @@ export function DetailsTab() {
               value={form.password}
               maxLength={64}
               autoComplete="off"
-              placeholder="No password"
+              placeholder="בלי סיסמה"
               onChange={(e) => set("password", e.target.value)}
             />
           </SettingRow>
 
           <SettingRow
-            label="Search visibility"
-            hint="Public chases can be found by name; hidden ones need the code."
+            label="נראות בחיפוש"
+            hint="מרדף ציבורי אפשר למצוא לפי שם; למרדף מוסתר צריך את הקוד."
             htmlFor="details-visibility"
           >
             <Select
@@ -209,8 +209,8 @@ export function DetailsTab() {
                 set("searchVisibility", e.target.value as Chase["searchVisibility"])
               }
             >
-              <option value="hidden">Hidden — invite only</option>
-              <option value="public">Public — listed in search</option>
+              <option value="hidden">מוסתר — בהזמנה בלבד</option>
+              <option value="public">ציבורי — מופיע בחיפוש</option>
             </Select>
           </SettingRow>
         </CardContent>
@@ -219,8 +219,8 @@ export function DetailsTab() {
       <Card>
         <CardContent className="pt-5">
           <SettingRow
-            label="Moderation"
-            hint="Review mode holds every submission until you approve it."
+            label="בדיקת הגשות"
+            hint="במצב בדיקה כל הגשה ממתינה עד שתאשרו אותה."
             htmlFor="details-moderation"
           >
             <Select
@@ -230,32 +230,32 @@ export function DetailsTab() {
                 set("moderationMode", e.target.value as Chase["moderationMode"])
               }
             >
-              <option value="auto">Auto-approve — points award instantly</option>
-              <option value="review">Review queue — approve before points</option>
+              <option value="auto">אישור אוטומטי — הנקודות נכנסות מיד</option>
+              <option value="review">תור בדיקה — מאשרים ואז נכנסות נקודות</option>
             </Select>
             {form.moderationMode === "review" && (
               <p className="mt-2 rounded-md bg-info-surface px-3 py-2 text-xs text-info">
-                Submissions land in the Submissions tab as pending and earn no
-                points until you approve them.
+                ההגשות נוחתות בלשונית &quot;הגשות&quot; כממתינות, ולא מזכות
+                בנקודות עד שתאשרו אותן.
               </p>
             )}
           </SettingRow>
 
-          <SettingRow label="Profanity filter">
+          <SettingRow label="סינון שפה">
             <Switch
               checked={form.profanityFilter}
               onChange={(v) => set("profanityFilter", v)}
-              label="Flag risky captions and answers"
-              description="Flags for review rather than deleting anything."
+              label="סימון כיתובים ותשובות בעייתיים"
+              description="רק מסמן לבדיקה — לא מוחק כלום."
             />
           </SettingRow>
 
-          <SettingRow label="Email collection">
+          <SettingRow label="איסוף אימיילים">
             <Switch
               checked={form.collectEmails}
               onChange={(v) => set("collectEmails", v)}
-              label="Ask players for an email address when they join"
-              description="Included in the participants export."
+              label="לבקש מהשחקנים כתובת אימייל בהצטרפות"
+              description="נכלל בייצוא רשימת המשתתפים."
             />
           </SettingRow>
         </CardContent>

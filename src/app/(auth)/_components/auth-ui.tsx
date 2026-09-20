@@ -105,7 +105,7 @@ export function GoogleButton({
       disabled={disabled}
     >
       {!busy && <GoogleG />}
-      Continue with Google
+      ממשיכים עם Google
     </Button>
   );
 }
@@ -115,7 +115,7 @@ export function OrDivider() {
     <div className="flex items-center gap-3" aria-hidden>
       <span className="h-px flex-1 bg-border" />
       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        or
+        או
       </span>
       <span className="h-px flex-1 bg-border" />
     </div>

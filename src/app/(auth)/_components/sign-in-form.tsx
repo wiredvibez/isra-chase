@@ -48,10 +48,10 @@ export function SignInForm() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-extrabold tracking-tight">
-          Sign in
+          כניסה
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Get back to your chases, your missions and your teams.
+          חוזרים למרדפים, למשימות ולקבוצות שלכם.
         </p>
       </div>
 
@@ -67,14 +67,14 @@ export function SignInForm() {
           id="signin-email"
           name="email"
           type="email"
-          label="Email"
+          label="אימייל"
           required
           autoComplete="email"
           autoFocus
           placeholder="you@example.com"
           messages={{
-            valueMissing: "Enter the email you signed up with.",
-            typeMismatch: "That doesn't look like an email address.",
+            valueMissing: "תכתבו את האימייל שנרשמתם איתו.",
+            typeMismatch: "זה לא נראה כמו כתובת אימייל.",
           }}
         />
 
@@ -82,10 +82,10 @@ export function SignInForm() {
           id="signin-password"
           name="password"
           type="password"
-          label="Password"
+          label="סיסמה"
           required
           autoComplete="current-password"
-          messages={{ valueMissing: "Enter your password." }}
+          messages={{ valueMissing: "צריך להקליד סיסמה." }}
         />
 
         <div className="flex justify-end">
@@ -93,20 +93,20 @@ export function SignInForm() {
             href={withNext("/reset-password", next)}
             className="rounded-sm text-sm font-semibold text-primary underline underline-offset-2"
           >
-            Forgot your password?
+            שכחתם סיסמה?
           </Link>
         </div>
 
         <Button type="submit" size="lg" className="w-full" loading={busy}>
-          Sign in
+          נכנסים
         </Button>
       </form>
 
       <AuthAltLink
         href="/signup"
         next={next}
-        prompt="New here?"
-        action="Create an account"
+        prompt="חדשים כאן?"
+        action="פותחים חשבון"
       />
     </div>
   );

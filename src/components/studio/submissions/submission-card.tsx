@@ -150,7 +150,7 @@ export function SubmissionCard({
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge tone="brand">{submission.missionName}</Badge>
           <Badge tone={total > 0 ? "success" : "neutral"}>
-            {formatPoints(total)} נק'
+            {`${formatPoints(total)} נק'`}
             {submission.bonusPoints
               ? ` (${formatPoints(submission.bonusPoints, true)} בונוס)`
               : ""}

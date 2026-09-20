@@ -64,7 +64,7 @@ function FeedItem({
               {submission.teamName}
               {mine && (
                 <span className="ms-1.5 text-xs font-semibold text-primary">
-                  you
+                  אתם
                 </span>
               )}
             </p>
@@ -72,7 +72,11 @@ function FeedItem({
               {submission.participantName} · {timeAgo(submission.createdAt)}
             </p>
           </div>
-          {total > 0 && <Badge tone="accent">+{fmtPoints(total)}</Badge>}
+          {total > 0 && (
+            <Badge tone="accent">
+              <span dir="ltr">+{fmtPoints(total)}</span>
+            </Badge>
+          )}
         </div>
 
         {media?.kind === "video" ? (
@@ -87,7 +91,7 @@ function FeedItem({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={media.url}
-            alt={submission.caption ?? `${submission.teamName}'s submission`}
+            alt={submission.caption ?? `ההגשה של ${submission.teamName}`}
             loading="lazy"
             className="aspect-square w-full bg-surface-inset object-cover"
           />
@@ -116,7 +120,7 @@ function FeedItem({
               type="button"
               onClick={() => onToggleLike(submission)}
               aria-pressed={liked}
-              aria-label={liked ? "Remove your like" : "Like this submission"}
+              aria-label={liked ? "מבטלים לייק" : "לייק להגשה הזאת"}
               className={cn(
                 "flex h-11 items-center gap-1.5 rounded-md px-3 text-sm font-bold transition-colors",
                 liked
@@ -134,7 +138,7 @@ function FeedItem({
             <button
               type="button"
               onClick={() => onReport(submission.id)}
-              aria-label="Report this submission"
+              aria-label="לדווח על ההגשה הזאת"
               className="ms-auto flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-muted hover:text-danger"
             >
               <Flag className="size-[1.125rem]" aria-hidden />
@@ -193,7 +197,7 @@ export function FeedView() {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't register that like.",
+          : "הלייק לא נקלט. תנסו שוב.",
       );
     }
   }
@@ -212,8 +216,8 @@ export function FeedView() {
     return (
       <EmptyState
         icon={<Rss className="size-5" />}
-        title="The feed is quiet"
-        description="As soon as teams start completing missions, their submissions land here."
+        title="עדיין שקט כאן"
+        description="תהיו הראשונים — כל הגשה של קבוצה נוחתת כאן ברגע שהיא מאושרת."
       />
     );
   }

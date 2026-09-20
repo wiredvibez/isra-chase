@@ -6,6 +6,7 @@ import type {
   BroadcastSchedule,
   Chase,
   ExpiryRule,
+  MissionOrder,
   MissionType,
   ParticipantMode,
   ReleaseRule,
@@ -14,7 +15,7 @@ import type {
 
 /* ------------------------------------------------------------------ errors */
 
-export function toastError(error: unknown, fallback = "Something went wrong.") {
+export function toastError(error: unknown, fallback = "משהו השתבש.") {
   const message =
     error instanceof ApiClientError || error instanceof Error
       ? error.message || fallback
@@ -60,10 +61,31 @@ export function joinDuration(parts: DurationParts): number {
 export function durationLabel(ms: number): string {
   const { days, hours, minutes } = splitDuration(Math.abs(ms));
   const bits: string[] = [];
-  if (days) bits.push(`${days} d`);
-  if (hours) bits.push(`${hours} h`);
-  if (minutes || !bits.length) bits.push(`${minutes} min`);
+  if (days) bits.push(days === 1 ? "יום" : `${days} ימים`);
+  if (hours) bits.push(hours === 1 ? "שעה" : `${hours} שע'`);
+  if (minutes || !bits.length) bits.push(minutes === 1 ? "דקה" : `${minutes} דק'`);
   return bits.join(" ");
+}
+
+/** "נשארו 2 ימים 4 שע'" — the ticking label beside a live chase. */
+export function countdownLabel(toMs: number | null, now = Date.now()): string {
+  if (toMs === null) return "";
+  const diff = toMs - now;
+  if (diff <= 0) return "הסתיים";
+  const mins = Math.floor(diff / MINUTE);
+  if (mins < 1) return "נשארה פחות מדקה";
+  if (mins < 60) return mins === 1 ? "נשארה דקה" : `נשארו ${mins} דק'`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `נשארו ${hours} שע' ${mins % 60} דק'`;
+  const days = Math.floor(hours / 24);
+  return days === 1
+    ? `נשארו יום ו-${hours % 24} שע'`
+    : `נשארו ${days} ימים ו-${hours % 24} שע'`;
+}
+
+/** "250 מ'" / "5 ק"מ" — the accept radius of a GPS mission. */
+export function radiusLabel(metres: number): string {
+  return metres < 1000 ? `${metres} מ'` : `${metres / 1000} ק"מ`;
 }
 
 /* -------------------------------------------------- <input type=datetime> */
@@ -86,6 +108,34 @@ export function fromLocalInput(value: string): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
+/* --------------------------------------------------------------- bidi/time */
+
+/**
+ * Wraps a Latin/numeric run in a Unicode isolate so it keeps its own order
+ * inside the Hebrew, RTL UI — the string equivalent of <span dir="ltr">.
+ */
+export function ltr(text: string): string {
+  return `\u2066${text}\u2069`;
+}
+
+/** "20.9.2026, 19:44" — a timestamp in Hebrew, isolated so RTL cannot flip it. */
+export function msLabel(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined || !Number.isFinite(ms)) return "—";
+  return ltr(
+    new Date(ms).toLocaleString("he-IL", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  );
+}
+
+export function dateTimeLabel(stamp: Stamp | null | undefined): string {
+  return msLabel(stampMs(stamp));
+}
+
 /* ------------------------------------------------------------------ labels */
 
 export const STATUS_TONE = {
@@ -96,30 +146,44 @@ export const STATUS_TONE = {
 } as const;
 
 export const STATUS_LABEL: Record<Chase["status"], string> = {
-  draft: "Draft",
-  scheduled: "Scheduled",
-  live: "Live",
-  ended: "Ended",
+  draft: "טיוטה",
+  scheduled: "מתוזמן",
+  live: "באוויר",
+  ended: "הסתיים",
 };
 
 export const MISSION_TYPE_LABEL: Record<MissionType, string> = {
-  camera: "Camera",
-  text: "Text",
-  gps: "GPS",
+  camera: "צילום",
+  text: "טקסט",
+  gps: "מיקום",
+};
+
+/** The badge on a text mission, per the glossary. */
+export const TEXT_BADGE_LABEL: Record<"open" | "exact" | "approximate", string> = {
+  open: "תשובה חופשית",
+  exact: "התאמה מדויקת",
+  approximate: "בערך מספיק",
+};
+
+export const MISSION_ORDER_LABEL: Record<MissionOrder, string> = {
+  custom: "מותאם אישית",
+  points: "לפי ניקוד",
+  alphabetical: "לפי א־ב",
+  random: "אקראי לכל קבוצה",
 };
 
 export const PARTICIPANT_MODE_LABEL: Record<ParticipantMode, string> = {
-  teams_or_solo: "Teams or individuals",
-  teams_only: "Teams only",
-  solo_only: "Individuals only",
-  organizer_managed: "Organizer-managed teams only",
+  teams_or_solo: "קבוצות או משתתפים יחידים",
+  teams_only: "קבוצות בלבד",
+  solo_only: "משתתפים יחידים בלבד",
+  organizer_managed: "רק קבוצות שהמארגן יצר",
 };
 
 export const PARTICIPANT_MODE_HINT: Record<ParticipantMode, string> = {
-  teams_or_solo: "Players choose to join a team or play solo.",
-  teams_only: "Everyone must be on a team.",
-  solo_only: "Everyone plays as their own one-person profile.",
-  organizer_managed: "Players can only join teams you created.",
+  teams_or_solo: "כל שחקן בוחר אם להצטרף לקבוצה או לשחק לבד.",
+  teams_only: "כולם חייבים להיות בקבוצה.",
+  solo_only: "כל אחד משחק בפרופיל אישי משלו.",
+  organizer_managed: "אפשר להצטרף רק לקבוצות שאתם יצרתם.",
 };
 
 /** The badge Goosechase shows on a text mission. */
@@ -131,50 +195,56 @@ export function textBadge(
   return approximate ? "approximate" : "exact";
 }
 
+/** "לפני תחילת המרדף" / "אחרי סיום המרדף" and the like. */
+function anchorPhrase(anchor: "start" | "end", offsetMs: number): string {
+  const when = offsetMs < 0 ? "לפני" : "אחרי";
+  return `${when} ${anchor === "start" ? "תחילת המרדף" : "סיום המרדף"}`;
+}
+
 export function releaseSummary(release: ReleaseRule): string {
   switch (release.kind) {
     case "chase_start":
-      return "At chase start";
+      return "נפתחת עם תחילת המרדף";
     case "relative":
-      return `${durationLabel(release.offsetMs)} ${release.offsetMs < 0 ? "before" : "after"} ${release.anchor}`;
+      return `נפתחת ${durationLabel(release.offsetMs)} ${anchorPhrase(release.anchor, release.offsetMs)}`;
     case "specific":
-      return "At a specific time";
+      return "נפתחת בשעה מסוימת";
     case "mission":
       return release.requireCorrect
-        ? "After another mission is answered correctly"
-        : "After another mission is completed";
+        ? "נפתחת אחרי שמשימה אחרת נענתה נכון"
+        : "נפתחת אחרי שמשימה אחרת הושלמה";
     case "points":
-      return `At ${release.points} points`;
+      return `נפתחת ב-${release.points} נקודות`;
   }
 }
 
 export function expirySummary(expiry: ExpiryRule): string {
   switch (expiry.kind) {
     case "chase_end":
-      return "At chase end";
+      return "נסגרת עם סיום המרדף";
     case "relative":
-      return `${durationLabel(expiry.offsetMs)} ${expiry.offsetMs < 0 ? "before" : "after"} ${expiry.anchor}`;
+      return `נסגרת ${durationLabel(expiry.offsetMs)} ${anchorPhrase(expiry.anchor, expiry.offsetMs)}`;
     case "specific":
-      return "At a specific time";
+      return "נסגרת בשעה מסוימת";
   }
 }
 
 export function broadcastScheduleSummary(schedule: BroadcastSchedule): string {
   switch (schedule.kind) {
     case "now":
-      return "Immediately";
+      return "מיד";
     case "before_start":
-      return `${durationLabel(schedule.offsetMs)} before the chase starts`;
+      return `${durationLabel(schedule.offsetMs)} לפני תחילת המרדף`;
     case "at_start":
-      return "When the chase starts";
+      return "עם תחילת המרדף";
     case "during_relative":
-      return `${durationLabel(schedule.offsetMs)} ${schedule.offsetMs < 0 ? "before" : "after"} the ${schedule.anchor}`;
+      return `${durationLabel(schedule.offsetMs)} ${anchorPhrase(schedule.anchor, schedule.offsetMs)}`;
     case "during_specific":
-      return "At a specific time";
+      return "בשעה מסוימת";
     case "at_end":
-      return "When the chase ends";
+      return "עם סיום המרדף";
     case "after_end":
-      return `${durationLabel(schedule.offsetMs)} after the chase ends`;
+      return `${durationLabel(schedule.offsetMs)} אחרי סיום המרדף`;
   }
 }
 

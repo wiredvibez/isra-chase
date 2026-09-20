@@ -14,7 +14,6 @@ import { SkeletonList } from "@/components/ui/skeleton";
 import { Tabs } from "@/components/ui/tabs";
 import { apiDelete, apiPatch, apiPost } from "@/lib/api-client";
 import type { Broadcast } from "@/lib/domain/types";
-import { dateTime } from "@/lib/format";
 import { useLoadedChase } from "../chase-context";
 import {
   BroadcastSchedulePicker,
@@ -24,7 +23,11 @@ import {
 import { useBroadcasts, useTeams } from "../data-hooks";
 import { ImageUpload } from "../image-upload";
 import { TabHeader } from "../section";
-import { broadcastScheduleSummary, toastError } from "../studio-utils";
+import {
+  broadcastScheduleSummary,
+  dateTimeLabel,
+  toastError,
+} from "../studio-utils";
 
 interface ComposerState {
   body: string;
@@ -77,11 +80,11 @@ export function BroadcastsTab() {
 
   async function submit() {
     if (!form.body.trim()) {
-      toast.error("Write something to send.");
+      toast.error("צריך לכתוב משהו כדי לשלוח.");
       return;
     }
     if (form.schedule.kind === "during_specific" && !form.schedule.atMs) {
-      toast.error("Pick the time to send this broadcast.");
+      toast.error("בחרו מתי לשלוח את ההודעה.");
       return;
     }
     const link = form.linkUrl.trim();
@@ -89,7 +92,7 @@ export function BroadcastsTab() {
       try {
         new URL(link);
       } catch {
-        toast.error("That link isn't a valid URL.");
+        toast.error("הקישור אינו כתובת תקינה.");
         return;
       }
     }
@@ -105,17 +108,17 @@ export function BroadcastsTab() {
     try {
       if (editingId) {
         await apiPatch(`/api/chases/${chaseId}/broadcasts/${editingId}`, payload);
-        toast.success("Broadcast updated.");
+        toast.success("ההודעה עודכנה.");
       } else {
         await apiPost(`/api/chases/${chaseId}/broadcasts`, payload);
         toast.success(
-          form.schedule.kind === "now" ? "Broadcast sent." : "Broadcast scheduled.",
+          form.schedule.kind === "now" ? "ההודעה נשלחה." : "ההודעה תוזמנה.",
         );
       }
       setForm(blank());
       setEditingId(null);
     } catch (error) {
-      toastError(error, "Couldn't send that broadcast.");
+      toastError(error, "לא הצלחנו לשלוח את ההודעה.");
     } finally {
       setSending(false);
     }
@@ -126,10 +129,10 @@ export function BroadcastsTab() {
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${chaseId}/broadcasts/${deleteTarget.id}`);
-      toast.success("Broadcast deleted.");
+      toast.success("ההודעה נמחקה.");
       setDeleteTarget(null);
     } catch (error) {
-      toastError(error, "Couldn't delete that broadcast.");
+      toastError(error, "לא הצלחנו למחוק את ההודעה.");
     } finally {
       setBusy(false);
     }
@@ -150,36 +153,37 @@ export function BroadcastsTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Broadcasts"
-        description="One-way announcements to everyone, or to particular teams."
+        title="הודעות"
+        description="הודעות חד-כיווניות לכולם, או לקבוצות מסוימות."
       />
 
       <Card>
         <CardContent className="space-y-4 pt-5">
-          <Field label="Message" htmlFor="broadcast-body" required>
+          <Field label="תוכן ההודעה" htmlFor="broadcast-body" required>
             <Textarea
               id="broadcast-body"
               value={form.body}
               maxLength={2000}
-              placeholder="Ten minutes left — get your last missions in!"
+              placeholder="נשארו עשר דקות — תספיקו לשלוח את המשימות האחרונות!"
               onChange={(e) => set("body", e.target.value)}
             />
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Image" hint="Optional.">
+            <Field label="תמונה" hint="לא חובה.">
               <ImageUpload
-                label="Broadcast image"
+                label="תמונה להודעה"
                 folder={`chases/${chaseId}/cover`}
                 value={form.imageUrl}
                 onChange={(url) => set("imageUrl", url)}
               />
             </Field>
-            <Field label="Link" htmlFor="broadcast-link" hint="Optional.">
+            <Field label="קישור" htmlFor="broadcast-link" hint="לא חובה.">
               <Input
                 id="broadcast-link"
                 type="url"
                 inputMode="url"
+                dir="ltr"
                 placeholder="https://"
                 value={form.linkUrl}
                 onChange={(e) => set("linkUrl", e.target.value)}
@@ -188,7 +192,7 @@ export function BroadcastsTab() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold">Audience</legend>
+            <legend className="text-sm font-semibold">למי שולחים</legend>
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -197,7 +201,7 @@ export function BroadcastsTab() {
                   checked={form.teamIds === null}
                   onChange={() => set("teamIds", null)}
                 />
-                Everyone
+                לכולם
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -206,7 +210,7 @@ export function BroadcastsTab() {
                   checked={form.teamIds !== null}
                   onChange={() => set("teamIds", [])}
                 />
-                Specific teams
+                לקבוצות מסוימות
               </label>
             </div>
             {form.teamIds !== null && (
@@ -227,14 +231,14 @@ export function BroadcastsTab() {
                   ))
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    No teams yet — this will go to everyone.
+                    עדיין אין קבוצות — ההודעה תגיע לכולם.
                   </p>
                 )}
               </div>
             )}
           </fieldset>
 
-          <Field label="When to send">
+          <Field label="מתי לשלוח">
             <BroadcastSchedulePicker
               value={form.schedule}
               onChange={(next) => set("schedule", next)}
@@ -245,10 +249,10 @@ export function BroadcastsTab() {
             <Button onClick={() => void submit()} loading={sending}>
               <Send className="size-4" aria-hidden />
               {editingId
-                ? "Save broadcast"
+                ? "שמירת ההודעה"
                 : form.schedule.kind === "now"
-                  ? "Send now"
-                  : "Schedule broadcast"}
+                  ? "שליחה עכשיו"
+                  : "תזמון ההודעה"}
             </Button>
             {editingId && (
               <Button
@@ -258,7 +262,7 @@ export function BroadcastsTab() {
                   setForm(blank());
                 }}
               >
-                Cancel edit
+                ביטול העריכה
               </Button>
             )}
           </div>
@@ -269,9 +273,9 @@ export function BroadcastsTab() {
         value={filter}
         onChange={setFilter}
         items={[
-          { id: "all", label: "All", count: broadcasts.length },
-          { id: "scheduled", label: "Scheduled", count: scheduled.length },
-          { id: "sent", label: "Sent", count: sent.length },
+          { id: "all", label: "הכול", count: broadcasts.length },
+          { id: "scheduled", label: "מתוזמנות", count: scheduled.length },
+          { id: "sent", label: "נשלחו", count: sent.length },
         ]}
       />
 
@@ -280,8 +284,8 @@ export function BroadcastsTab() {
       {!loading && !shown.length && (
         <EmptyState
           icon={<Megaphone className="size-6" aria-hidden />}
-          title="Nothing here yet"
-          description="Broadcasts you send or schedule show up in this list."
+          title="עדיין ריק כאן"
+          description="הודעות שתשלחו או תתזמנו יופיעו ברשימה הזו."
         />
       )}
 
@@ -292,21 +296,21 @@ export function BroadcastsTab() {
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge tone={broadcast.status === "sent" ? "success" : "info"}>
-                    {broadcast.status === "sent" ? "Sent" : "Scheduled"}
+                    {broadcast.status === "sent" ? "נשלחה" : "מתוזמנת"}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
                     {broadcastScheduleSummary(broadcast.schedule)}
-                    {broadcast.sentAt ? ` · ${dateTime(broadcast.sentAt)}` : ""}
+                    {broadcast.sentAt ? ` · ${dateTimeLabel(broadcast.sentAt)}` : ""}
                   </span>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{broadcast.body}</p>
                 <p className="text-xs text-muted-foreground">
-                  To:{" "}
+                  אל:{" "}
                   {broadcast.teamIds?.length
                     ? broadcast.teamIds
                         .map((id) => teams.find((t) => t.id === id)?.name ?? id)
                         .join(", ")
-                    : "Everyone"}
+                    : "כולם"}
                 </p>
               </div>
               {broadcast.status === "scheduled" && (
@@ -314,7 +318,7 @@ export function BroadcastsTab() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Edit broadcast"
+                    aria-label="עריכת ההודעה"
                     onClick={() => edit(broadcast)}
                   >
                     <Pencil className="size-4" aria-hidden />
@@ -322,7 +326,7 @@ export function BroadcastsTab() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Delete broadcast"
+                    aria-label="מחיקת ההודעה"
                     onClick={() => setDeleteTarget(broadcast)}
                   >
                     <Trash2 className="size-4 text-danger" aria-hidden />
@@ -339,9 +343,9 @@ export function BroadcastsTab() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
         loading={busy}
-        title="Delete this scheduled broadcast?"
-        description="It will never be sent. Players who already received it are unaffected."
-        confirmLabel="Delete broadcast"
+        title="למחוק את ההודעה המתוזמנת?"
+        description="היא לא תישלח לעולם. שחקנים שכבר קיבלו אותה לא מושפעים."
+        confirmLabel="מחיקת ההודעה"
       />
     </div>
   );

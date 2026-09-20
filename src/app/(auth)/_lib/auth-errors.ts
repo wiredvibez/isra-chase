@@ -7,29 +7,29 @@
  * and telling them about it would be noise.
  */
 const MESSAGES: Record<string, string | null> = {
-  "auth/invalid-credential": "That email and password don't match.",
-  "auth/wrong-password": "That email and password don't match.",
-  "auth/user-not-found": "That email and password don't match.",
-  "auth/invalid-email": "That doesn't look like an email address.",
-  "auth/missing-password": "Enter your password.",
-  "auth/email-already-in-use": "There's already an account with that email.",
-  "auth/weak-password": "Passwords need at least six characters.",
-  "auth/user-disabled": "That account has been disabled.",
+  "auth/invalid-credential": "האימייל והסיסמה האלה לא מסתדרים ביחד.",
+  "auth/wrong-password": "האימייל והסיסמה האלה לא מסתדרים ביחד.",
+  "auth/user-not-found": "האימייל והסיסמה האלה לא מסתדרים ביחד.",
+  "auth/invalid-email": "זה לא נראה כמו כתובת אימייל.",
+  "auth/missing-password": "צריך להקליד סיסמה.",
+  "auth/email-already-in-use": "כבר יש חשבון עם האימייל הזה.",
+  "auth/weak-password": "סיסמה צריכה לפחות 6 תווים.",
+  "auth/user-disabled": "החשבון הזה חסום.",
   "auth/too-many-requests":
-    "Too many attempts from this device. Wait a minute and try again.",
+    "יותר מדי ניסיונות מהמכשיר הזה. חכו דקה ותנסו שוב.",
   "auth/network-request-failed":
-    "We couldn't reach the server. Check your connection and try again.",
+    "לא הצלחנו להגיע לשרת. תבדקו את החיבור ותנסו שוב.",
   "auth/popup-blocked":
-    "Your browser blocked the Google window. Allow pop-ups for this site and try again.",
+    "הדפדפן חסם את החלון של Google. תאשרו חלונות קופצים לאתר הזה ותנסו שוב.",
   "auth/operation-not-allowed":
-    "That sign-in method isn't enabled for this app yet.",
+    "שיטת הכניסה הזאת עוד לא מופעלת באפליקציה.",
   // The person closed the Google window on purpose — not an error worth showing.
   "auth/popup-closed-by-user": null,
   "auth/cancelled-popup-request": null,
   "auth/user-cancelled": null,
 };
 
-const FALLBACK = "Something went wrong on our side. Please try again.";
+const FALLBACK = "משהו השתבש אצלנו. תנסו שוב.";
 
 function codeOf(error: unknown): string | null {
   if (typeof error === "object" && error !== null && "code" in error) {

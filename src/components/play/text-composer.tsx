@@ -10,9 +10,9 @@ import { apiPost, ApiClientError } from "@/lib/api-client";
 import type { CreateSubmissionResponse, PlayMission } from "./types";
 
 const HINT: Record<string, string> = {
-  open: "Anything goes here — say it your way.",
-  exact: "This one is checked letter for letter, so watch the spelling.",
-  approximate: "Close counts — word order and small typos are forgiven.",
+  open: "כאן הכול הולך — תכתבו את זה בסגנון שלכם.",
+  exact: "את התשובה הזאת בודקים אות באות, אז שימו לב לכתיב.",
+  approximate: "לא צריך לקלוע מילה במילה — סדר מילים ושגיאות קטנות נסלחים.",
 };
 
 export function TextComposer({
@@ -52,7 +52,7 @@ export function TextComposer({
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "That didn't go through. Try again.",
+          : "התשובה לא נשלחה. תנסו שוב.",
       );
     } finally {
       setSending(false);
@@ -67,20 +67,20 @@ export function TextComposer({
           aria-live="polite"
           className="space-y-2 rounded-lg border border-warning/30 bg-warning-surface p-4"
         >
-          <p className="font-display text-base font-bold">Not quite yet</p>
+          <p className="font-display text-base font-bold">זה לא זה</p>
           <p className="text-sm text-muted-foreground">
             {rejection.submission.gradeReason ??
-              "That isn't the answer we're after — but nothing is lost. Have another go."}
+              "זאת לא התשובה שחיפשנו, אבל לא הפסדתם כלום. תנסו שוב."}
           </p>
           <Button type="button" variant="outline" size="sm" onClick={onRetry}>
             <RotateCcw className="size-4" aria-hidden />
-            Try again
+            עוד ניסיון
           </Button>
         </div>
       )}
 
       <Field
-        label="Your answer"
+        label="התשובה שלכם"
         htmlFor="text-answer"
         hint={mission.text ? HINT[mission.text.badge] : undefined}
       >
@@ -92,7 +92,7 @@ export function TextComposer({
           maxLength={2000}
           rows={3}
           autoComplete="off"
-          placeholder="Type your answer…"
+          placeholder="כתבו כאן את התשובה…"
           disabled={sending}
         />
       </Field>
@@ -105,7 +105,7 @@ export function TextComposer({
         loading={sending}
       >
         {!sending && <Send className="size-5" aria-hidden />}
-        {sending ? "Checking…" : "Submit answer"}
+        {sending ? "בודקים…" : "שולחים תשובה"}
       </Button>
     </form>
   );

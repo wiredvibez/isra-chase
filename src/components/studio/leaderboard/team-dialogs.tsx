@@ -42,11 +42,11 @@ export function AdjustScoreDialog({
     if (!team) return;
     const value = Math.round(Number(amount));
     if (!Number.isFinite(value) || value === 0) {
-      toast.error("An adjustment can't be zero.");
+      toast.error("עדכון ניקוד לא יכול להיות 0.");
       return;
     }
     if (!reason.trim()) {
-      toast.error("Score adjustments need a reason.");
+      toast.error("צריך לכתוב סיבה לעדכון הניקוד.");
       return;
     }
     setBusy(true);
@@ -56,10 +56,10 @@ export function AdjustScoreDialog({
         points: value,
         reason: reason.trim(),
       });
-      toast.success(`${formatPoints(value, true)} for ${team.name}.`);
+      toast.success(`${formatPoints(value, true)} נקודות לקבוצה ${team.name}.`);
       onClose();
     } catch (error) {
-      toastError(error, "Couldn't adjust that score.");
+      toastError(error, "לא הצלחנו לעדכן את הניקוד.");
     } finally {
       setBusy(false);
     }
@@ -70,21 +70,21 @@ export function AdjustScoreDialog({
       open={Boolean(team)}
       onClose={onClose}
       size="sm"
-      title={`Adjust ${team?.name ?? ""}'s score`}
-      description="Use a minus sign to deduct points. Every adjustment is recorded in the team's bonus history."
+      title={`עדכון הניקוד של ${team?.name ?? ""}`}
+      description="מספר שלילי מוריד נקודות. כל עדכון נרשם בהיסטוריית הבונוסים של הקבוצה."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button onClick={() => void submit()} loading={busy}>
-            Apply adjustment
+            לעדכן ניקוד
           </Button>
         </>
       }
     >
       <div className="space-y-4">
-        <Field label="Points" htmlFor="adjust-points" required>
+        <Field label="נקודות" htmlFor="adjust-points" required>
           <Input
             id="adjust-points"
             type="number"
@@ -93,11 +93,11 @@ export function AdjustScoreDialog({
             onChange={(e) => setAmount(e.target.value)}
           />
         </Field>
-        <Field label="Reason" htmlFor="adjust-reason" required>
+        <Field label="סיבה" htmlFor="adjust-reason" required>
           <Textarea
             id="adjust-reason"
             value={reason}
-            placeholder="Why are these points changing?"
+            placeholder="למה הניקוד משתנה?"
             onChange={(e) => setReason(e.target.value)}
           />
         </Field>
@@ -130,7 +130,7 @@ export function BonusHistoryDialog({
   async function saveEdit(entry: Adjustment) {
     const value = Math.round(Number(points));
     if (!Number.isFinite(value) || value === 0) {
-      toast.error("An adjustment can't be zero.");
+      toast.error("עדכון ניקוד לא יכול להיות 0.");
       return;
     }
     setBusy(true);
@@ -139,10 +139,10 @@ export function BonusHistoryDialog({
         points: value,
         reason: reason.trim() || undefined,
       });
-      toast.success("Adjustment updated.");
+      toast.success("העדכון נשמר.");
       setEditingId(null);
     } catch (error) {
-      toastError(error, "Couldn't update that entry.");
+      toastError(error, "לא הצלחנו לעדכן את השורה.");
     } finally {
       setBusy(false);
     }
@@ -152,9 +152,9 @@ export function BonusHistoryDialog({
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${chaseId}/adjustments/${entry.id}`);
-      toast.success("Adjustment removed and points recalculated.");
+      toast.success("השורה נמחקה והניקוד חושב מחדש.");
     } catch (error) {
-      toastError(error, "Couldn't remove that entry.");
+      toastError(error, "לא הצלחנו למחוק את השורה.");
     } finally {
       setBusy(false);
     }
@@ -164,11 +164,11 @@ export function BonusHistoryDialog({
     <Dialog
       open={Boolean(team)}
       onClose={onClose}
-      title={`${team?.name ?? ""} — bonus history`}
-      description="Every bonus and manual adjustment, with who made it and when."
+      title={`היסטוריית הבונוסים של ${team?.name ?? ""}`}
+      description="כל נקודות הבונוס וכל עדכון ניקוד ידני — מי ביצע ומתי."
       footer={
         <Button variant="ghost" onClick={onClose}>
-          Done
+          סגירה
         </Button>
       }
     >
@@ -180,25 +180,25 @@ export function BonusHistoryDialog({
                 <div className="space-y-2">
                   <Input
                     type="number"
-                    aria-label="Points"
+                    aria-label="נקודות"
                     value={points}
                     onChange={(e) => setPoints(e.target.value)}
                   />
                   <Textarea
-                    aria-label="Reason"
+                    aria-label="סיבה"
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                   />
                   <div className="flex gap-2">
                     <Button size="sm" loading={busy} onClick={() => void saveEdit(entry)}>
-                      Save
+                      לשמור
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => setEditingId(null)}
                     >
-                      Cancel
+                      ביטול
                     </Button>
                   </div>
                 </div>
@@ -208,17 +208,17 @@ export function BonusHistoryDialog({
                     {formatPoints(entry.points, true)}
                   </Badge>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm">{entry.reason ?? "No reason given"}</p>
+                    <p className="text-sm">{entry.reason ?? "ללא סיבה"}</p>
                     <p className="text-xs text-muted-foreground">
                       {entry.byName} · {dateTime(entry.createdAt)}
-                      {entry.editedAt ? " · edited" : ""}
-                      {entry.submissionId ? " · submission bonus" : ""}
+                      {entry.editedAt ? " · נערך" : ""}
+                      {entry.submissionId ? " · בונוס על הגשה" : ""}
                     </p>
                   </div>
                   <Button
                     size="icon"
                     variant="ghost"
-                    aria-label="Edit adjustment"
+                    aria-label="לערוך את השורה"
                     onClick={() => {
                       setEditingId(entry.id);
                       setPoints(String(entry.points));
@@ -230,7 +230,7 @@ export function BonusHistoryDialog({
                   <Button
                     size="icon"
                     variant="ghost"
-                    aria-label="Delete adjustment"
+                    aria-label="למחוק את השורה"
                     onClick={() => void remove(entry)}
                   >
                     <Trash2 className="size-4 text-danger" aria-hidden />
@@ -242,7 +242,7 @@ export function BonusHistoryDialog({
         </ul>
       ) : (
         <p className="text-sm text-muted-foreground">
-          No bonuses or adjustments for this team yet.
+          עוד אין בונוסים או עדכוני ניקוד לקבוצה הזו.
         </p>
       )}
     </Dialog>
@@ -272,7 +272,7 @@ export function TeamBroadcastDialog({
 
   async function send() {
     if (!team || !body.trim()) {
-      toast.error("Write something to send.");
+      toast.error("צריך לכתוב משהו כדי לשלוח.");
       return;
     }
     setBusy(true);
@@ -284,10 +284,10 @@ export function TeamBroadcastDialog({
         teamIds: [team.id],
         schedule: { kind: "now" },
       });
-      toast.success(`Sent to ${team.name}.`);
+      toast.success(`ההודעה נשלחה לקבוצה ${team.name}.`);
       onClose();
     } catch (error) {
-      toastError(error, "Couldn't send that broadcast.");
+      toastError(error, "לא הצלחנו לשלוח את ההודעה.");
     } finally {
       setBusy(false);
     }
@@ -298,20 +298,20 @@ export function TeamBroadcastDialog({
       open={Boolean(team)}
       onClose={onClose}
       size="sm"
-      title={`Message ${team?.name ?? ""}`}
-      description="Only this team sees it."
+      title={`הודעה לקבוצה ${team?.name ?? ""}`}
+      description="רק הקבוצה הזו תראה אותה."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button onClick={() => void send()} loading={busy}>
-            Send now
+            לשלוח עכשיו
           </Button>
         </>
       }
     >
-      <Field label="Message" htmlFor="team-broadcast-body" required>
+      <Field label="ההודעה" htmlFor="team-broadcast-body" required>
         <Textarea
           id="team-broadcast-body"
           value={body}

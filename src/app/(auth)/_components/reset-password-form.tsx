@@ -34,7 +34,7 @@ export function ResetPasswordForm() {
     return (
       <div className="space-y-6">
         <h1 className="font-display text-3xl font-extrabold tracking-tight">
-          Check your inbox
+          תבדקו את המייל
         </h1>
         <div
           // Announced because it replaces the form the person just submitted.
@@ -43,15 +43,18 @@ export function ResetPasswordForm() {
         >
           <MailCheck className="mt-0.5 size-5 shrink-0 text-success" aria-hidden />
           <p className="leading-relaxed">
-            If <span className="font-semibold">{sentTo}</span> has an account, a
-            reset link is on its way. The link expires after an hour.
+            אם יש חשבון על{" "}
+            <span dir="ltr" className="font-semibold">
+              {sentTo}
+            </span>
+            , קישור לאיפוס כבר בדרך. הקישור תקף לשעה.
           </p>
         </div>
         <AuthAltLink
           href="/signin"
           next={next}
-          prompt="Got it?"
-          action="Back to sign in"
+          prompt="זהו?"
+          action="חזרה לכניסה"
         />
       </div>
     );
@@ -61,11 +64,10 @@ export function ResetPasswordForm() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-extrabold tracking-tight">
-          Reset your password
+          איפוס סיסמה
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Tell us the email on the account and we&rsquo;ll send a link to set a new
-          password.
+          תכתבו את האימייל של החשבון ונשלח לשם קישור לבחירת סיסמה חדשה.
         </p>
       </div>
 
@@ -76,27 +78,27 @@ export function ResetPasswordForm() {
           id="reset-email"
           name="email"
           type="email"
-          label="Email"
+          label="אימייל"
           required
           autoComplete="email"
           autoFocus
           placeholder="you@example.com"
           messages={{
-            valueMissing: "Enter the email on the account.",
-            typeMismatch: "That doesn't look like an email address.",
+            valueMissing: "תכתבו את האימייל של החשבון.",
+            typeMismatch: "זה לא נראה כמו כתובת אימייל.",
           }}
         />
 
         <Button type="submit" size="lg" className="w-full" loading={busy}>
-          Send the reset link
+          שולחים קישור לאיפוס
         </Button>
       </form>
 
       <AuthAltLink
         href="/signin"
         next={next}
-        prompt="Remembered it?"
-        action="Back to sign in"
+        prompt="נזכרתם?"
+        action="חזרה לכניסה"
       />
     </div>
   );

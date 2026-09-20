@@ -1,7 +1,9 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Isra Chase — turn any group into teams racing through photo, text and GPS missions.";
+  "Isra Chase — הופכים חבורה שלמה לקבוצות שרצות בין משימות צילום, טקסט ומיקום.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -18,7 +20,53 @@ const CORAL = "#ff8f6b";
 const GOLD = "#ffc94d";
 const WHITE = "#ffffff";
 
-export default function OpengraphImage() {
+/*
+ * The card is Hebrew, and the renderer's built-in font is Latin-only — without
+ * a font that carries Hebrew glyphs every word would come out as empty boxes.
+ * Rubik is the same family the site uses, and one bold cut covers the whole
+ * card. The `process.cwd()` join is the shape Next's file tracing recognises,
+ * so the .ttf travels with the deployment.
+ */
+const FONT_PATH = join(process.cwd(), "src/app/og-rubik-700.ttf");
+
+/*
+ * THE CARD IS LAID OUT BY HAND, RIGHT TO LEFT. Read this before editing it.
+ *
+ * The image renderer (satori) has no bidirectional text pass and ignores
+ * `direction: rtl`: it places glyphs in logical order from the left, and lays
+ * flex rows out left to right whatever you tell it. So this file does both jobs
+ * itself — `visual()` hands it each Hebrew line already in visual order, and
+ * every row is written with its right-hand element last.
+ *
+ * The rules that keep it correct:
+ *   - every Hebrew line is its own element, pure Hebrew, and `nowrap`;
+ *   - line breaks are chosen here, not by the renderer. A line that outgrows
+ *     the card overflows visibly, which is a far better failure than a wrapped
+ *     line silently reading backwards;
+ *   - Latin runs (the brand name) are left alone — they are already visual.
+ */
+const visual = (line: string) => [...line].reverse().join("");
+
+const HEADLINE = [
+  "הופכים חבורה שלמה לקבוצות שרצות",
+  "בין משימות צילום, טקסט ומיקום.",
+];
+
+const SUBHEAD = [
+  "פיד פעילות בזמן אמת · טבלת מובילים בדירוג אולימפי",
+  "נקודות בונוס · בקרה עם יומן שינויים",
+];
+
+// Rightmost first, because the row itself is still drawn left to right.
+const CHIPS = [
+  { label: "צ'ק-אין במיקום", color: GOLD },
+  { label: "טקסט", color: TEAL_300 },
+  { label: "צילום", color: CORAL },
+];
+
+export default async function OpengraphImage() {
+  const fontData = await readFile(FONT_PATH);
+
   return new ImageResponse(
     (
       <div
@@ -27,16 +75,20 @@ export default function OpengraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          alignItems: "flex-end",
           justifyContent: "space-between",
           gap: 28,
           padding: 80,
           backgroundColor: TEAL_900,
-          backgroundImage: `radial-gradient(circle at 78% 18%, ${TEAL_700} 0%, ${TEAL_900} 58%)`,
+          backgroundImage: `radial-gradient(circle at 22% 18%, ${TEAL_700} 0%, ${TEAL_900} 58%)`,
           color: WHITE,
-          fontFamily: "sans-serif",
+          fontFamily: "Rubik",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", fontSize: 44, fontWeight: 700, letterSpacing: -1 }}>
+            Isra Chase
+          </div>
           <svg width="72" height="72" viewBox="0 0 32 32">
             <rect width="32" height="32" rx="9" fill={TEAL_300} />
             <g
@@ -57,36 +109,58 @@ export default function OpengraphImage() {
               <circle cx="22.8" cy="10.2" r="3.4" fill="none" strokeWidth="2.1" />
             </g>
           </svg>
-          <div style={{ display: "flex", fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>
-            Isra Chase
-          </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 24,
+          }}
+        >
+          {HEADLINE.map((line) => (
+            <div
+              key={line}
+              style={{
+                display: "flex",
+                fontSize: 58,
+                fontWeight: 700,
+                lineHeight: 1.1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {visual(line)}
+            </div>
+          ))}
+
           <div
             style={{
               display: "flex",
-              fontSize: 60,
-              fontWeight: 800,
-              lineHeight: 1.08,
-              letterSpacing: -2,
-              maxWidth: 940,
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 6,
+              marginTop: 6,
             }}
           >
-            Turn any group into teams racing through photo, text and GPS missions.
-          </div>
-          <div style={{ display: "flex", fontSize: 30, color: TEAL_300, maxWidth: 860 }}>
-            Live activity feed · Olympic-ranked leaderboard · bonus points ·
-            moderation with an audit trail
+            {SUBHEAD.map((line) => (
+              <div
+                key={line}
+                style={{
+                  display: "flex",
+                  fontSize: 30,
+                  color: TEAL_300,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {visual(line)}
+              </div>
+            ))}
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 16 }}>
-          {[
-            { label: "Camera", color: CORAL },
-            { label: "Text", color: TEAL_300 },
-            { label: "GPS check-in", color: GOLD },
-          ].map((chip) => (
+          {CHIPS.map((chip) => (
             <div
               key={chip.label}
               style={{
@@ -99,8 +173,10 @@ export default function OpengraphImage() {
                 color: chip.color,
                 fontSize: 28,
                 fontWeight: 700,
+                whiteSpace: "nowrap",
               }}
             >
+              {visual(chip.label)}
               <div
                 style={{
                   width: 14,
@@ -109,12 +185,14 @@ export default function OpengraphImage() {
                   backgroundColor: chip.color,
                 }}
               />
-              {chip.label}
             </div>
           ))}
         </div>
       </div>
     ),
-    size,
+    {
+      ...size,
+      fonts: [{ name: "Rubik", data: fontData, style: "normal", weight: 700 }],
+    },
   );
 }

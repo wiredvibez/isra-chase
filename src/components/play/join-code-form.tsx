@@ -26,19 +26,20 @@ export function JoinCodeForm({ initialCode = "" }: { initialCode?: string }) {
         <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-100">
           <QrCode className="size-7" aria-hidden />
         </span>
-        <h1 className="font-display text-3xl font-bold">Join a chase</h1>
+        <h1 className="font-display text-3xl font-bold">מצטרפים למרדף</h1>
         <p className="text-sm text-muted-foreground">
-          Type the code your organizer gave you — or scan their QR code and skip
-          this step entirely.
+          תקלידו את הקוד שקיבלתם מהמארגן — או תסרקו את קוד ה-QR שלו ותדלגו על
+          השלב הזה לגמרי.
         </p>
       </div>
 
       <Card>
         <CardContent className="p-5">
           <form onSubmit={submit} className="space-y-4">
-            <Field label="Join code" htmlFor="join-code" required>
+            <Field label="קוד הצטרפות" htmlFor="join-code" required>
               <Input
                 id="join-code"
+                dir="ltr"
                 value={code}
                 onChange={(event) => setCode(event.target.value)}
                 autoCapitalize="characters"
@@ -58,7 +59,7 @@ export function JoinCodeForm({ initialCode = "" }: { initialCode?: string }) {
               className="w-full"
               disabled={!code.trim()}
             >
-              Continue
+              ממשיכים
               <ArrowRight className="size-5 flip-rtl" aria-hidden />
             </Button>
           </form>

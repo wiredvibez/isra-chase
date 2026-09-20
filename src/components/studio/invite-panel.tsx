@@ -137,7 +137,7 @@ export function InvitePanel({
           <p>השחקנים סורקים אותו, או מקלידים את הקוד באפליקציה.</p>
           <Button type="button" size="sm" variant="outline" onClick={downloadQr}>
             <Download className="size-4" aria-hidden />
-            הורדת ה-QR
+            הורדת QR
           </Button>
         </div>
       </div>

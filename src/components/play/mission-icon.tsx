@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 import type { MissionType } from "@/lib/domain/types";
 
 const BY_TYPE = {
-  camera: { icon: Camera, label: "Photo or video mission", tone: "bg-accent/12 text-accent" },
-  text: { icon: Type, label: "Text mission", tone: "bg-info-surface text-info" },
-  gps: { icon: MapPin, label: "GPS mission", tone: "bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-100" },
+  camera: { icon: Camera, label: "משימת צילום", tone: "bg-accent/12 text-accent" },
+  text: { icon: Type, label: "משימת טקסט", tone: "bg-info-surface text-info" },
+  gps: { icon: MapPin, label: "משימת מיקום", tone: "bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-100" },
 } as const;
 
 export function MissionIcon({

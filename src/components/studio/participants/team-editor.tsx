@@ -69,7 +69,7 @@ export function TeamEditor({
 
   async function save() {
     if (!form.name.trim()) {
-      toast.error("Teams need a name.");
+      toast.error("לקבוצה צריך שם.");
       return;
     }
     setSaving(true);
@@ -84,14 +84,14 @@ export function TeamEditor({
     try {
       if (team) {
         await apiPatch(`/api/chases/${chaseId}/teams/${team.id}`, payload);
-        toast.success("Team updated.");
+        toast.success("הקבוצה עודכנה.");
       } else {
         await apiPost(`/api/chases/${chaseId}/teams`, payload);
-        toast.success("Team created.");
+        toast.success("הקבוצה נוצרה.");
       }
       onClose();
     } catch (error) {
-      toastError(error, "Couldn't save that team.");
+      toastError(error, "לא הצלחנו לשמור את הקבוצה.");
     } finally {
       setSaving(false);
     }
@@ -101,21 +101,21 @@ export function TeamEditor({
     <Dialog
       open={open}
       onClose={onClose}
-      title={team ? `Edit ${team.name}` : "Pre-create a team"}
-      description="Pre-created teams are ready for players to join with the team passcode."
+      title={team ? `עריכת ${team.name}` : "קבוצה מוכנה מראש"}
+      description="קבוצה שהוכנה מראש מחכה לשחקנים שיצטרפו אליה עם קוד הקבוצה."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button onClick={() => void save()} loading={saving}>
-            {team ? "Save team" : "Create team"}
+            {team ? "שמירת הקבוצה" : "יצירת הקבוצה"}
           </Button>
         </>
       }
     >
       <div className="space-y-4">
-        <Field label="Team name" htmlFor="team-name" required>
+        <Field label="שם הקבוצה" htmlFor="team-name" required>
           <Input
             id="team-name"
             value={form.name}
@@ -124,9 +124,9 @@ export function TeamEditor({
           />
         </Field>
 
-        <Field label="Team photo">
+        <Field label="תמונת הקבוצה">
           <ImageUpload
-            label="Team photo"
+            label="תמונת קבוצה"
             ratio="1/1"
             folder={`chases/${chaseId}/teams/${uploadId}`}
             value={form.photoUrl}
@@ -135,12 +135,12 @@ export function TeamEditor({
         </Field>
 
         <Field
-          label="Passcode"
+          label="קוד הקבוצה"
           htmlFor="team-passcode"
           hint={
             team?.hasPasscode
-              ? "A passcode is already set. Type a new one to replace it."
-              : "Players who know it skip the chase password."
+              ? "כבר מוגדר קוד. הקלידו קוד חדש כדי להחליף אותו."
+              : "מי שמכיר את הקוד לא צריך את סיסמת המרדף."
           }
         >
           <Input
@@ -149,7 +149,7 @@ export function TeamEditor({
             maxLength={32}
             autoComplete="off"
             disabled={form.clearPasscode}
-            placeholder={team?.hasPasscode ? "Unchanged" : "No passcode"}
+            placeholder={team?.hasPasscode ? "ללא שינוי" : "בלי קוד"}
             onChange={(e) => setForm((f) => ({ ...f, passcode: e.target.value }))}
           />
           {team?.hasPasscode && (
@@ -161,13 +161,13 @@ export function TeamEditor({
                   setForm((f) => ({ ...f, clearPasscode: e.target.checked }))
                 }
               />
-              Remove the existing passcode
+              להסיר את הקוד הקיים
             </label>
           )}
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Mode" htmlFor="team-mode">
+          <Field label="סוג" htmlFor="team-mode">
             <Select
               id="team-mode"
               value={form.mode}
@@ -175,14 +175,14 @@ export function TeamEditor({
                 setForm((f) => ({ ...f, mode: e.target.value as "team" | "solo" }))
               }
             >
-              <option value="team">Team — many players</option>
-              <option value="solo">Solo — one player</option>
+              <option value="team">קבוצה — כמה שחקנים</option>
+              <option value="solo">משתתף יחיד — שחקן אחד</option>
             </Select>
           </Field>
           <Field
-            label="Max members"
+            label="מקסימום חברים"
             htmlFor="team-max"
-            hint="Blank means unlimited."
+            hint="שדה ריק = בלי הגבלה."
           >
             <Input
               id="team-max"

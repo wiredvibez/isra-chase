@@ -13,16 +13,16 @@ type Status = "idle" | "locating" | "ready" | "denied" | "unavailable" | "timeou
 
 const FAILURE_COPY: Record<"denied" | "unavailable" | "timeout", { title: string; body: string }> = {
   denied: {
-    title: "Location is blocked",
-    body: "Your browser is holding back your position. Tap the lock or ⓘ icon next to the address bar, set Location to Allow, then try again. On iPhone, also check Settings › Privacy & Security › Location Services.",
+    title: "אין גישה למיקום",
+    body: "הדפדפן חוסם את המיקום שלכם. הקישו על סמל המנעול או ⓘ שליד שורת הכתובת, שנו את ההרשאה למיקום ל\"אישור\" ונסו שוב. באייפון כדאי לבדוק גם: הגדרות › פרטיות ואבטחה › שירותי מיקום.",
   },
   unavailable: {
-    title: "Couldn't get a fix",
-    body: "Your device can't work out where it is right now. Step outside or somewhere with a clearer view of the sky, then try again.",
+    title: "לא הצלחנו לאתר אתכם",
+    body: "המכשיר לא מצליח להבין איפה הוא כרגע. צאו החוצה או לאזור פתוח יותר ונסו שוב.",
   },
   timeout: {
-    title: "That took too long",
-    body: "The GPS didn't answer in time. Stay put for a moment and try again — the first fix is always the slowest.",
+    title: "זה לקח יותר מדי זמן",
+    body: "ה-GPS לא ענה בזמן. עמדו במקום רגע ונסו שוב — האיתור הראשון תמיד הכי איטי.",
   },
 };
 
@@ -85,7 +85,7 @@ export function GpsComposer({
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "That didn't go through. Try again.",
+          : "הצ'ק-אין לא נשלח. תנסו שוב.",
       );
     } finally {
       setSending(false);
@@ -106,16 +106,16 @@ export function GpsComposer({
           aria-live="polite"
           className="space-y-2 rounded-lg border border-warning/30 bg-warning-surface p-4"
         >
-          <p className="font-display text-base font-bold">Not there yet</p>
+          <p className="font-display text-base font-bold">עוד לא הגעתם</p>
           <p className="text-sm text-muted-foreground">
             {missDistance !== null
-              ? `You're ${fmtDistance(missDistance)} away — get within ${radiusLabel(radiusM)} and check in again.`
+              ? `אתם ${fmtDistance(missDistance)} משם. תיכנסו לטווח של ${radiusLabel(radiusM)} ותעשו צ'ק-אין שוב.`
               : (rejection.submission.gradeReason ??
-                `You're outside the ${radiusLabel(radiusM)} zone. Get closer and check in again.`)}
+                `אתם מחוץ לטווח של ${radiusLabel(radiusM)}. תתקרבו ותעשו צ'ק-אין שוב.`)}
           </p>
           <Button type="button" variant="outline" size="sm" onClick={onRetry}>
             <RotateCcw className="size-4" aria-hidden />
-            Check in again
+            {"צ'ק-אין נוסף"}
           </Button>
         </div>
       )}
@@ -123,11 +123,10 @@ export function GpsComposer({
       <div className="rounded-lg border border-border bg-surface p-4">
         <p className="flex items-center gap-2 font-display text-base font-bold">
           <Navigation className="size-4 text-primary" aria-hidden />
-          Get within {radiusLabel(radiusM)}
+          תיכנסו לטווח של {radiusLabel(radiusM)}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          We check your distance on the server — the exact spot stays secret.
-          Your position is used once, for this check-in.
+          {"את המרחק בודקים בשרת, והנקודה המדויקת נשארת סוד. המיקום שלכם משמש פעם אחת בלבד, לצ'ק-אין הזה."}
         </p>
       </div>
 
@@ -149,13 +148,18 @@ export function GpsComposer({
           aria-live="polite"
           className="rounded-lg border border-success/30 bg-success-surface p-4"
         >
-          <p className="font-display text-base font-bold">Got your location</p>
+          <p className="font-display text-base font-bold">יש לנו את המיקום שלכם</p>
           <p className="mt-1 text-sm text-muted-foreground tabular-nums">
-            {fix.accuracyM !== null
-              ? `Accurate to about ±${fmtDistance(fix.accuracyM)}.`
-              : "Accuracy unknown."}{" "}
+            {fix.accuracyM !== null ? (
+              <>
+                דיוק של בערך <span dir="ltr">±{fmtDistance(fix.accuracyM)}</span>
+                .
+              </>
+            ) : (
+              "רמת הדיוק לא ידועה."
+            )}{" "}
             {fix.accuracyM !== null && fix.accuracyM > radiusM
-              ? "That's wider than the target zone, so move somewhere with a better signal if this fails."
+              ? "זה רחב יותר מטווח המשימה, אז אם הצ'ק-אין ייכשל — עברו למקום עם קליטה טובה יותר."
               : ""}
           </p>
         </div>
@@ -171,10 +175,10 @@ export function GpsComposer({
       >
         {status !== "locating" && <LocateFixed className="size-5" aria-hidden />}
         {status === "locating"
-          ? "Finding you…"
+          ? "מאתרים אתכם…"
           : status === "ready"
-            ? "Refresh my location"
-            : "Share my location"}
+            ? "לרענן את המיקום"
+            : "משתפים מיקום"}
       </Button>
 
       <Button
@@ -186,7 +190,7 @@ export function GpsComposer({
         loading={sending}
       >
         {!sending && <Send className="size-5" aria-hidden />}
-        {sending ? "Checking…" : "Check in here"}
+        {sending ? "בודקים…" : "עושים צ'ק-אין כאן"}
       </Button>
     </div>
   );

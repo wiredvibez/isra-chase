@@ -71,7 +71,7 @@ export function Sheet({
         <button
           type="button"
           onClick={() => ref.current?.close()}
-          aria-label="Close"
+          aria-label="סגירה"
           className="rounded-md p-1 text-muted-foreground hover:bg-surface-muted"
         >
           <X className="size-5" />

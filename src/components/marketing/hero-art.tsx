@@ -5,6 +5,11 @@ import { cn } from "@/lib/utils";
  * A drawn city map with a dotted route between a camera mission, a text
  * mission and a GPS check-in. Every colour is an alpha blend of a brand token
  * over `--surface`, so the same drawing reads correctly in both themes.
+ *
+ * The drawing is horizontally mirrored because it tells a story in order —
+ * stop 1, stop 2, stop 3 — and in an RTL document that story has to start on
+ * the right. Mirroring the whole group also keeps the little text-mission
+ * glyph ragged on the correct side.
  */
 function MapDrawing() {
   const blocks: Array<[number, number, number, number]> = [
@@ -23,7 +28,7 @@ function MapDrawing() {
     <svg
       viewBox="0 0 400 320"
       role="img"
-      aria-label="A city map with a dotted route linking a photo mission, a text mission and a GPS check-in."
+      aria-label="מפת עיר עם מסלול מקווקו שמחבר משימת צילום, משימת טקסט וצ'ק-אין במיקום."
       className="w-full h-auto"
     >
       <defs>
@@ -32,7 +37,7 @@ function MapDrawing() {
         </clipPath>
       </defs>
 
-      <g clipPath="url(#hero-map-clip)">
+      <g clipPath="url(#hero-map-clip)" transform="translate(400 0) scale(-1 1)">
         <rect width="400" height="320" className="fill-surface-muted" />
 
         {/* Street grid */}
@@ -135,8 +140,8 @@ export function HeroArt({ className }: { className?: string }) {
           <Trophy className="size-4" aria-hidden />
         </span>
         <span className="text-xs leading-tight">
-          <span className="block font-semibold">Blue Herons</span>
-          <span className="block text-muted-foreground">940 points · 1st</span>
+          <span className="block font-semibold">אנפות כחולות</span>
+          <span className="block text-muted-foreground">940 נקודות · מקום 1</span>
         </span>
       </FloatingChip>
 
@@ -145,8 +150,8 @@ export function HeroArt({ className }: { className?: string }) {
           <Users className="size-4" aria-hidden />
         </span>
         <span className="text-xs leading-tight">
-          <span className="block font-semibold">12 teams playing</span>
-          <span className="block text-muted-foreground">48 submissions so far</span>
+          <span className="block font-semibold">12 קבוצות משחקות</span>
+          <span className="block text-muted-foreground">48 הגשות עד עכשיו</span>
         </span>
       </FloatingChip>
     </div>

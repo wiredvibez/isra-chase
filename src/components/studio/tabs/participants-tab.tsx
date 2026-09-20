@@ -14,7 +14,6 @@ import { SkeletonList } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { apiDelete, apiPatch, apiPost } from "@/lib/api-client";
 import type { Chase, Participant, Team } from "@/lib/domain/types";
-import { dateTime } from "@/lib/format";
 import { useLoadedChase } from "../chase-context";
 import { useParticipants, useTeams } from "../data-hooks";
 import { Menu } from "../menu";
@@ -22,6 +21,7 @@ import { TeamEditor } from "../participants/team-editor";
 import { SaveBar, useSaveState } from "../save-bar";
 import { SettingRow, TabHeader } from "../section";
 import {
+  dateTimeLabel,
   PARTICIPANT_MODE_HINT,
   PARTICIPANT_MODE_LABEL,
   toastError,
@@ -84,7 +84,7 @@ export function ParticipantsTab() {
       save.markSaved();
     } catch (error) {
       save.markFailed();
-      toastError(error, "Couldn't save those settings.");
+      toastError(error, "לא הצלחנו לשמור את ההגדרות.");
     }
   }
 
@@ -93,10 +93,10 @@ export function ParticipantsTab() {
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${chaseId}/teams/${deleteTeam.id}`);
-      toast.success("Team deleted.");
+      toast.success("הקבוצה נמחקה.");
       setDeleteTeam(null);
     } catch (error) {
-      toastError(error, "Couldn't delete that team.");
+      toastError(error, "לא הצלחנו למחוק את הקבוצה.");
     } finally {
       setBusy(false);
     }
@@ -107,10 +107,10 @@ export function ParticipantsTab() {
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${chaseId}/participants/${removePerson.uid}`);
-      toast.success(`${removePerson.displayName} removed.`);
+      toast.success(`הסרנו את ${removePerson.displayName} מהמרדף.`);
       setRemovePerson(null);
     } catch (error) {
-      toastError(error, "Couldn't remove that participant.");
+      toastError(error, "לא הצלחנו להסיר את המשתתף.");
     } finally {
       setBusy(false);
     }
@@ -124,11 +124,11 @@ export function ParticipantsTab() {
         `/api/chases/${chaseId}/participants/${movePerson.uid}/move`,
         { teamId: moveTarget },
       );
-      toast.success(`${movePerson.displayName} moved.`);
+      toast.success(`העברנו את ${movePerson.displayName}.`);
       setMovePerson(null);
       setMoveTarget("");
     } catch (error) {
-      toastError(error, "Couldn't move that participant.");
+      toastError(error, "לא הצלחנו להעביר את המשתתף.");
     } finally {
       setBusy(false);
     }
@@ -151,8 +151,8 @@ export function ParticipantsTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Participants"
-        description="How people join, the teams they join, and who is on them."
+        title="משתתפים"
+        description="איך מצטרפים, לאילו קבוצות, ומי נמצא בכל אחת."
         actions={
           <Button
             onClick={() => {
@@ -161,7 +161,7 @@ export function ParticipantsTab() {
             }}
           >
             <Plus className="size-4" aria-hidden />
-            Pre-create team
+            קבוצה מוכנה מראש
           </Button>
         }
       />
@@ -169,7 +169,7 @@ export function ParticipantsTab() {
       <Card>
         <CardContent className="pt-5">
           <SettingRow
-            label="Participant mode"
+            label="מצב השתתפות"
             hint={PARTICIPANT_MODE_HINT[form.participantMode]}
             htmlFor="participant-mode"
           >
@@ -190,18 +190,18 @@ export function ParticipantsTab() {
             </Select>
           </SettingRow>
 
-          <SettingRow label="Participant-created teams">
+          <SettingRow label="קבוצות שהשחקנים יוצרים">
             <Switch
               checked={form.allowSelfCreatedTeams}
               onChange={(v) => set("allowSelfCreatedTeams", v)}
-              label="Players can create their own teams"
-              description="Turn this off to only allow the teams you pre-create."
+              label="לאפשר לשחקנים ליצור קבוצות משלהם"
+              description="כיבוי מאפשר להצטרף רק לקבוצות שהכנתם מראש."
             />
           </SettingRow>
 
           <SettingRow
-            label="Max members per team"
-            hint="Blank means unlimited."
+            label="מקסימום חברים בקבוצה"
+            hint="שדה ריק = בלי הגבלה."
             htmlFor="max-members"
           >
             <Input
@@ -216,8 +216,8 @@ export function ParticipantsTab() {
           </SettingRow>
 
           <SettingRow
-            label="Mission order"
-            hint="How missions are sorted in the player app."
+            label="סדר המשימות"
+            hint="איך המשימות ממוינות באפליקציית השחקנים."
             htmlFor="mission-order"
           >
             <Select
@@ -227,10 +227,10 @@ export function ParticipantsTab() {
                 set("missionOrder", e.target.value as Chase["missionOrder"])
               }
             >
-              <option value="custom">Custom — your drag order</option>
-              <option value="points">Point value</option>
-              <option value="alphabetical">Alphabetical</option>
-              <option value="random">Random per team</option>
+              <option value="custom">מותאם אישית — לפי סדר הגרירה שלכם</option>
+              <option value="points">לפי ניקוד</option>
+              <option value="alphabetical">לפי א־ב</option>
+              <option value="random">אקראי לכל קבוצה</option>
             </Select>
           </SettingRow>
         </CardContent>
@@ -246,15 +246,15 @@ export function ParticipantsTab() {
       />
 
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold">Roster</h2>
+        <h2 className="font-display text-lg font-bold">הרכב המשתתפים</h2>
 
         {(teamsLoading || peopleLoading) && <SkeletonList rows={3} />}
 
         {!teamsLoading && !teams.length && (
           <EmptyState
             icon={<Users className="size-6" aria-hidden />}
-            title="No teams yet"
-            description="Pre-create teams now, or let players create their own when they join."
+            title="עדיין אין קבוצות"
+            description="אפשר להכין קבוצות עכשיו, או לתת לשחקנים ליצור קבוצות בעצמם כשהם מצטרפים."
             action={
               <Button
                 onClick={() => {
@@ -263,7 +263,7 @@ export function ParticipantsTab() {
                 }}
               >
                 <Plus className="size-4" aria-hidden />
-                Pre-create a team
+                מכינים קבוצה
               </Button>
             }
           />
@@ -282,22 +282,23 @@ export function ParticipantsTab() {
                         {team.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {members.length}{" "}
-                        {members.length === 1 ? "member" : "members"}
-                        {team.maxMembers ? ` of ${team.maxMembers}` : ""} ·{" "}
-                        {team.points} pts
+                        {members.length === 1
+                          ? "חבר אחד"
+                          : `${members.length} חברים`}
+                        {team.maxMembers ? ` מתוך ${team.maxMembers}` : ""} ·{" "}
+                        {`${team.points} נק'`}
                       </p>
                     </div>
-                    {team.mode === "solo" && <Badge tone="info">Solo</Badge>}
+                    {team.mode === "solo" && <Badge tone="info">משתתף יחיד</Badge>}
                     {team.createdBy === "organizer" && (
-                      <Badge tone="neutral">Pre-created</Badge>
+                      <Badge tone="neutral">מוכנה מראש</Badge>
                     )}
                     <Menu
-                      label={`Actions for ${team.name}`}
+                      label={`פעולות עבור ${team.name}`}
                       items={[
                         {
                           id: "edit",
-                          label: "Edit team",
+                          label: "עריכת הקבוצה",
                           icon: <Pencil className="size-4" aria-hidden />,
                           onSelect: () => {
                             setEditingTeam(team);
@@ -306,7 +307,7 @@ export function ParticipantsTab() {
                         },
                         {
                           id: "delete",
-                          label: "Delete team",
+                          label: "מחיקת הקבוצה",
                           icon: <Trash2 className="size-4" aria-hidden />,
                           tone: "danger",
                           onSelect: () => setDeleteTeam(team),
@@ -332,16 +333,16 @@ export function ParticipantsTab() {
                               {person.displayName}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Joined {dateTime(person.joinedAt)}
+                              הצטרף ב-{dateTimeLabel(person.joinedAt)}
                               {person.email ? ` · ${person.email}` : ""}
                             </p>
                           </div>
                           <Menu
-                            label={`Actions for ${person.displayName}`}
+                            label={`פעולות עבור ${person.displayName}`}
                             items={[
                               {
                                 id: "move",
-                                label: "Move to another team",
+                                label: "העברה לקבוצה אחרת",
                                 icon: (
                                   <ArrowLeftRight className="size-4" aria-hidden />
                                 ),
@@ -355,7 +356,7 @@ export function ParticipantsTab() {
                               },
                               {
                                 id: "remove",
-                                label: "Remove from chase",
+                                label: "הסרה מהמרדף",
                                 icon: <UserMinus className="size-4" aria-hidden />,
                                 tone: "danger",
                                 onSelect: () => setRemovePerson(person),
@@ -367,7 +368,7 @@ export function ParticipantsTab() {
                     </ul>
                   ) : (
                     <p className="px-4 py-3 text-sm text-muted-foreground">
-                      Nobody has joined this team yet.
+                      עדיין אף אחד לא הצטרף לקבוצה הזו.
                     </p>
                   )}
                 </Card>
@@ -379,7 +380,7 @@ export function ParticipantsTab() {
         {orphans.length > 0 && (
           <Card>
             <CardContent className="pt-5">
-              <p className="mb-2 text-sm font-semibold">Without a team</p>
+              <p className="mb-2 text-sm font-semibold">בלי קבוצה</p>
               <ul className="divide-y divide-border">
                 {orphans.map((person) => (
                   <li key={person.uid} className="flex items-center gap-3 py-2">
@@ -395,7 +396,7 @@ export function ParticipantsTab() {
                         setMoveTarget(teams[0]?.id ?? "");
                       }}
                     >
-                      Assign to a team
+                      שיוך לקבוצה
                     </Button>
                   </li>
                 ))}
@@ -417,9 +418,9 @@ export function ParticipantsTab() {
         onClose={() => setDeleteTeam(null)}
         onConfirm={confirmDeleteTeam}
         loading={busy}
-        title={`Delete “${deleteTeam?.name ?? ""}”?`}
-        description={`Its ${byTeam.get(deleteTeam?.id ?? "")?.length ?? 0} member(s) are removed from the chase, and every submission and point this team earned is deleted. This cannot be undone.`}
-        confirmLabel="Delete team"
+        title={`למחוק את "${deleteTeam?.name ?? ""}"?`}
+        description={`${byTeam.get(deleteTeam?.id ?? "")?.length ?? 0} חברי הקבוצה יוסרו מהמרדף, וכל ההגשות והנקודות שהקבוצה צברה יימחקו. אי אפשר לשחזר.`}
+        confirmLabel="מחיקת הקבוצה"
       />
 
       <ConfirmDialog
@@ -427,43 +428,43 @@ export function ParticipantsTab() {
         onClose={() => setRemovePerson(null)}
         onConfirm={confirmRemovePerson}
         loading={busy}
-        title={`Remove ${removePerson?.displayName ?? ""}?`}
-        description="Their submissions are deleted and the points those earned come off their team's total. The team itself stays."
-        confirmLabel="Remove participant"
+        title={`להסיר את ${removePerson?.displayName ?? ""}?`}
+        description="כל ההגשות יימחקו, והנקודות שהן הכניסו יירדו מסך הנקודות של הקבוצה. הקבוצה עצמה נשארת."
+        confirmLabel="הסרת המשתתף"
       />
 
       {/* Moving a player between teams is our addition — Goosechase cannot do it. */}
       <Dialog
         open={Boolean(movePerson)}
         onClose={() => setMovePerson(null)}
-        title="Move to another team"
-        description={`${movePerson?.displayName ?? ""} keeps their submissions; the points move with them to the new team.`}
+        title="העברה לקבוצה אחרת"
+        description={`ההגשות של ${movePerson?.displayName ?? ""} נשארות, והנקודות עוברות יחד איתן לקבוצה החדשה.`}
         size="sm"
         footer={
           <>
             <Button variant="ghost" onClick={() => setMovePerson(null)}>
-              Cancel
+              ביטול
             </Button>
             <Button
               onClick={() => void confirmMove()}
               loading={busy}
               disabled={!moveTarget}
             >
-              Move participant
+              העברת המשתתף
             </Button>
           </>
         }
       >
         <div className="space-y-2">
           <label htmlFor="move-target" className="text-sm font-semibold">
-            New team
+            הקבוצה החדשה
           </label>
           <Select
             id="move-target"
             value={moveTarget}
             onChange={(e) => setMoveTarget(e.target.value)}
           >
-            <option value="">Choose a team…</option>
+            <option value="">בחרו קבוצה…</option>
             {teams
               .filter((team) => team.id !== movePerson?.teamId)
               .map((team) => (
@@ -472,7 +473,7 @@ export function ParticipantsTab() {
                 </option>
               ))}
           </Select>
-          <Badge tone="accent">Beyond Goosechase</Badge>
+          <Badge tone="accent">תוספת שלנו</Badge>
         </div>
       </Dialog>
     </div>

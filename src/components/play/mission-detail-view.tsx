@@ -31,18 +31,18 @@ import type { CreateSubmissionResponse } from "./types";
 function PriorMiss() {
   return (
     <div className="rounded-lg border border-warning/30 bg-warning-surface p-4">
-      <p className="font-display text-base font-bold">Your last try missed</p>
+      <p className="font-display text-base font-bold">הניסיון הקודם לא קלע</p>
       <p className="mt-1 text-sm text-muted-foreground">
-        Nothing was lost — submit again whenever you&rsquo;re ready.
+        לא הפסדתם כלום — אפשר לשלוח שוב מתי שתרצו.
       </p>
     </div>
   );
 }
 
 const TEXT_BADGE_LABEL = {
-  open: "Open answer",
-  exact: "Exact match",
-  approximate: "Close enough",
+  open: "תשובה חופשית",
+  exact: "התאמה מדויקת",
+  approximate: "בערך מספיק",
 } as const;
 
 export function MissionDetailView({ missionId }: { missionId: string }) {
@@ -76,12 +76,12 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
       setResult(null);
       await refreshMissions();
       setConfirmRedo(false);
-      toast.success("Mission reopened — give it another shot.");
+      toast.success("המשימה נפתחה מחדש. קדימה, עוד ניסיון.");
     } catch (caught) {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't reopen that mission.",
+          : "לא הצלחנו לפתוח את המשימה מחדש.",
       );
     } finally {
       setRedoing(false);
@@ -101,14 +101,14 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
         ) : (
           <EmptyState
             icon={<CircleAlert className="size-5" />}
-            title="This mission isn't available"
-            description="It may have been removed, or it isn't unlocked for your team yet."
+            title="המשימה הזאת לא זמינה"
+            description="יכול להיות שהיא הוסרה, או שהיא עוד לא נפתחה לקבוצה שלכם."
             action={
               <Link
                 href={backHref}
                 className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground"
               >
-                Back to missions
+                חזרה למשימות
               </Link>
             }
           />
@@ -131,7 +131,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
       <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-surface/95 px-2 py-2 backdrop-blur-sm pt-[calc(0.5rem+env(safe-area-inset-top))]">
         <Link
           href={backHref}
-          aria-label="Back to missions"
+          aria-label="חזרה למשימות"
           className="flex size-11 items-center justify-center rounded-full text-foreground hover:bg-surface-muted"
         >
           <ArrowLeft className="size-5 flip-rtl" />
@@ -160,26 +160,30 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
-            <Badge tone="accent">{fmtPoints(mission.points)} pts</Badge>
+            <Badge tone="accent">{`${fmtPoints(mission.points)} נק'`}</Badge>
             {mission.text && (
               <Badge tone="info">{TEXT_BADGE_LABEL[mission.text.badge]}</Badge>
             )}
             {mission.gps && (
               <Badge tone="neutral">
                 <MapPin className="size-3" aria-hidden />
-                within {radiusLabel(mission.gps.radiusM)}
+                ברדיוס {radiusLabel(mission.gps.radiusM)}
               </Badge>
             )}
             {mission.feedVisibility === "hidden" && (
-              <Badge tone="neutral">Not shown in the feed</Badge>
+              <Badge tone="neutral">לא מופיעה בפיד</Badge>
             )}
             {!expired && mission.availability.expiresAt && (
               <Badge tone="warning">
                 <Clock className="size-3" aria-hidden />
-                <Countdown toMs={mission.availability.expiresAt} />
+                <Countdown
+                  toMs={mission.availability.expiresAt}
+                  prefix="נשארו"
+                  endedLabel="נסגרה"
+                />
               </Badge>
             )}
-            {expired && <Badge tone="danger">Expired</Badge>}
+            {expired && <Badge tone="danger">נסגרה</Badge>}
           </div>
 
           {mission.description && (
@@ -196,7 +200,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline underline-offset-2"
             >
               <ExternalLink className="size-4" aria-hidden />
-              Open the link
+              פותחים את הקישור
             </a>
           )}
         </div>
@@ -212,13 +216,13 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
           <div className="space-y-3 rounded-lg border border-success/30 bg-success-surface p-4">
             <p className="font-display text-lg font-bold">
               {mission.submission?.status === "pending"
-                ? "Waiting on the organizer"
-                : "You&rsquo;ve done this one"}
+                ? "ממתינים למארגן"
+                : "את זו כבר עשיתם"}
             </p>
             <p className="text-sm text-muted-foreground">
               {mission.submission?.status === "pending"
-                ? "Your submission is in the review queue. Points land once it's approved."
-                : `Worth ${fmtPoints(mission.submission?.points ?? mission.points)} points to your team.`}
+                ? "ההגשה שלכם בתור לבדיקה. הנקודות ייכנסו ברגע שהיא תאושר."
+                : `${fmtPoints(mission.submission?.points ?? mission.points)} נקודות נכנסו לקבוצה.`}
             </p>
             <Button
               variant="outline"
@@ -227,27 +231,25 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
               onClick={() => setConfirmRedo(true)}
             >
               <RotateCcw className="size-5" aria-hidden />
-              Redo mission
+              לעשות שוב
             </Button>
           </div>
         ) : expired ? (
           <div className="rounded-lg border border-danger/30 bg-danger-surface p-4">
-            <p className="font-display text-base font-bold">
-              This mission has expired
-            </p>
+            <p className="font-display text-base font-bold">המשימה נסגרה</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              The window for it has closed, so it can&rsquo;t be submitted any more.
+              חלון הזמן שלה נגמר, אז אי אפשר לשלוח אליה יותר.
             </p>
           </div>
         ) : chaseClosed ? (
           <div className="rounded-lg border border-border bg-surface-muted p-4">
             <p className="font-display text-base font-bold">
               {chase?.status === "ended"
-                ? "The chase has ended"
-                : "The chase hasn't started"}
+                ? "המרדף הסתיים"
+                : "המרדף עוד לא התחיל"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Submissions are closed right now.
+              אי אפשר לשלוח הגשות כרגע.
             </p>
           </div>
         ) : !uid ? null : mission.type === "camera" ? (
@@ -255,10 +257,10 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
             {previouslyMissed && <PriorMiss />}
             {rejected && (
               <div role="status" aria-live="polite" className="rounded-lg border border-warning/30 bg-warning-surface p-4">
-                <p className="font-display text-base font-bold">Not accepted</p>
+                <p className="font-display text-base font-bold">ההגשה לא התקבלה</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {result?.submission.gradeReason ??
-                    "That submission wasn't accepted. Try another shot."}
+                    "ההגשה הזאת לא התקבלה. נסו צילום אחר."}
                 </p>
               </div>
             )}
@@ -299,9 +301,9 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
         onClose={() => setConfirmRedo(false)}
         onConfirm={redo}
         loading={redoing}
-        confirmLabel="Delete and redo"
-        title="Redo this mission?"
-        description="Your current submission is deleted and its points come off your team's total. You can then submit again."
+        confirmLabel="למחוק ולעשות שוב"
+        title="לעשות את המשימה שוב?"
+        description="ההגשה הנוכחית תימחק והנקודות שלה יירדו מהסכום של הקבוצה. אחר כך אפשר לשלוח מחדש."
       />
     </div>
   );

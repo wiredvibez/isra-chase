@@ -9,14 +9,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { Input, Select } from "@/components/ui/input";
 import { apiPost } from "@/lib/api-client";
-import { dateTime } from "@/lib/format";
 import { useLoadedChase } from "../chase-context";
 import { useMissions } from "../data-hooks";
 import { DurationField } from "../duration-field";
 import { SettingRow, TabHeader } from "../section";
 import {
   DAY,
+  dateTimeLabel,
   fromLocalInput,
+  msLabel,
   STATUS_LABEL,
   stampMs,
   toLocalInput,
@@ -66,28 +67,28 @@ export function ScheduleTab() {
   const checklist = [
     {
       id: "missions",
-      label: "At least one published mission",
+      label: "לפחות משימה אחת מפורסמת",
       ok: liveMissions.length > 0,
-      detail: `${liveMissions.length} published, ${missions.length - liveMissions.length} draft`,
+      detail: `${liveMissions.length} מפורסמות, ${missions.length - liveMissions.length} בטיוטה`,
     },
     {
       id: "end",
-      label: "An end time",
+      label: "שעת סיום",
       ok: Boolean(resolvedEndMs),
       detail: resolvedEndMs
-        ? new Date(resolvedEndMs).toLocaleString()
-        : "A chase cannot go live without one",
+        ? msLabel(resolvedEndMs)
+        : "בלי שעת סיום אי אפשר לעלות לאוויר",
     },
     {
       id: "start",
-      label: "A start time",
+      label: "שעת התחלה",
       ok: startMode === "now" || Boolean(startAtMs),
       detail:
         startMode === "now"
-          ? "Starts the moment you go live"
+          ? "מתחיל ברגע שתעלו לאוויר"
           : startAtMs
-            ? new Date(startAtMs).toLocaleString()
-            : "Pick when the chase opens",
+            ? msLabel(startAtMs)
+            : "בחרו מתי המרדף נפתח",
     },
   ];
 
@@ -106,18 +107,18 @@ export function ScheduleTab() {
       });
       toast.success(
         action === "reset"
-          ? "Chase reset to draft."
+          ? "המרדף חזר לטיוטה."
           : action === "end"
-            ? "Chase ended."
+            ? "המרדף הסתיים."
             : action === "update_end"
-              ? "End time updated."
+              ? "שעת הסיום עודכנה."
               : action === "schedule"
-                ? "Chase scheduled."
-                : "You're live!",
+                ? "המרדף תוזמן."
+                : "אתם באוויר!",
       );
       setConfirm(null);
     } catch (error) {
-      toastError(error, "Couldn't update the schedule.");
+      toastError(error, "לא הצלחנו לעדכן את לוח הזמנים.");
     } finally {
       setBusy(null);
     }
@@ -126,14 +127,14 @@ export function ScheduleTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Start & end"
-        description="When the chase opens, when it closes, and how to go live."
+        title="התחלה וסיום"
+        description="מתי המרדף נפתח, מתי הוא נסגר, ואיך עולים לאוויר."
         actions={<Badge tone="neutral">{STATUS_LABEL[chase.status]}</Badge>}
       />
 
       <Card>
         <CardContent className="pt-5">
-          <SettingRow label="Start" htmlFor="start-mode">
+          <SettingRow label="התחלה" htmlFor="start-mode">
             <Select
               id="start-mode"
               value={startMode}
@@ -142,13 +143,15 @@ export function ScheduleTab() {
                 setStartMode(e.target.value as "now" | "scheduled")
               }
             >
-              <option value="now">Now — when I press Go live</option>
-              <option value="scheduled">At a specific time</option>
+              <option value="now">
+                עכשיו — ברגע שאלחץ על &quot;עולים לאוויר&quot;
+              </option>
+              <option value="scheduled">בשעה מסוימת</option>
             </Select>
             {startMode === "scheduled" && (
               <Input
                 type="datetime-local"
-                aria-label="Start time"
+                aria-label="שעת התחלה"
                 className="mt-2"
                 value={toLocalInput(startAtMs)}
                 onChange={(e) => setStartAtMs(fromLocalInput(e.target.value))}
@@ -156,12 +159,12 @@ export function ScheduleTab() {
             )}
             {chase.startAt && (
               <p className="mt-1 text-xs text-muted-foreground">
-                Currently starts {dateTime(chase.startAt)}
+                כרגע מתחיל ב-{dateTimeLabel(chase.startAt)}
               </p>
             )}
           </SettingRow>
 
-          <SettingRow label="End" htmlFor="end-mode" hint="Required before going live.">
+          <SettingRow label="סיום" htmlFor="end-mode" hint="חובה לפני עלייה לאוויר.">
             <Select
               id="end-mode"
               value={endMode}
@@ -169,8 +172,8 @@ export function ScheduleTab() {
                 setEndMode(e.target.value as "duration" | "specific")
               }
             >
-              <option value="duration">Run for a length of time</option>
-              <option value="specific">End at a specific time</option>
+              <option value="duration">לרוץ למשך זמן מוגדר</option>
+              <option value="specific">להסתיים בשעה מסוימת</option>
             </Select>
             {endMode === "duration" ? (
               <div className="mt-2 space-y-1">
@@ -181,14 +184,14 @@ export function ScheduleTab() {
                 />
                 <p aria-live="polite" className="text-xs text-muted-foreground">
                   {resolvedEndMs
-                    ? `Ends ${new Date(resolvedEndMs).toLocaleString()}`
-                    : "Pick a start time to see the end time."}
+                    ? `מסתיים ב-${msLabel(resolvedEndMs)}`
+                    : "בחרו שעת התחלה כדי לראות את שעת הסיום."}
                 </p>
               </div>
             ) : (
               <Input
                 type="datetime-local"
-                aria-label="End time"
+                aria-label="שעת סיום"
                 className="mt-2"
                 value={toLocalInput(endAtMs)}
                 onChange={(e) => setEndAtMs(fromLocalInput(e.target.value))}
@@ -197,8 +200,8 @@ export function ScheduleTab() {
           </SettingRow>
 
           <SettingRow
-            label="Timezone"
-            hint="Captured when the chase was created and locked from then on, so schedules never shift under players. Everyone sees times in their own local clock."
+            label="אזור זמן"
+            hint="נקבע ביצירת המרדף וננעל מאז, כדי שלוח הזמנים לא יזוז לשחקנים באמצע. כל אחד רואה את השעות לפי השעון המקומי שלו."
           >
             <p className="flex items-center gap-2 rounded-md bg-surface-inset px-3 py-2 text-sm">
               <Globe className="size-4 text-muted-foreground" aria-hidden />
@@ -210,7 +213,9 @@ export function ScheduleTab() {
 
       <Card>
         <CardContent className="pt-5">
-          <h2 className="font-display text-base font-bold">Pre-launch checklist</h2>
+          <h2 className="font-display text-base font-bold">
+            {"צ'ק-ליסט לפני שעולים לאוויר"}
+          </h2>
           <ul className="mt-3 space-y-2">
             {checklist.map((item) => (
               <li key={item.id} className="flex items-start gap-2 text-sm">
@@ -225,7 +230,7 @@ export function ScheduleTab() {
                     {item.detail}
                   </span>
                 </span>
-                <span className="sr-only">{item.ok ? "Ready" : "Not ready"}</span>
+                <span className="sr-only">{item.ok ? "מוכן" : "לא מוכן"}</span>
               </li>
             ))}
           </ul>
@@ -241,7 +246,7 @@ export function ScheduleTab() {
                 onClick={() => void run("go_live")}
               >
                 <Clock className="size-4" aria-hidden />
-                Go live now
+                עולים לאוויר
               </Button>
             )}
             {chase.status === "draft" && startMode === "scheduled" && (
@@ -251,7 +256,7 @@ export function ScheduleTab() {
                 onClick={() => void run("schedule")}
               >
                 <Clock className="size-4" aria-hidden />
-                Schedule chase
+                תזמון המרדף
               </Button>
             )}
             {chase.status === "scheduled" && (
@@ -261,7 +266,7 @@ export function ScheduleTab() {
                   loading={busy === "go_live"}
                   onClick={() => void run("go_live")}
                 >
-                  Go live now
+                  עולים לאוויר עכשיו
                 </Button>
                 <Button
                   variant="outline"
@@ -269,7 +274,7 @@ export function ScheduleTab() {
                   disabled={!resolvedEndMs}
                   onClick={() => void run("update_end")}
                 >
-                  Update end time
+                  עדכון שעת הסיום
                 </Button>
               </>
             )}
@@ -281,22 +286,22 @@ export function ScheduleTab() {
                   disabled={!resolvedEndMs}
                   onClick={() => void run("update_end")}
                 >
-                  Update end time
+                  עדכון שעת הסיום
                 </Button>
                 <Button variant="danger" onClick={() => setConfirm("end")}>
-                  End chase now
+                  סיום המרדף עכשיו
                 </Button>
               </>
             )}
             {chase.status === "ended" && (
               <Button variant="outline" onClick={() => setConfirm("reset")}>
                 <RotateCcw className="size-4" aria-hidden />
-                Reset start &amp; end
+                איפוס ההתחלה והסיום
               </Button>
             )}
             {blocked && chase.status === "draft" && (
               <p className="text-xs font-semibold text-danger">
-                Fix the checklist above before going live.
+                {"יש לסגור את הפערים בצ'ק-ליסט שלמעלה לפני העלייה לאוויר."}
               </p>
             )}
           </div>
@@ -308,9 +313,9 @@ export function ScheduleTab() {
         onClose={() => setConfirm(null)}
         onConfirm={() => run("end")}
         loading={busy === "end"}
-        title="End this chase now?"
-        description="Players can no longer submit. Everything they have already submitted, and every point, is kept."
-        confirmLabel="End chase"
+        title="לסיים את המרדף עכשיו?"
+        description="השחקנים לא יוכלו לשלוח עוד הגשות. כל מה שכבר נשלח, וכל הנקודות, נשמרים."
+        confirmLabel="סיום המרדף"
       />
 
       <ConfirmDialog
@@ -319,9 +324,9 @@ export function ScheduleTab() {
         onConfirm={() => run("reset")}
         loading={busy === "reset"}
         tone="primary"
-        title="Reset start & end?"
-        description="The chase goes back to draft so you can schedule it again. Participants, teams, submissions and points are all preserved — nothing is deleted."
-        confirmLabel="Reset to draft"
+        title="לאפס את ההתחלה והסיום?"
+        description="המרדף חוזר להיות טיוטה כדי שתוכלו לתזמן אותו מחדש. המשתתפים, הקבוצות, ההגשות והנקודות נשמרים במלואם — שום דבר לא נמחק."
+        confirmLabel="חזרה לטיוטה"
       />
     </div>
   );

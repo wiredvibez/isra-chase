@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Logo, LogoMark } from "@/components/marketing/logo";
 
 const promises = [
-  "Camera, text and GPS missions in one place",
-  "Server-side scoring, so nobody can inflate a total",
-  "A live feed, a live leaderboard and a full audit trail",
+  "משימות צילום, טקסט ומיקום במקום אחד",
+  "הניקוד נסגר בשרת, אז אף אחד לא מנפח לעצמו סכום",
+  "פיד בזמן אמת, טבלת מובילים בזמן אמת ויומן שינויים מלא",
 ];
 
 /**
@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <header className="px-5 py-5 sm:px-8">
           <Link href="/" className="inline-flex rounded-sm">
             <Logo />
-            <span className="sr-only">— back to the home page</span>
+            <span className="sr-only">— חזרה לדף הבית</span>
           </Link>
         </header>
 
@@ -33,7 +33,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <svg
           aria-hidden
           viewBox="0 0 320 320"
-          className="pointer-events-none absolute -right-16 -top-16 w-[26rem] text-white/10"
+          className="pointer-events-none absolute -end-16 -top-16 w-[26rem] text-white/10"
         >
           <g fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round">
             <path d="M30 280c40-10 30-90 80-110s60-70 110-100" strokeDasharray="1 34" />
@@ -45,7 +45,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="relative max-w-md">
           <LogoMark className="size-11" />
           <p className="mt-6 font-display text-2xl font-extrabold leading-snug sm:text-3xl">
-            Build the missions. Share one code. Watch a whole group play.
+            בונים את המשימות. מחלקים קוד אחד. צופים בחבורה שלמה משחקת.
           </p>
           <ul className="mt-6 space-y-2.5 text-sm text-white/85">
             {promises.map((line) => (

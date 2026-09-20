@@ -45,7 +45,7 @@ export function CollaboratorsDialog({
       onChanged(res.chase);
       setEmail("");
     } catch (error) {
-      toastError(error, "Couldn't invite that person.");
+      toastError(error, "לא הצלחנו להזמין את האדם הזה.");
     } finally {
       setBusy(false);
     }
@@ -59,7 +59,7 @@ export function CollaboratorsDialog({
       );
       onChanged(res.chase);
     } catch (error) {
-      toastError(error, "Couldn't remove that collaborator.");
+      toastError(error, "לא הצלחנו להסיר את השותף.");
     } finally {
       setBusy(false);
     }
@@ -69,11 +69,11 @@ export function CollaboratorsDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title="Invite collaborators"
-      description={`Collaborators can edit everything in “${chase.name}” except deleting it.`}
+      title="הזמנת שותפים"
+      description={`שותפים יכולים לערוך הכול ב"${chase.name}" — חוץ ממחיקת המרדף.`}
       footer={
         <Button variant="ghost" onClick={onClose}>
-          Done
+          סיום
         </Button>
       }
     >
@@ -84,18 +84,19 @@ export function CollaboratorsDialog({
           void invite();
         }}
       >
-        <Field label="Email address" htmlFor="collab-email">
+        <Field label="כתובת אימייל" htmlFor="collab-email">
           <div className="flex gap-2">
             <Input
               id="collab-email"
               type="email"
               value={email}
+              dir="ltr"
               placeholder="teammate@example.com"
               onChange={(e) => setEmail(e.target.value)}
             />
             <Button type="submit" loading={busy} disabled={!email.trim()}>
               <UserPlus className="size-4" aria-hidden />
-              Invite
+              הזמנה
             </Button>
           </div>
         </Field>
@@ -107,11 +108,13 @@ export function CollaboratorsDialog({
                 key={row.uid}
                 className="flex items-center gap-2 px-3 py-2 text-sm"
               >
-                <span className="min-w-0 flex-1 truncate">{row.email}</span>
+                <span dir="ltr" className="min-w-0 flex-1 truncate text-start">
+                  {row.email}
+                </span>
                 <button
                   type="button"
                   onClick={() => void remove(row.uid)}
-                  aria-label={`Remove ${row.email}`}
+                  aria-label={`הסרת ${row.email}`}
                   className="rounded-md p-1 text-muted-foreground hover:bg-surface-muted hover:text-danger"
                 >
                   <X className="size-4" aria-hidden />
@@ -121,8 +124,8 @@ export function CollaboratorsDialog({
           </ul>
         ) : (
           <p className="text-sm text-muted-foreground">
-            No collaborators yet. They need an Isra Chase account with that
-            email address.
+            עדיין אין שותפים. לשותף צריך להיות חשבון Isra Chase עם כתובת
+            האימייל הזו.
           </p>
         )}
       </form>

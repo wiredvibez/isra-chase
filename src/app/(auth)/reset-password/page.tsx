@@ -4,8 +4,8 @@ import { FormFallback } from "../_components/form-fallback";
 import { ResetPasswordForm } from "../_components/reset-password-form";
 
 export const metadata: Metadata = {
-  title: "Reset your password",
-  description: "Send yourself a link to set a new Isra Chase password.",
+  title: "איפוס סיסמה",
+  description: "שולחים לעצמכם קישור לבחירת סיסמה חדשה ל-Isra Chase.",
   robots: { index: false },
 };
 

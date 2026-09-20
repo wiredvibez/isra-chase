@@ -96,7 +96,7 @@ export function Dialog({
           <button
             type="button"
             onClick={() => ref.current?.close()}
-            aria-label="Close dialog"
+            aria-label="סגירה"
             className="-m-1 rounded-md p-1 text-muted-foreground hover:bg-surface-muted hover:text-foreground"
           >
             <X className="size-5" />
@@ -120,7 +120,8 @@ export function ConfirmDialog({
   onConfirm,
   title,
   description,
-  confirmLabel = "Confirm",
+  confirmLabel = "אישור",
+  cancelLabel = "ביטול",
   tone = "danger",
   loading,
 }: {
@@ -130,6 +131,7 @@ export function ConfirmDialog({
   title: string;
   description?: React.ReactNode;
   confirmLabel?: string;
+  cancelLabel?: string;
   tone?: "danger" | "primary";
   loading?: boolean;
 }) {
@@ -147,7 +149,7 @@ export function ConfirmDialog({
             onClick={onClose}
             className="h-10 rounded-md border border-border-strong px-4 text-sm font-semibold hover:bg-surface-muted"
           >
-            Cancel
+            {cancelLabel}
           </button>
           <button
             type="button"

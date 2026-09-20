@@ -11,10 +11,15 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs } from "@/components/ui/tabs";
 import { apiPatch, apiPost } from "@/lib/api-client";
 import { GPS_RADII, type GpsRadius, type Mission, type MissionType } from "@/lib/domain/types";
-import { radiusLabel } from "@/lib/format";
 import { ImageUpload } from "../image-upload";
 import { LocationPicker } from "../location-picker";
-import { MISSION_TYPE_LABEL, textBadge, toastError } from "../studio-utils";
+import {
+  MISSION_TYPE_LABEL,
+  radiusLabel,
+  TEXT_BADGE_LABEL,
+  textBadge,
+  toastError,
+} from "../studio-utils";
 import {
   AvailabilityEditor,
   expiryToInput,
@@ -140,23 +145,23 @@ export function MissionEditor({
   }
 
   function validate(): string | null {
-    if (!form.name.trim()) return "Missions need a name.";
-    if (!form.description.trim()) return "Missions need a description.";
+    if (!form.name.trim()) return "למשימה צריך שם.";
+    if (!form.description.trim()) return "למשימה צריך תיאור.";
     if (!Number.isFinite(form.points) || form.points < 0)
-      return "Points must be zero or more.";
+      return "הניקוד חייב להיות אפס או יותר.";
     if (form.type === "gps" && (form.gps.lat === null || form.gps.lng === null))
-      return "Pick a location for this mission.";
+      return "בחרו מיקום למשימה הזו.";
     if (form.release.kind === "specific" && !form.release.atMs)
-      return "Choose the time this mission is released.";
+      return "בחרו מתי המשימה נפתחת.";
     if (form.expiry.kind === "specific" && !form.expiry.atMs)
-      return "Choose the time this mission expires.";
+      return "בחרו מתי המשימה נסגרת.";
     if (form.release.kind === "mission" && !form.release.missionId)
-      return "Choose the mission that unlocks this one.";
+      return "בחרו את המשימה שפותחת את זו.";
     if (form.linkUrl.trim()) {
       try {
         new URL(form.linkUrl.trim());
       } catch {
-        return "That external link isn't a valid URL.";
+        return "הקישור החיצוני אינו כתובת תקינה.";
       }
     }
     return null;
@@ -221,7 +226,7 @@ export function MissionEditor({
       onSaved();
       onClose();
     } catch (err) {
-      setError(toastError(err, "Couldn't save that mission."));
+      setError(toastError(err, "לא הצלחנו לשמור את המשימה."));
     } finally {
       setSaving(false);
     }
@@ -234,15 +239,15 @@ export function MissionEditor({
       open={open}
       onClose={onClose}
       size="xl"
-      title={mission ? "Edit mission" : "New mission"}
-      description={`${MISSION_TYPE_LABEL[form.type]} mission`}
+      title={mission ? "עריכת משימה" : "משימה חדשה"}
+      description={`משימת ${MISSION_TYPE_LABEL[form.type]}`}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button onClick={() => void save()} loading={saving}>
-            {mission ? "Save mission" : "Create mission"}
+            {mission ? "שמירת המשימה" : "יצירת המשימה"}
           </Button>
         </>
       }
@@ -252,10 +257,10 @@ export function MissionEditor({
           value={pane}
           onChange={setPane}
           items={[
-            { id: "basics", label: "Basics" },
+            { id: "basics", label: "בסיס" },
             { id: "type", label: MISSION_TYPE_LABEL[form.type] },
-            { id: "availability", label: "Availability" },
-            { id: "extras", label: "Extras" },
+            { id: "availability", label: "זמינות" },
+            { id: "extras", label: "תוספות" },
           ]}
         />
 
@@ -267,7 +272,7 @@ export function MissionEditor({
 
         {pane === "basics" && (
           <div className="space-y-4">
-            <Field label="Name" htmlFor="mission-name" required>
+            <Field label="שם" htmlFor="mission-name" required>
               <Input
                 id="mission-name"
                 value={form.name}
@@ -276,10 +281,10 @@ export function MissionEditor({
               />
             </Field>
             <Field
-              label="Description"
+              label="תיאור"
               htmlFor="mission-description"
               required
-              hint="Tell players exactly what counts as done."
+              hint="כתבו לשחקנים בדיוק מה נחשב לביצוע."
             >
               <Textarea
                 id="mission-description"
@@ -289,7 +294,7 @@ export function MissionEditor({
               />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Points" htmlFor="mission-points" required>
+              <Field label="ניקוד" htmlFor="mission-points" required>
                 <Input
                   id="mission-points"
                   type="number"
@@ -299,15 +304,15 @@ export function MissionEditor({
                   onChange={(e) => set("points", Number(e.target.value))}
                 />
               </Field>
-              <Field label="Mission type" htmlFor="mission-type">
+              <Field label="סוג המשימה" htmlFor="mission-type">
                 <Select
                   id="mission-type"
                   value={form.type}
                   onChange={(e) => changeType(e.target.value as MissionType)}
                 >
-                  <option value="camera">Camera — photo or video</option>
-                  <option value="text">Text — typed answer</option>
-                  <option value="gps">GPS — be in a place</option>
+                  <option value="camera">צילום — תמונה או סרטון</option>
+                  <option value="text">טקסט — תשובה מוקלדת</option>
+                  <option value="gps">מיקום — להגיע למקום</option>
                 </Select>
               </Field>
             </div>
@@ -316,7 +321,7 @@ export function MissionEditor({
 
         {pane === "type" && form.type === "camera" && (
           <div className="space-y-4">
-            <Field label="Accepted submissions" htmlFor="camera-accepts">
+            <Field label="מה מתקבל" htmlFor="camera-accepts">
               <Select
                 id="camera-accepts"
                 value={form.camera.accepts}
@@ -327,15 +332,15 @@ export function MissionEditor({
                   })
                 }
               >
-                <option value="both">Photos and videos</option>
-                <option value="photos">Photos only</option>
-                <option value="videos">Videos only</option>
+                <option value="both">תמונות וסרטונים</option>
+                <option value="photos">תמונות בלבד</option>
+                <option value="videos">סרטונים בלבד</option>
               </Select>
             </Field>
             <Field
-              label="Submission sources"
+              label="מקור ההגשה"
               htmlFor="camera-sources"
-              hint="Live capture only is the anti-cheat setting: no camera roll."
+              hint="צילום במקום בלבד הוא ההגדרה נגד רמאות: אי אפשר להעלות מהגלריה."
             >
               <Select
                 id="camera-sources"
@@ -347,12 +352,12 @@ export function MissionEditor({
                   })
                 }
               >
-                <option value="live_and_library">Live capture and library</option>
-                <option value="live_only">Live capture only</option>
+                <option value="live_and_library">צילום במקום או מהגלריה</option>
+                <option value="live_only">צילום במקום בלבד</option>
               </Select>
             </Field>
             {form.camera.accepts !== "photos" && (
-              <Field label="Max video length" htmlFor="camera-seconds" hint="Seconds.">
+              <Field label="אורך סרטון מרבי" htmlFor="camera-seconds" hint="בשניות.">
                 <Input
                   id="camera-seconds"
                   type="number"
@@ -378,26 +383,26 @@ export function MissionEditor({
         {pane === "type" && form.type === "text" && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">Grading</span>
+              <span className="text-sm font-semibold">בדיקת התשובה</span>
               <Badge tone={badge === "open" ? "info" : badge === "exact" ? "brand" : "accent"}>
-                {badge}
+                {TEXT_BADGE_LABEL[badge]}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
               {badge === "open"
-                ? "No accepted responses means anything players type is accepted."
+                ? "בלי תשובות מאושרות, כל מה שהשחקנים יקלידו יתקבל."
                 : badge === "exact"
-                  ? "Answers must match one of these exactly."
-                  : "Close answers count: word order and small typos are forgiven, numbers still have to match."}
+                  ? "התשובה חייבת להיות זהה לאחת מהתשובות כאן."
+                  : "גם תשובה קרובה נחשבת: סדר מילים ושגיאות כתיב קטנות נסלחים, אבל מספרים עדיין חייבים להתאים."}
             </p>
 
             <fieldset className="space-y-2">
-              <legend className="text-sm font-semibold">Accepted responses</legend>
+              <legend className="text-sm font-semibold">תשובות מאושרות</legend>
               {form.text.acceptedResponses.map((response, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
                     value={response}
-                    aria-label={`Accepted response ${index + 1}`}
+                    aria-label={`תשובה מאושרת ${index + 1}`}
                     onChange={(e) => {
                       const next = [...form.text.acceptedResponses];
                       next[index] = e.target.value;
@@ -408,7 +413,7 @@ export function MissionEditor({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove accepted response ${index + 1}`}
+                    aria-label={`הסרת תשובה מאושרת ${index + 1}`}
                     onClick={() =>
                       set("text", {
                         ...form.text,
@@ -434,15 +439,15 @@ export function MissionEditor({
                 }
               >
                 <Plus className="size-4" aria-hidden />
-                Add response
+                הוספת תשובה
               </Button>
             </fieldset>
 
             <Switch
               checked={form.text.approximate}
               onChange={(v) => set("text", { ...form.text, approximate: v })}
-              label="Accept approximate responses"
-              description="Ignores case, word order and near-misses above 92% similarity."
+              label="לקבל גם תשובות מקורבות"
+              description="מתעלם מאותיות גדולות/קטנות ומסדר מילים, ומקבל תשובות בדמיון של 92% ומעלה."
             />
           </div>
         )}
@@ -471,9 +476,9 @@ export function MissionEditor({
               }
             />
             <Field
-              label="Accept within"
+              label="טווח קבלה"
               htmlFor="gps-radius"
-              hint="Players never see the pin or the radius."
+              hint="השחקנים לא רואים את הסימון ולא את הרדיוס."
             >
               <Select
                 id="gps-radius"
@@ -511,18 +516,19 @@ export function MissionEditor({
         {pane === "extras" && (
           <div className="space-y-4">
             <ImageUpload
-              label="Attachment"
+              label="תמונה מצורפת"
               ratio="2/1"
-              hint="Optional reference image, shown with the mission (2:1)."
+              hint="לא חובה. תמונת ייחוס שמוצגת עם המשימה (יחס 2:1)."
               folder={`chases/${chaseId}/missions/${uploadId}`}
               value={form.imageUrl}
               onChange={(url) => set("imageUrl", url)}
             />
-            <Field label="External link" htmlFor="mission-link" hint="Optional.">
+            <Field label="קישור חיצוני" htmlFor="mission-link" hint="לא חובה.">
               <Input
                 id="mission-link"
                 type="url"
                 inputMode="url"
+                dir="ltr"
                 placeholder="https://"
                 value={form.linkUrl}
                 onChange={(e) => set("linkUrl", e.target.value)}
@@ -531,14 +537,14 @@ export function MissionEditor({
             <Switch
               checked={form.feedVisibility === "shown"}
               onChange={(v) => set("feedVisibility", v ? "shown" : "hidden")}
-              label="Show submissions in the activity feed"
-              description="Hidden missions keep answers out of the cross-team feed."
+              label="להציג את ההגשות בפיד הפעילות"
+              description="משימה מוסתרת שומרת את התשובות מחוץ לפיד המשותף לכל הקבוצות."
             />
             <Switch
               checked={form.isDraft}
               onChange={(v) => set("isDraft", v)}
-              label="Keep as a draft"
-              description="Drafts are invisible to players until you publish them."
+              label="לשמור כטיוטה"
+              description="טיוטות מוסתרות מהשחקנים עד שתפרסמו אותן."
             />
           </div>
         )}

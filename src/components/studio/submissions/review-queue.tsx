@@ -109,8 +109,11 @@ export function ReviewQueue({
           <p className="ms-auto hidden text-xs text-muted-foreground sm:block">
             <kbd className="rounded border border-border px-1">A</kbd> לאשר ·{" "}
             <kbd className="rounded border border-border px-1">R</kbd> לדחות ·{" "}
-            <kbd className="rounded border border-border px-1">←</kbd>
-            <kbd className="rounded border border-border px-1">→</kbd> מעבר בין הגשות
+            <span dir="ltr" className="inline-flex gap-0.5">
+              <kbd className="rounded border border-border px-1">←</kbd>
+              <kbd className="rounded border border-border px-1">→</kbd>
+            </span>{" "}
+            מעבר בין הגשות
           </p>
         </div>
 
@@ -126,7 +129,7 @@ export function ReviewQueue({
             {current.caption && (
               <p className="text-sm whitespace-pre-wrap">{current.caption}</p>
             )}
-            <Badge tone="brand">{formatPoints(current.points)} נק' עם האישור</Badge>
+            <Badge tone="brand">{`${formatPoints(current.points)} נק' עם האישור`}</Badge>
             {current.flagged && (
               <p className="rounded-md bg-danger-surface px-3 py-2 text-xs text-danger">
                 מסומנת{current.flagReason ? `: ${current.flagReason}` : ""}

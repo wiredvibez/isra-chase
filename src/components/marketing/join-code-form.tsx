@@ -24,7 +24,7 @@ export function JoinCodeForm({ className }: { className?: string }) {
     event.preventDefault();
     const clean = normalise(code);
     if (clean.length < 4) {
-      setError("Join codes are at least four characters.");
+      setError("קוד הצטרפות הוא לפחות 4 תווים.");
       return;
     }
     setError(null);
@@ -42,7 +42,7 @@ export function JoinCodeForm({ className }: { className?: string }) {
         htmlFor={inputId}
         className="text-sm font-semibold"
       >
-        Already have a join code?
+        יש לכם כבר קוד הצטרפות?
       </label>
       <div className="mt-2 flex flex-col gap-2 sm:flex-row">
         <Input
@@ -59,7 +59,7 @@ export function JoinCodeForm({ className }: { className?: string }) {
             // message never appears before the player has typed anything.
             setError(
               el.value && !el.checkValidity()
-                ? "Join codes are at least four characters."
+                ? "קוד הצטרפות הוא לפחות 4 תווים."
                 : null,
             );
           }}
@@ -75,7 +75,7 @@ export function JoinCodeForm({ className }: { className?: string }) {
           className="h-12 font-mono text-base tracking-[0.25em] uppercase sm:max-w-[11rem]"
         />
         <Button type="submit" size="lg" className="shrink-0">
-          Join with a code
+          מצטרפים עם קוד
         </Button>
       </div>
       {error ? (
@@ -84,7 +84,7 @@ export function JoinCodeForm({ className }: { className?: string }) {
         </p>
       ) : (
         <p className="mt-1.5 text-xs text-muted-foreground">
-          The organiser shares it as a code, a link or a QR poster.
+          המארגן מחלק אותו כקוד, כקישור או כפוסטר QR.
         </p>
       )}
     </form>

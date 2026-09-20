@@ -37,20 +37,20 @@ export function SubmissionSuccess({
 
       <div className="space-y-1">
         <p className="font-display text-2xl font-bold">
-          {pending ? "Sent for review" : "Mission complete!"}
+          {pending ? "נשלח לבדיקה" : "סגרתם את זה"}
         </p>
         <p className="text-sm text-muted-foreground">{mission.name}</p>
       </div>
 
       {pending ? (
         <p className="text-sm text-muted-foreground">
-          The organizer will take a look. {fmtPoints(mission.points)} points are
-          waiting on their word.
+          המארגן יעבור על זה. {fmtPoints(mission.points)} נקודות מחכות לאישור
+          שלו.
         </p>
       ) : (
         <p className="font-display text-4xl font-bold text-success tabular-nums">
-          +{fmtPoints(earned)}
-          <span className="ms-1 text-base font-bold">points</span>
+          <span dir="ltr">+{fmtPoints(earned)}</span>
+          <span className="ms-1 text-base font-bold">נקודות</span>
         </p>
       )}
 
@@ -62,14 +62,14 @@ export function SubmissionSuccess({
 
       <div className="flex w-full flex-col gap-2 pt-2">
         <Button size="lg" className="w-full" onClick={onDone}>
-          Back to missions
+          חזרה למשימות
         </Button>
         {mission.feedVisibility === "shown" && !pending && (
           <Link
             href={`/play/${chaseId}/feed`}
             className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border-strong bg-surface px-4 text-sm font-semibold"
           >
-            See it in the feed
+            לראות את זה בפיד
           </Link>
         )}
       </div>

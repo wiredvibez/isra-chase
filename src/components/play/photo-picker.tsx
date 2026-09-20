@@ -54,7 +54,7 @@ export function PhotoPicker({
       const media = await uploadMedia(file, pathFor(extensionOf(file)), setProgress);
       onChange(media.url);
     } catch {
-      setError("That photo didn't upload. Try another one.");
+      setError("התמונה לא עלתה. נסו אחת אחרת.");
     } finally {
       setProgress(null);
     }
@@ -78,8 +78,8 @@ export function PhotoPicker({
           <button
             type="button"
             onClick={() => onChange(null)}
-            aria-label="Remove photo"
-            className="absolute -right-1 -top-1 flex size-7 items-center justify-center rounded-full bg-surface text-muted-foreground shadow-card ring-1 ring-border"
+            aria-label="מסירים את התמונה"
+            className="absolute -end-1 -top-1 flex size-7 items-center justify-center rounded-full bg-surface text-muted-foreground shadow-card ring-1 ring-border"
           >
             <X className="size-4" />
           </button>
@@ -94,11 +94,11 @@ export function PhotoPicker({
           className="inline-flex h-11 items-center gap-2 rounded-md border border-border-strong bg-surface px-4 text-sm font-semibold disabled:opacity-60"
         >
           <Camera className="size-[1.125rem]" aria-hidden />
-          {value ? "Change photo" : label}
+          {value ? "מחליפים תמונה" : label}
         </button>
 
         {progress !== null && (
-          <Progress value={progress} label="Photo upload progress" />
+          <Progress value={progress} label="התקדמות העלאת התמונה" />
         )}
 
         {error && (

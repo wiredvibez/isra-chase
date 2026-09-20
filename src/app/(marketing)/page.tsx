@@ -28,9 +28,9 @@ import {
 } from "@/components/marketing/mocks";
 
 export const metadata: Metadata = {
-  title: "Isra Chase — scavenger hunts that actually get people moving",
+  title: "ציד מטמון שמזיז אנשים באמת",
   description:
-    "Build camera, text and GPS missions, share one join code, and score a whole group live: activity feed, Olympic-ranked leaderboard, bonus points and a review queue when you want one.",
+    "בונים משימות צילום, טקסט ומיקום, מחלקים קוד הצטרפות אחד ומנקדים חבורה שלמה בזמן אמת: פיד פעילות, טבלת מובילים בדירוג אולימפי, נקודות בונוס ותור בדיקה כשבא לכם.",
   alternates: { canonical: "/" },
 };
 
@@ -55,18 +55,17 @@ function Hero() {
         className={`${shell} relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24`}
       >
         <div>
-          <Badge tone="brand">Scavenger hunts · team games · onboarding days</Badge>
+          <Badge tone="brand">ציד מטמון · משחקי קבוצות · ימי גיבוש</Badge>
 
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            Turn any group into teams racing through{" "}
-            <span className="text-primary">photo, text and GPS</span> missions.
+            הופכים חבורה שלמה לקבוצות שרצות בין משימות{" "}
+            <span className="text-primary">צילום, טקסט ומיקום</span>.
           </h1>
 
           <p className={lede}>
-            Build the missions in the Studio, hand out one join code, and let the
-            scoring run itself. Submissions land in a live feed, the leaderboard
-            keeps itself in order, and you can adjust, hide or delete anything
-            without stopping the game.
+            בונים את המשימות בסטודיו, מחלקים קוד הצטרפות אחד, והניקוד רץ לבד.
+            ההגשות נוחתות בפיד תוך שניות, טבלת המובילים מסדרת את עצמה, ואפשר
+            לתקן, להסתיר או למחוק כל דבר בלי לעצור את המשחק.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -74,13 +73,13 @@ function Hero() {
               href="/studio"
               className="inline-flex h-12 items-center rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover"
             >
-              Create a chase
+              יוצרים מרדף
             </Link>
             <a
               href="#how-it-works"
               className="inline-flex h-12 items-center rounded-md border border-border-strong bg-surface px-6 text-base font-semibold hover:bg-surface-muted"
             >
-              See how it works
+              איך זה עובד
             </a>
           </div>
 
@@ -104,28 +103,28 @@ const missionTypes = [
   {
     id: "camera",
     icon: Camera,
-    name: "Camera",
+    name: "צילום",
     blurb:
-      "Photos, video, or both — video capped at thirty seconds. Lock a mission to live capture when you don't want camera-roll uploads. Camera missions are accepted the moment they arrive; there is nothing to mark.",
-    facts: ["Photo, video or both", "Live capture only, optionally", "Always auto-accepted"],
+      "תמונות, וידאו או שניהם — וידאו עד שלושים שניות. אפשר לנעול משימה לצילום בזמן אמת, אם לא בא לכם על העלאות מגלריית התמונות. משימות צילום מתקבלות ברגע שהן נוחתות; אין מה לבדוק.",
+    facts: ["תמונה, וידאו או שניהם", "אפשר לנעול לצילום בזמן אמת", "תמיד מתקבלות אוטומטית"],
     mock: <CameraMissionMock />,
   },
   {
     id: "text",
     icon: TypeIcon,
-    name: "Text",
+    name: "טקסט",
     blurb:
-      "List every answer you will accept. Matching is approximate at 92% similarity: word order and plurals do not matter and typos are forgiven, while numbers still have to be exact. Leave the list empty and the prompt is open-ended.",
-    facts: ["Exact, approximate or open", "Graded the instant it is sent", "Hidden from the feed by default"],
+      "כותבים את כל התשובות שיתקבלו. ההתאמה היא בערך מספיק, 92% דמיון: סדר המילים ויחיד או רבים לא משנים, שגיאות כתיב נסלחות, ומספרים עדיין חייבים להיות מדויקים. משאירים את הרשימה ריקה ומקבלים תשובה חופשית.",
+    facts: ["התאמה מדויקת, בערך מספיק או תשובה חופשית", "נבדקת בשנייה שהיא נשלחת", "לא מופיעה בפיד כברירת מחדל"],
     mock: <TextMissionMock />,
   },
   {
     id: "gps",
     icon: MapPin,
-    name: "GPS check-in",
+    name: "צ'ק-אין במיקום",
     blurb:
-      "Set the destination by address search, by coordinates, or by clicking the map, then choose a radius between 25 m and 5 km. Players never see the pin or the radius — the check-in is graded by distance.",
-    facts: ["Eight fixed radii, 25 m to 5 km", "Pin and radius stay hidden", "Graded by distance on arrival"],
+      "קובעים יעד לפי חיפוש כתובת, לפי קואורדינטות או בלחיצה על המפה, ואז בוחרים רדיוס בין 25 מ' ל-5 ק\"מ. השחקנים לא רואים את הסיכה ולא את הרדיוס — הצ'ק-אין נבדק לפי מרחק.",
+    facts: ["שמונה רדיוסים קבועים, מ-25 מ' עד 5 ק\"מ", "הסיכה והרדיוס נשארים מוסתרים", "נבדק לפי מרחק ברגע ההגעה"],
     mock: <GpsMissionMock />,
   },
 ];
@@ -134,12 +133,12 @@ function MissionTypes() {
   return (
     <section id="missions" className={`${shell} scroll-mt-20 py-20 sm:py-24`}>
       <div className="max-w-2xl">
-        <p className={eyebrow}>Mission types</p>
-        <h2 className={`${h2} mt-3`}>Three kinds of mission — that is the whole vocabulary.</h2>
+        <p className={eyebrow}>סוגי משימות</p>
+        <h2 className={`${h2} mt-3`}>שלושה סוגים של משימות, וזהו כל אוצר המילים.</h2>
         <p className={lede}>
-          Every mission carries a name, a description, a point value and an optional
-          image and link. Beyond that you only choose how it is answered, when it
-          unlocks and when it expires.
+          לכל משימה יש שם, תיאור, כמה נקודות היא שווה, ואם בא לכם גם תמונה
+          וקישור. מעבר לזה בוחרים רק איך עונים עליה, מתי היא נפתחת ומתי היא
+          נסגרת.
         </p>
       </div>
 
@@ -172,9 +171,9 @@ function MissionTypes() {
       </ul>
 
       <p className="mt-8 max-w-3xl text-sm text-muted-foreground">
-        Missions can release at the start, at a set time, a fixed interval before the
-        end, when another mission is completed, or once a team passes a point total —
-        and a locked mission is invisible until then, submissions included.
+        משימות יכולות להיפתח בהתחלה, בשעה שתקבעו, זמן קבוע לפני הסוף, אחרי
+        שמשלימים משימה אחרת, או ברגע שקבוצה עוברת מספר נקודות — ומשימה נעולה לא
+        נראית בכלל עד אז, כולל ההגשות שלה.
       </p>
     </section>
   );
@@ -185,27 +184,27 @@ function MissionTypes() {
 const liveFeatures = [
   {
     icon: Activity,
-    title: "A live activity feed",
+    title: "פיד פעילות בזמן אמת",
     body:
-      "Accepted submissions appear in a shared feed as they land — photos, answers and check-ins, each with the points it earned. Text missions stay out of the feed by default so nobody can copy an answer.",
+      "כל הגשה שמתקבלת עולה לפיד המשותף ברגע שהיא נוחתת — תמונות, תשובות וצ'ק-אינים, וליד כל אחת הנקודות שהיא הכניסה. משימות טקסט נשארות מחוץ לפיד כברירת מחדל, שאף אחד לא יעתיק תשובה.",
   },
   {
     icon: Trophy,
-    title: "A leaderboard that ranks itself",
+    title: "טבלת מובילים שמדרגת את עצמה",
     body:
-      "Points descending, ties broken by whoever reached the total first, and Olympic numbering: three teams tied for 2nd means the next one is 5th. Show it, hide it until you reveal it, or hold it back until the chase ends.",
+      "נקודות מלמעלה למטה, שוויון נשבר לפי מי הגיע לסכום קודם, ודירוג אולימפי: שלוש קבוצות במקום השני אומרות שהבאה אחריהן במקום החמישי. אפשר להציג אותה, להסתיר עד שתחשפו, או להחזיק עד שהמרדף נגמר.",
   },
   {
     icon: Sparkles,
-    title: "Bonus and penalty points",
+    title: "נקודות בונוס וקנסות",
     body:
-      "Award extra points on any submission with a reason attached. Negative amounts are allowed, so a penalty is just a bonus with a minus sign — and the team is notified either way.",
+      "אפשר לתת נקודות נוספות על כל הגשה, עם סיבה שנדבקת אליהן. גם מספר שלילי עובד, אז קנס הוא פשוט בונוס עם מינוס — והקבוצה מקבלת התראה בשני המקרים.",
   },
   {
     icon: Megaphone,
-    title: "Broadcasts",
+    title: "הודעות לכולם",
     body:
-      "Send an announcement to everyone or to chosen teams: right now, before the start, at the start, at a moment during play, or after the end. Scheduled ones stay editable until they go out.",
+      "שולחים הודעה לכולם או לקבוצות נבחרות: עכשיו, לפני ההתחלה, ברגע ההתחלה, בנקודת זמן באמצע המשחק, או אחרי הסוף. הודעה מתוזמנת נשארת פתוחה לעריכה עד שהיא יוצאת.",
   },
 ];
 
@@ -214,12 +213,12 @@ function RunningTheGame() {
     <section id="live" className="scroll-mt-20 border-y border-border bg-surface py-20 sm:py-24">
       <div className={shell}>
         <div className="max-w-2xl">
-          <p className={eyebrow}>While the chase is live</p>
-          <h2 className={`${h2} mt-3`}>You watch it happen, and you can still change it.</h2>
+          <p className={eyebrow}>בזמן שהמרדף באוויר</p>
+          <h2 className={`${h2} mt-3`}>רואים הכול קורה, ועדיין אפשר לשנות.</h2>
           <p className={lede}>
-            Scoring is handled on the server, so nobody can talk their device into
-            more points. Everything else — missions, timing, teams, points — stays
-            editable while the chase runs and applies immediately.
+            הניקוד נסגר בשרת, אז אף אחד לא ישכנע את המכשיר שלו לתת לו עוד
+            נקודות. כל השאר — משימות, תזמונים, קבוצות, נקודות — נשאר פתוח
+            לעריכה בזמן שהמרדף רץ, והשינוי נכנס לתוקף מיד.
           </p>
         </div>
 
@@ -253,27 +252,27 @@ function RunningTheGame() {
 const moderationFeatures = [
   {
     icon: ListChecks,
-    title: "An optional review queue",
+    title: "תור בדיקה, אם בא לכם",
     body:
-      "Switch a chase into review mode and submissions arrive pending instead of scoring straight away. Approve, reject or ask for a resubmission, with keyboard shortcuts and bulk actions. It is off by default, so nothing changes unless you want it to.",
+      "מעבירים מרדף למצב בדיקה וההגשות מגיעות ממתינות במקום להיכנס ישר לניקוד. מאשרים, דוחים או מבקשים לעשות שוב, עם קיצורי מקלדת ופעולות על כמה הגשות ביחד. זה כבוי כברירת מחדל, אז שום דבר לא משתנה בלי שתבקשו.",
   },
   {
     icon: EyeOff,
-    title: "Hide and flag",
+    title: "להסתיר ולסמן",
     body:
-      "Hide a single submission from the feed without removing it or its points. Captions and text answers are screened against a blocklist and flagged for a human decision — never deleted behind your back. Players can report a submission too.",
+      "אפשר להסתיר הגשה אחת מהפיד בלי למחוק אותה ובלי לקחת את הנקודות. כיתובים ותשובות טקסט נבדקים מול רשימת מילים חסומות ומסומנים להחלטה של בן אדם — שום דבר לא נמחק מאחורי הגב שלכם. גם שחקנים יכולים לדווח על הגשה.",
   },
   {
     icon: Trash2,
-    title: "Delete with a reason",
+    title: "מחיקה עם סיבה",
     body:
-      "Deleting a submission takes its points back automatically and notifies the team with the reason you wrote, so nobody is left guessing. The mission reopens and they can try again.",
+      "מחיקה של הגשה מחזירה את הנקודות אוטומטית ושולחת לקבוצה התראה עם הסיבה שכתבתם, כדי שאף אחד לא יישאר לנחש. המשימה נפתחת מחדש והם יכולים לנסות שוב.",
   },
   {
     icon: Scale,
-    title: "Adjustments that leave a trail",
+    title: "תיקוני ניקוד שמשאירים עקבות",
     body:
-      "A per-team score adjustment requires a reason. Each entry records the amount, the reason, who made it and when, stays editable, and doubles as the team's score history.",
+      "כל תיקון ניקוד לקבוצה דורש סיבה. כל שורה שומרת את הסכום, את הסיבה, מי עשה אותה ומתי, נשארת פתוחה לעריכה, ומשמשת גם כהיסטוריית הניקוד של הקבוצה.",
   },
 ];
 
@@ -281,11 +280,11 @@ function Moderation() {
   return (
     <section id="moderation" className={`${shell} scroll-mt-20 py-20 sm:py-24`}>
       <div className="max-w-2xl">
-        <p className={eyebrow}>Moderation</p>
-        <h2 className={`${h2} mt-3`}>Keep the feed clean without stopping the game.</h2>
+        <p className={eyebrow}>בקרה</p>
+        <h2 className={`${h2} mt-3`}>שומרים על פיד נקי בלי לעצור את המשחק.</h2>
         <p className={lede}>
-          Submissions are accepted automatically by default, which is what players
-          expect. The controls below are there for the times that is not enough.
+          כברירת מחדל כל הגשה מתקבלת אוטומטית, וזה גם מה שהשחקנים מצפים לו.
+          הכלים שכאן קיימים בשביל הפעמים שזה לא מספיק.
         </p>
       </div>
 
@@ -318,21 +317,21 @@ function Moderation() {
 const steps = [
   {
     icon: ListChecks,
-    title: "Build the missions",
+    title: "בונים את המשימות",
     body:
-      "Write the prompts, set point values, and decide what unlocks when. Duplicate a mission, save it to your library, or pull one in from a previous chase.",
+      "כותבים את ההוראות, קובעים כמה נקודות כל משימה שווה, ומחליטים מה נפתח מתי. אפשר לשכפל משימה, לשמור אותה בספרייה, או לשלוף אחת ממרדף קודם.",
   },
   {
     icon: QrCode,
-    title: "Share a join code or a QR",
+    title: "מחלקים קוד הצטרפות או QR",
     body:
-      "Players scan the QR, follow the invite link, or type the code. Add a chase password for a closed group, and pre-create teams if you want the rosters fixed.",
+      "השחקנים סורקים את קוד ה-QR, נכנסים דרך קישור ההזמנה, או מקלידים את הקוד. אפשר להוסיף סיסמה למרדף אם הקבוצה סגורה, ולהכין קבוצות מראש אם אתם רוצים הרכבים קבועים.",
   },
   {
     icon: Activity,
-    title: "Watch the feed",
+    title: "צופים בפיד",
     body:
-      "Go live, and submissions start scoring themselves. Broadcast, adjust points, and export the participants, submissions and media when it is over.",
+      "עולים באוויר, וההגשות מתחילות לנקד את עצמן. שולחים הודעות, מתקנים נקודות, ובסוף מייצאים את המשתתפים, ההגשות והמדיה.",
   },
 ];
 
@@ -344,8 +343,8 @@ function HowItWorks() {
     >
       <div className={shell}>
         <div className="max-w-2xl">
-          <p className={eyebrow}>How it works</p>
-          <h2 className={`${h2} mt-3`}>Three steps from an idea to a game in progress.</h2>
+          <p className={eyebrow}>איך זה עובד</p>
+          <h2 className={`${h2} mt-3`}>שלושה צעדים מרעיון למשחק שכבר רץ.</h2>
         </div>
 
         <ol className="mt-12 grid gap-6 md:grid-cols-3">
@@ -379,24 +378,24 @@ function ClosingCta() {
     <section className={`${shell} py-20 sm:py-24`}>
       <div className="rounded-xl bg-primary px-6 py-12 text-primary-foreground sm:px-12 sm:py-16">
         <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Build your first chase.
+          בונים את המרדף הראשון.
         </h2>
         <p className="mt-4 max-w-xl text-base leading-relaxed">
-          Start in the Studio with a draft, add a handful of missions, and go live
-          when you are ready. Nothing is locked until you say so.
+          מתחילים בסטודיו עם טיוטה, מוסיפים כמה משימות, ועולים באוויר כשמתחשק.
+          שום דבר לא ננעל עד שתגידו.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/studio"
             className="inline-flex h-12 items-center rounded-md bg-surface px-6 text-base font-semibold text-foreground shadow-sm hover:bg-surface-muted"
           >
-            Create a chase
+            יוצרים מרדף
           </Link>
           <Link
             href="/signup"
             className="inline-flex h-12 items-center rounded-md border border-current px-6 text-base font-semibold hover:bg-white/10"
           >
-            Create an account
+            פותחים חשבון
           </Link>
         </div>
       </div>

@@ -32,7 +32,12 @@ import { useMissions } from "../data-hooks";
 import { Menu } from "../menu";
 import { MissionEditor } from "../missions/mission-editor";
 import { TabHeader } from "../section";
-import { expirySummary, releaseSummary, toastError } from "../studio-utils";
+import {
+  expirySummary,
+  MISSION_ORDER_LABEL,
+  releaseSummary,
+  toastError,
+} from "../studio-utils";
 
 const TYPE_ICON: Record<MissionType, React.ReactNode> = {
   camera: <Camera className="size-4" aria-hidden />,
@@ -68,7 +73,7 @@ export function MissionsTab() {
         order: next.map((m) => m.id),
       });
     } catch (error) {
-      toastError(error, "Couldn't save the new order.");
+      toastError(error, "לא הצלחנו לשמור את הסדר החדש.");
       setOrder(missions);
     }
   }
@@ -84,9 +89,9 @@ export function MissionsTab() {
   async function duplicate(mission: Mission) {
     try {
       await apiPost(`/api/chases/${chaseId}/missions/${mission.id}/duplicate`);
-      toast.success(`Duplicated “${mission.name}”.`);
+      toast.success(`"${mission.name}" שוכפלה.`);
     } catch (error) {
-      toastError(error, "Couldn't duplicate that mission.");
+      toastError(error, "לא הצלחנו לשכפל את המשימה.");
     }
   }
 
@@ -95,10 +100,10 @@ export function MissionsTab() {
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${chaseId}/missions/${deleteTarget.id}`);
-      toast.success("Mission deleted.");
+      toast.success("המשימה נמחקה.");
       setDeleteTarget(null);
     } catch (error) {
-      toastError(error, "Couldn't delete that mission.");
+      toastError(error, "לא הצלחנו למחוק את המשימה.");
     } finally {
       setBusy(false);
     }
@@ -112,21 +117,22 @@ export function MissionsTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Missions"
-        description="Drag to set the order players see. Drafts stay invisible until you publish them."
+        title="משימות"
+        description="גוררים כדי לקבוע את הסדר שהשחקנים רואים. טיוטות נשארות מוסתרות עד הפרסום."
         actions={
           <Button onClick={() => openEditor(null)}>
             <Plus className="size-4" aria-hidden />
-            Add mission
+            משימה חדשה
           </Button>
         }
       />
 
       {chase.missionOrder !== "custom" && order.length > 1 && (
         <p className="rounded-md bg-info-surface px-3 py-2 text-xs text-info">
-          Players currently see missions ordered by{" "}
-          <strong>{chase.missionOrder}</strong>. Set the mission order to
-          “custom” in Participants to use your drag order.
+          כרגע השחקנים רואים את המשימות בסדר{" "}
+          <strong>{MISSION_ORDER_LABEL[chase.missionOrder]}</strong>. כדי
+          להשתמש בסדר הגרירה שלכם, שנו את סדר המשימות ל&quot;מותאם
+          אישית&quot; בלשונית &quot;משתתפים&quot;.
         </p>
       )}
 
@@ -135,12 +141,12 @@ export function MissionsTab() {
       {!loading && !order.length && (
         <EmptyState
           icon={<ListChecks className="size-6" aria-hidden />}
-          title="No missions yet"
-          description="Missions are the things players actually do — a photo, an answer, a place to reach."
+          title="עדיין אין משימות"
+          description="משימות הן מה שהשחקנים באמת עושים — תמונה, תשובה, מקום להגיע אליו."
           action={
             <Button onClick={() => openEditor(null)}>
               <Plus className="size-4" aria-hidden />
-              Create the first mission
+              יוצרים משימה ראשונה
             </Button>
           }
         />
@@ -186,7 +192,7 @@ export function MissionsTab() {
               <span
                 aria-hidden
                 className="mt-1 cursor-grab text-muted-foreground active:cursor-grabbing"
-                title="Drag to reorder"
+                title="גוררים כדי לשנות סדר"
               >
                 <GripVertical className="size-5" />
               </span>
@@ -204,16 +210,16 @@ export function MissionsTab() {
                   >
                     {mission.name}
                   </button>
-                  {mission.isDraft && <Badge tone="warning">Draft</Badge>}
-                  <Badge tone="brand">{formatPoints(mission.points)} pts</Badge>
+                  {mission.isDraft && <Badge tone="warning">טיוטה</Badge>}
+                  <Badge tone="brand">{`${formatPoints(mission.points)} נק'`}</Badge>
                   <Badge tone="neutral">
                     {mission.feedVisibility === "shown" ? (
                       <>
-                        <Eye className="size-3" aria-hidden /> In feed
+                        <Eye className="size-3" aria-hidden /> בפיד
                       </>
                     ) : (
                       <>
-                        <EyeOff className="size-3" aria-hidden /> Hidden from feed
+                        <EyeOff className="size-3" aria-hidden /> מוסתרת מהפיד
                       </>
                     )}
                   </Badge>
@@ -222,43 +228,43 @@ export function MissionsTab() {
                   {mission.description}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Releases: {releaseSummary(mission.release)} · Expires:{" "}
+                  {releaseSummary(mission.release)} ·{" "}
                   {expirySummary(mission.expiry)}
                 </p>
               </div>
 
               <Menu
-                label={`Actions for ${mission.name}`}
+                label={`פעולות עבור ${mission.name}`}
                 items={[
                   {
                     id: "edit",
-                    label: "Edit",
+                    label: "עריכה",
                     icon: <Pencil className="size-4" aria-hidden />,
                     onSelect: () => openEditor(mission),
                   },
                   {
                     id: "duplicate",
-                    label: "Duplicate",
+                    label: "שכפול",
                     icon: <Copy className="size-4" aria-hidden />,
                     onSelect: () => void duplicate(mission),
                   },
                   {
                     id: "up",
-                    label: "Move up",
+                    label: "העברה למעלה",
                     icon: <ArrowUp className="size-4" aria-hidden />,
                     disabled: index === 0,
                     onSelect: () => move(index, index - 1),
                   },
                   {
                     id: "down",
-                    label: "Move down",
+                    label: "העברה למטה",
                     icon: <ArrowDown className="size-4" aria-hidden />,
                     disabled: index === order.length - 1,
                     onSelect: () => move(index, index + 1),
                   },
                   {
                     id: "delete",
-                    label: "Delete",
+                    label: "מחיקה",
                     icon: <Trash2 className="size-4" aria-hidden />,
                     tone: "danger",
                     onSelect: () => setDeleteTarget(mission),
@@ -276,7 +282,7 @@ export function MissionsTab() {
         missions={missions}
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
-        onSaved={() => toast.success("Mission saved.")}
+        onSaved={() => toast.success("המשימה נשמרה.")}
       />
 
       <ConfirmDialog
@@ -284,9 +290,9 @@ export function MissionsTab() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
         loading={busy}
-        title={`Delete “${deleteTarget?.name ?? ""}”?`}
-        description="Every submission to this mission is deleted and the points they earned are taken back off the leaderboard. This cannot be undone."
-        confirmLabel="Delete mission"
+        title={`למחוק את "${deleteTarget?.name ?? ""}"?`}
+        description="כל ההגשות למשימה הזו יימחקו, והנקודות שהן הכניסו יירדו מטבלת המובילים. אי אפשר לשחזר."
+        confirmLabel="מחיקת המשימה"
       />
     </div>
   );

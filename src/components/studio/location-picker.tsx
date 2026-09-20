@@ -48,12 +48,12 @@ export function LocationPicker({
         `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(term.trim())}`,
         { headers: { accept: "application/json" } },
       );
-      if (!res.ok) throw new Error("Address lookup failed.");
+      if (!res.ok) throw new Error("חיפוש הכתובת נכשל.");
       const data = (await res.json()) as NominatimHit[];
       setHits(data);
-      if (!data.length) toastError(new Error("No matching places found."));
+      if (!data.length) toastError(new Error("לא נמצאו מקומות מתאימים."));
     } catch (error) {
-      toastError(error, "Address lookup failed. Drop the pin on the map instead.");
+      toastError(error, "חיפוש הכתובת נכשל. אפשר לסמן את הנקודה ידנית על המפה.");
     } finally {
       setSearching(false);
     }
@@ -64,8 +64,8 @@ export function LocationPicker({
       <div className="flex gap-2">
         <Input
           value={term}
-          placeholder="Search an address or place"
-          aria-label="Search for an address"
+          placeholder="כתובת או שם מקום"
+          aria-label="חיפוש כתובת"
           onChange={(e) => setTerm(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -81,7 +81,7 @@ export function LocationPicker({
           loading={searching}
         >
           <Search className="size-4" aria-hidden />
-          <span className="sr-only sm:not-sr-only">Search</span>
+          <span className="sr-only sm:not-sr-only">חיפוש</span>
         </Button>
       </div>
 
@@ -122,16 +122,23 @@ export function LocationPicker({
       />
 
       <p id={statusId} aria-live="polite" className="text-xs text-muted-foreground">
-        {value
-          ? `Pin at ${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}`
-          : "No pin yet — search above or click the map."}
+        {value ? (
+          <>
+            הסימון ב-
+            <span dir="ltr">
+              {value.lat.toFixed(5)}, {value.lng.toFixed(5)}
+            </span>
+          </>
+        ) : (
+          "עדיין אין סימון — חפשו למעלה, או לחצו על המפה."
+        )}
       </p>
 
       {value && (
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={value.label}
-            aria-label="Location label"
+            aria-label="שם המיקום"
             onChange={(e) => onChange({ ...value, label: e.target.value })}
             className="max-w-sm"
           />
@@ -143,7 +150,7 @@ export function LocationPicker({
               onClick={() => onChange(null)}
             >
               <Trash2 className="size-4" aria-hidden />
-              Clear
+              ניקוי
             </Button>
           )}
         </div>

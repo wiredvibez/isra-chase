@@ -30,13 +30,13 @@ export function ReportDialog({
         `/api/chases/${chaseId}/submissions/${submissionId}/report`,
         { reason: reason.trim() },
       );
-      toast.success("Thanks — the organizer will take a look.");
+      toast.success("תודה. המארגן יבדוק את זה.");
       onClose();
     } catch (caught) {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't send that report.",
+          : "הדיווח לא נשלח. תנסו שוב.",
       );
     } finally {
       setSending(false);
@@ -48,12 +48,12 @@ export function ReportDialog({
       open={open}
       onClose={onClose}
       size="sm"
-      title="Report this submission"
-      description="Only the organizer sees this. Nothing is removed automatically."
+      title="דיווח על ההגשה"
+      description="רק המארגן רואה את זה, ושום דבר לא נמחק אוטומטית."
       footer={
         <>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button
             variant="danger"
@@ -61,19 +61,19 @@ export function ReportDialog({
             loading={sending}
             disabled={!reason.trim()}
           >
-            Send report
+            שולחים דיווח
           </Button>
         </>
       }
     >
-      <Field label="What's wrong with it?" htmlFor="report-reason" required>
+      <Field label="מה הבעיה בהגשה?" htmlFor="report-reason" required>
         <Textarea
           id="report-reason"
           value={reason}
           onChange={(event) => setReason(event.target.value)}
           maxLength={500}
           rows={4}
-          placeholder="Tell the organizer what you saw…"
+          placeholder="ספרו למארגן מה ראיתם…"
         />
       </Field>
     </Dialog>

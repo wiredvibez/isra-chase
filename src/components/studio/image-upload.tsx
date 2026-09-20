@@ -56,7 +56,7 @@ export function ImageUpload({
       );
       onChange(media.url);
     } catch (error) {
-      toastError(error, "That image didn't upload.");
+      toastError(error, "התמונה לא עלתה.");
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -77,7 +77,7 @@ export function ImageUpload({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={value}
-              alt={`${label} preview`}
+              alt={`תצוגה מקדימה: ${label}`}
               className="size-full object-cover"
             />
           ) : (
@@ -103,7 +103,7 @@ export function ImageUpload({
               onClick={() => inputRef.current?.click()}
               loading={progress !== null}
             >
-              {value ? "Replace" : "Upload"} {label.toLowerCase()}
+              {value ? "החלפת" : "העלאת"} {label}
             </Button>
             {value && (
               <Button
@@ -113,13 +113,13 @@ export function ImageUpload({
                 onClick={() => onChange(null)}
               >
                 <Trash2 className="size-4" aria-hidden />
-                Remove
+                הסרה
               </Button>
             )}
           </div>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
           {progress !== null && (
-            <Progress value={progress} label={`Uploading ${label}`} />
+            <Progress value={progress} label={`בהעלאה: ${label}`} />
           )}
         </div>
       </div>

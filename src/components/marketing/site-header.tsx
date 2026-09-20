@@ -2,10 +2,10 @@ import Link from "next/link";
 import { LogoMark } from "@/components/marketing/logo";
 
 const sections = [
-  { href: "/#missions", label: "Mission types" },
-  { href: "/#live", label: "Running a chase" },
-  { href: "/#moderation", label: "Moderation" },
-  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#missions", label: "סוגי משימות" },
+  { href: "/#live", label: "איך מריצים מרדף" },
+  { href: "/#moderation", label: "בקרה" },
+  { href: "/#how-it-works", label: "איך זה עובד" },
 ];
 
 export function SiteHeader() {
@@ -21,7 +21,7 @@ export function SiteHeader() {
           <span className="sr-only sm:hidden">Isra Chase</span>
         </Link>
 
-        <nav aria-label="Page sections" className="ms-4 hidden lg:block">
+        <nav aria-label="מקטעי העמוד" className="ms-4 hidden lg:block">
           <ul className="flex items-center gap-1">
             {sections.map((item) => (
               <li key={item.href}>
@@ -41,13 +41,13 @@ export function SiteHeader() {
             href="/signin"
             className="inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold hover:bg-surface-muted"
           >
-            Sign in
+            כניסה
           </Link>
           <Link
             href="/studio"
             className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover sm:px-4"
           >
-            Create a chase
+            יוצרים מרדף
           </Link>
         </div>
       </div>

@@ -4,9 +4,9 @@ import { FormFallback } from "../_components/form-fallback";
 import { SignUpForm } from "../_components/sign-up-form";
 
 export const metadata: Metadata = {
-  title: "Create an account",
+  title: "פתיחת חשבון",
   description:
-    "Create an Isra Chase account to build camera, text and GPS missions and run them live.",
+    "פותחים חשבון ב-Isra Chase כדי לבנות משימות צילום, טקסט ומיקום ולהריץ אותן באוויר.",
   robots: { index: false },
 };
 

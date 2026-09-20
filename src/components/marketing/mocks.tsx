@@ -52,9 +52,9 @@ export function CameraMissionMock({ className }: { className?: string }) {
         <rect x="93" y="93" width="12" height="22" rx="6" className="fill-primary" />
       </svg>
       <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-        <p className="truncate text-xs font-semibold">Sunset with the whole team</p>
+        <p className="truncate text-xs font-semibold">שקיעה עם כל הקבוצה</p>
         <Badge tone="success" className="shrink-0">
-          <Check className="size-3" /> Accepted
+          <Check className="size-3" /> התקבלה
         </Badge>
       </div>
     </MockFrame>
@@ -67,14 +67,18 @@ export function TextMissionMock({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
       {/* Same 200x118 canvas as the other two mocks, so the three cards line up
-          at every breakpoint without hard-coded heights. */}
+          at every breakpoint without hard-coded heights. This one draws a UI
+          rather than a scene, so its coordinates are laid out for RTL: prompt
+          lines ragged on the left, the answer and its tick swapped over. The
+          `<text>` nodes carry `direction: rtl` explicitly, which makes the
+          default `text-anchor: start` mean "x is the right edge". */}
       <svg viewBox="0 0 200 118" className="block w-full">
         <rect width="200" height="118" className="fill-surface-muted" />
 
         <rect x="14" y="14" width="172" height="34" rx="7" className="fill-surface stroke-border" strokeWidth="1.5" />
         <g className="fill-muted-foreground/45">
-          <rect x="24" y="24" width="122" height="5" rx="2.5" />
-          <rect x="24" y="35" width="86" height="5" rx="2.5" />
+          <rect x="54" y="24" width="122" height="5" rx="2.5" />
+          <rect x="90" y="35" width="86" height="5" rx="2.5" />
         </g>
 
         <rect
@@ -86,11 +90,18 @@ export function TextMissionMock({ className }: { className?: string }) {
           className="fill-success-surface stroke-success/45"
           strokeWidth="1.5"
         />
-        <text x="26" y="78" className="fill-foreground" fontSize="14" fontWeight="700">
+        <text
+          x="174"
+          y="78"
+          style={{ direction: "rtl" }}
+          className="fill-foreground"
+          fontSize="14"
+          fontWeight="700"
+        >
           1932
         </text>
         <path
-          d="m162 73 4 4 8-8"
+          d="m38 73-4 4-8-8"
           fill="none"
           className="stroke-success"
           strokeWidth="2.6"
@@ -98,18 +109,23 @@ export function TextMissionMock({ className }: { className?: string }) {
           strokeLinejoin="round"
         />
 
-        <rect x="14" y="96" width="76" height="14" rx="7" className="fill-brand-400/30" />
-        <text x="24" y="106" className="fill-foreground" fontSize="8" fontWeight="700">
-          92% match
+        <rect x="110" y="96" width="76" height="14" rx="7" className="fill-brand-400/30" />
+        <text
+          x="176"
+          y="106"
+          style={{ direction: "rtl" }}
+          className="fill-foreground"
+          fontSize="8"
+          fontWeight="700"
+        >
+          92% התאמה
         </text>
       </svg>
 
       <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-        <p className="truncate text-xs font-semibold">
-          When was the water tower built?
-        </p>
+        <p className="truncate text-xs font-semibold">מתי נבנה מגדל המים?</p>
         <Badge tone="info" className="shrink-0">
-          approximate
+          בערך מספיק
         </Badge>
       </div>
     </MockFrame>
@@ -143,7 +159,7 @@ export function GpsMissionMock({ className }: { className?: string }) {
       </svg>
       <div className="flex items-center gap-2 px-3 py-2.5">
         <MapPin className="size-4 shrink-0 text-accent" />
-        <p className="text-xs font-semibold">Within 100 m of the lighthouse</p>
+        <p className="text-xs font-semibold">עד 100 מ&apos; מהמגדלור</p>
       </div>
     </MockFrame>
   );
@@ -152,18 +168,18 @@ export function GpsMissionMock({ className }: { className?: string }) {
 /* ----------------------------------------------------------- leaderboard */
 
 const standings = [
-  { rank: 1, team: "Blue Herons", points: 940 },
-  { rank: 2, team: "Cobalt Foxes", points: 780 },
-  { rank: 2, team: "Night Owls", points: 780 },
-  { rank: 4, team: "Sand Dollars", points: 655 },
+  { rank: 1, team: "אנפות כחולות", points: 940 },
+  { rank: 2, team: "שועלי קובלט", points: 780 },
+  { rank: 2, team: "ינשופי לילה", points: 780 },
+  { rank: 4, team: "כוכבי ים", points: 655 },
 ];
 
 export function LeaderboardMock({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="font-display text-sm font-bold">Leaderboard</p>
-        <Badge tone="success">live</Badge>
+        <p className="font-display text-sm font-bold">טבלת המובילים</p>
+        <Badge tone="success">באוויר</Badge>
       </div>
       <ul className="divide-y divide-border">
         {standings.map((row) => (
@@ -187,7 +203,7 @@ export function LeaderboardMock({ className }: { className?: string }) {
         ))}
       </ul>
       <p className="border-t border-border bg-surface-muted px-4 py-2 text-[11px] text-muted-foreground">
-        Two teams tied on 780, so the next team is 4th — Olympic ranking.
+        שתי קבוצות תקועות על 780, אז הבאה אחריהן במקום הרביעי — דירוג אולימפי.
       </p>
     </MockFrame>
   );
@@ -196,17 +212,17 @@ export function LeaderboardMock({ className }: { className?: string }) {
 /* --------------------------------------------------------- activity feed */
 
 const feed = [
-  { team: "Night Owls", text: "completed Sunset with the whole team", points: "+150", when: "just now" },
-  { team: "Sand Dollars", text: "checked in at the lighthouse", points: "+200", when: "2 min" },
-  { team: "Cobalt Foxes", text: "answered the water tower question", points: "+100", when: "4 min" },
+  { team: "ינשופי לילה", text: "השלימו את משימת השקיעה", points: "+150", when: "עכשיו" },
+  { team: "כוכבי ים", text: "עשו צ'ק-אין במגדלור", points: "+200", when: "לפני 2 דק'" },
+  { team: "שועלי קובלט", text: "ענו על שאלת מגדל המים", points: "+100", when: "לפני 4 דק'" },
 ];
 
 export function ActivityFeedMock({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="font-display text-sm font-bold">Activity</p>
-        <Badge tone="brand">everything, as it lands</Badge>
+        <p className="font-display text-sm font-bold">פעילות</p>
+        <Badge tone="brand">הכול, ברגע שזה נוחת</Badge>
       </div>
       <ul className="divide-y divide-border">
         <li className="flex items-start gap-3 bg-accent/8 px-4 py-2.5">
@@ -214,8 +230,8 @@ export function ActivityFeedMock({ className }: { className?: string }) {
             <Megaphone className="size-4" />
           </span>
           <p className="text-xs leading-snug">
-            <span className="font-semibold">Broadcast</span> · Thirty minutes left —
-            the harbour missions close first.
+            <span className="font-semibold">הודעה</span> · נשארו שלושים דקות —
+            משימות הנמל נסגרות ראשונות.
           </p>
         </li>
         {feed.map((row) => (
@@ -223,9 +239,14 @@ export function ActivityFeedMock({ className }: { className?: string }) {
             <Avatar name={row.team} size="sm" className="mt-0.5" />
             <p className="text-xs leading-snug">
               <span className="font-semibold">{row.team}</span> {row.text}
-              <span className="block text-muted-foreground">{row.when} ago</span>
+              <span className="block text-muted-foreground">{row.when}</span>
             </p>
-            <span className="ms-auto shrink-0 rounded-full bg-gold-400/25 px-2 py-0.5 text-xs font-bold tabular-nums">
+            {/* The leading `+` belongs to the number, not to the Hebrew
+                around it, so the run is isolated. */}
+            <span
+              dir="ltr"
+              className="ms-auto shrink-0 rounded-full bg-gold-400/25 px-2 py-0.5 text-xs font-bold tabular-nums"
+            >
               {row.points}
             </span>
           </li>
@@ -241,8 +262,8 @@ export function ReviewQueueMock({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="font-display text-sm font-bold">Review queue</p>
-        <Badge tone="warning">3 pending</Badge>
+        <p className="font-display text-sm font-bold">תור בדיקה</p>
+        <Badge tone="warning">3 ממתינות</Badge>
       </div>
 
       <div className="flex gap-3 px-4 py-3">
@@ -254,24 +275,24 @@ export function ReviewQueueMock({ className }: { className?: string }) {
           <rect x="19" y="46" width="10" height="16" rx="5" className="fill-accent" />
         </svg>
         <div className="min-w-0">
-          <p className="truncate text-xs font-semibold">Night Owls · Rooftop panorama</p>
+          <p className="truncate text-xs font-semibold">ינשופי לילה · פנורמה מהגג</p>
           <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-            Waiting on a decision. Nothing scores until you make one.
+            ממתינה להחלטה. שום דבר לא מנוקד עד שתחליטו.
           </p>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
         <span className="inline-flex items-center gap-1.5 rounded-sm bg-success px-2.5 py-1.5 text-xs font-semibold text-white">
-          <Check className="size-3.5" /> Approve
+          <Check className="size-3.5" /> לאשר
           <kbd className="ms-1 rounded-xs bg-black/20 px-1 font-mono text-[10px]">A</kbd>
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-strong px-2.5 py-1.5 text-xs font-semibold">
-          Reject
+          לדחות
           <kbd className="ms-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">R</kbd>
         </span>
         <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-strong px-2.5 py-1.5 text-xs font-semibold">
-          <Undo2 className="size-3.5" /> Ask again
+          <Undo2 className="size-3.5" /> לעשות שוב
           <kbd className="ms-1 rounded-xs bg-surface-inset px-1 font-mono text-[10px]">S</kbd>
         </span>
       </div>
@@ -282,17 +303,17 @@ export function ReviewQueueMock({ className }: { className?: string }) {
 /* ------------------------------------------------------- adjustment log */
 
 const adjustments = [
-  { amount: "+50", reason: "Helped another team find the trailhead", who: "Dana", when: "14:22" },
-  { amount: "−25", reason: "Left the play area during the harbour leg", who: "Dana", when: "13:58" },
-  { amount: "+100", reason: "First team to finish every camera mission", who: "Ori", when: "13:10" },
+  { amount: "+50", reason: "עזרו לקבוצה אחרת למצוא את תחילת המסלול", who: "דנה", when: "14:22" },
+  { amount: "−25", reason: "יצאו משטח המשחק בקטע של הנמל", who: "דנה", when: "13:58" },
+  { amount: "+100", reason: "הקבוצה הראשונה שסיימה את כל משימות הצילום", who: "אורי", when: "13:10" },
 ];
 
 export function AdjustmentLogMock({ className }: { className?: string }) {
   return (
     <MockFrame className={className}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="font-display text-sm font-bold">Cobalt Foxes · score history</p>
-        <Badge tone="neutral">audit log</Badge>
+        <p className="font-display text-sm font-bold">שועלי קובלט · היסטוריית ניקוד</p>
+        <Badge tone="neutral">יומן שינויים</Badge>
       </div>
       <ul className="divide-y divide-border">
         {adjustments.map((row) => (
@@ -312,7 +333,11 @@ export function AdjustmentLogMock({ className }: { className?: string }) {
               )}
             </span>
             <p className="min-w-0 text-xs leading-snug">
-              <span className="font-semibold tabular-nums">{row.amount} points</span>
+              {/* A signed number next to Hebrew: without the isolate the sign
+                  lands on the wrong side of the digits. */}
+              <span className="font-semibold tabular-nums">
+                <span dir="ltr">{row.amount}</span> נקודות
+              </span>
               <span className="block text-muted-foreground">{row.reason}</span>
               <span className="block text-muted-foreground">
                 {row.who} · {row.when}

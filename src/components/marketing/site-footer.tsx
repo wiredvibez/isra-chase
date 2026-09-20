@@ -4,26 +4,26 @@ import { Logo } from "@/components/marketing/logo";
 /** Only the product's own pages and sections — nothing invented. */
 const groups: Array<{ title: string; links: Array<{ href: string; label: string }> }> = [
   {
-    title: "What it does",
+    title: "מה זה עושה",
     links: [
-      { href: "/#missions", label: "Mission types" },
-      { href: "/#live", label: "Running a chase" },
-      { href: "/#moderation", label: "Moderation" },
-      { href: "/#how-it-works", label: "How it works" },
+      { href: "/#missions", label: "סוגי משימות" },
+      { href: "/#live", label: "איך מריצים מרדף" },
+      { href: "/#moderation", label: "בקרה" },
+      { href: "/#how-it-works", label: "איך זה עובד" },
     ],
   },
   {
-    title: "Organisers",
+    title: "למארגנים",
     links: [
-      { href: "/studio", label: "Open the Studio" },
-      { href: "/signup", label: "Create an account" },
-      { href: "/signin", label: "Sign in" },
-      { href: "/reset-password", label: "Reset your password" },
+      { href: "/studio", label: "הסטודיו" },
+      { href: "/signup", label: "פתיחת חשבון" },
+      { href: "/signin", label: "כניסה" },
+      { href: "/reset-password", label: "איפוס סיסמה" },
     ],
   },
   {
-    title: "Players",
-    links: [{ href: "/#join", label: "Join with a code" }],
+    title: "לשחקנים",
+    links: [{ href: "/#join", label: "הצטרפות עם קוד" }],
   },
 ];
 
@@ -35,8 +35,8 @@ export function SiteFooter() {
           <div>
             <Logo />
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              Build camera, text and GPS missions, hand out a join code, and score
-              a whole group live.
+              בונים משימות צילום, טקסט ומיקום, מחלקים קוד הצטרפות, ומנקדים חבורה
+              שלמה בזמן אמת.
             </p>
           </div>
 
@@ -60,8 +60,8 @@ export function SiteFooter() {
         </div>
 
         <p className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
-          Isra Chase is an independent scavenger hunt platform. Not affiliated with
-          any other hunt or experience product.
+          Isra Chase היא פלטפורמת ציד מטמון עצמאית, בלי שום קשר למוצרי ציד או
+          חוויה אחרים.
         </p>
       </div>
     </footer>

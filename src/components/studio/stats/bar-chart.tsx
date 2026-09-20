@@ -18,7 +18,7 @@ export interface BarRow {
 export function BarChart({
   title,
   rows,
-  unit = "submissions",
+  unit = "הגשות",
   emptyMessage,
   tone = "brand",
 }: {

@@ -25,7 +25,7 @@ export default function StudioLayout({
 
   React.useEffect(() => {
     if (!loading && !user) {
-      router.replace(`/sign-in?next=${encodeURIComponent(pathname)}`);
+      router.replace(`/signin?next=${encodeURIComponent(pathname)}`);
     }
   }, [loading, user, pathname, router]);
 

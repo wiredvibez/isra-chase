@@ -25,13 +25,13 @@ export function scheduleToInput(
 }
 
 const OPTIONS: Array<{ value: BroadcastScheduleInput["kind"]; label: string }> = [
-  { value: "now", label: "Send now" },
-  { value: "before_start", label: "Before the chase starts" },
-  { value: "at_start", label: "When the chase starts" },
-  { value: "during_relative", label: "During — relative to start or end" },
-  { value: "during_specific", label: "During — at a specific time" },
-  { value: "at_end", label: "When the chase ends" },
-  { value: "after_end", label: "After the chase ends" },
+  { value: "now", label: "לשלוח עכשיו" },
+  { value: "before_start", label: "לפני תחילת המרדף" },
+  { value: "at_start", label: "עם תחילת המרדף" },
+  { value: "during_relative", label: "במהלך המרדף — ביחס לתחילה או לסיום" },
+  { value: "during_specific", label: "במהלך המרדף — בשעה מסוימת" },
+  { value: "at_end", label: "עם סיום המרדף" },
+  { value: "after_end", label: "אחרי סיום המרדף" },
 ];
 
 export function BroadcastSchedulePicker({
@@ -69,7 +69,7 @@ export function BroadcastSchedulePicker({
   return (
     <div className="space-y-2">
       <Select
-        aria-label="When to send"
+        aria-label="מתי לשלוח"
         value={value.kind}
         onChange={(e) =>
           changeKind(e.target.value as BroadcastScheduleInput["kind"])
@@ -101,7 +101,7 @@ export function BroadcastSchedulePicker({
           />
           <div className="flex flex-wrap gap-2">
             <Select
-              aria-label="Before or after"
+              aria-label="לפני או אחרי"
               className="max-w-32"
               value={value.offsetMs < 0 ? "before" : "after"}
               onChange={(e) =>
@@ -114,19 +114,19 @@ export function BroadcastSchedulePicker({
                 })
               }
             >
-              <option value="after">after</option>
-              <option value="before">before</option>
+              <option value="after">אחרי</option>
+              <option value="before">לפני</option>
             </Select>
             <Select
-              aria-label="Anchor"
+              aria-label="נקודת ייחוס"
               className="max-w-40"
               value={value.anchor}
               onChange={(e) =>
                 onChange({ ...value, anchor: e.target.value as "start" | "end" })
               }
             >
-              <option value="start">the chase start</option>
-              <option value="end">the chase end</option>
+              <option value="start">תחילת המרדף</option>
+              <option value="end">סיום המרדף</option>
             </Select>
           </div>
         </div>
@@ -135,7 +135,7 @@ export function BroadcastSchedulePicker({
       {value.kind === "during_specific" && (
         <Input
           type="datetime-local"
-          aria-label="Send at"
+          aria-label="שעת השליחה"
           value={toLocalInput(value.atMs)}
           onChange={(e) =>
             onChange({

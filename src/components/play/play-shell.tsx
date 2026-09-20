@@ -14,10 +14,10 @@ import { NotificationsSheet } from "./notifications-sheet";
 import { Countdown } from "./countdown";
 
 const TABS = [
-  { id: "missions", label: "Missions", icon: ListChecks, segment: "" },
-  { id: "feed", label: "Feed", icon: Rss, segment: "/feed" },
-  { id: "leaderboard", label: "Ranks", icon: Trophy, segment: "/leaderboard" },
-  { id: "me", label: "Me", icon: UsersRound, segment: "/me" },
+  { id: "missions", label: "משימות", icon: ListChecks, segment: "" },
+  { id: "feed", label: "הפיד", icon: Rss, segment: "/feed" },
+  { id: "leaderboard", label: "הטבלה", icon: Trophy, segment: "/leaderboard" },
+  { id: "me", label: "אני", icon: UsersRound, segment: "/me" },
 ] as const;
 
 /** Reserves room for the fixed tab bar, including the home-indicator inset. */
@@ -29,7 +29,7 @@ function BottomTabBar({ chaseId }: { chaseId: string }) {
 
   return (
     <nav
-      aria-label="Play sections"
+      aria-label="ניווט במרדף"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto flex max-w-2xl">
@@ -92,19 +92,27 @@ function PlayHeader() {
           <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             {team && (
               <span className="font-semibold text-foreground">
-                {fmtPoints(team.points)} pts
+                {`${fmtPoints(team.points)} נק'`}
               </span>
             )}
             {chase?.status === "live" && endsAt && (
-              <Countdown toMs={endsAt} className="tabular-nums" />
+              <Countdown
+                toMs={endsAt}
+                prefix="נשארו"
+                endedLabel="נגמר הזמן"
+                className="tabular-nums"
+              />
             )}
             {chase?.status === "scheduled" && startsAt && (
-              <span className="tabular-nums">
-                starts in <Countdown toMs={startsAt} />
-              </span>
+              <Countdown
+                toMs={startsAt}
+                prefix="מתחיל בעוד"
+                endedLabel="מתחיל עכשיו"
+                className="tabular-nums"
+              />
             )}
-            {chase?.status === "ended" && <span>Chase ended</span>}
-            {chase?.status === "draft" && <span>Not started yet</span>}
+            {chase?.status === "ended" && <span>המרדף הסתיים</span>}
+            {chase?.status === "draft" && <span>עוד לא התחיל</span>}
           </p>
         </div>
 
@@ -112,7 +120,7 @@ function PlayHeader() {
           type="button"
           onClick={openSheet}
           aria-label={
-            unread ? `Notifications, ${unread} unread` : "Notifications"
+            unread ? `התראות, ${unread} שלא נקראו` : "התראות"
           }
           className="relative flex size-11 items-center justify-center rounded-full text-foreground hover:bg-surface-muted"
         >
@@ -183,14 +191,14 @@ export function PlayShell({ children }: { children: React.ReactNode }) {
   if (!uid) {
     return (
       <Gate
-        title="Sign in to play"
-        description="Enter your join code to get into the chase — no account required."
+        title="צריך להיכנס כדי לשחק"
+        description="קוד הצטרפות ושם זה כל מה שצריך. בלי חשבון, בלי טפסים."
         action={
           <Link
             href="/join"
             className="inline-flex h-12 w-full items-center justify-center rounded-md bg-primary px-6 font-semibold text-primary-foreground"
           >
-            Go to join
+            למסך ההצטרפות
           </Link>
         }
       />
@@ -200,14 +208,14 @@ export function PlayShell({ children }: { children: React.ReactNode }) {
   if (!participant) {
     return (
       <Gate
-        title="You haven't joined this chase"
-        description="Ask the organizer for the join code, or scan their QR code."
+        title="עוד לא הצטרפתם למרדף הזה"
+        description="בקשו מהמארגן את קוד ההצטרפות, או סרקו את קוד ה-QR שלו."
         action={
           <Link
             href={chase?.joinCode ? `/join/${chase.joinCode}` : "/join"}
             className="inline-flex h-12 w-full items-center justify-center rounded-md bg-primary px-6 font-semibold text-primary-foreground"
           >
-            Join this chase
+            מצטרפים למרדף
           </Link>
         }
       />

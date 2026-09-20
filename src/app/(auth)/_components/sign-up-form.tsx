@@ -50,10 +50,10 @@ export function SignUpForm() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-extrabold tracking-tight">
-          Create an account
+          פתיחת חשבון
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          You need one to build and run a chase. Playing one only needs a join code.
+          צריך חשבון כדי לבנות מרדף ולהריץ אותו. בשביל לשחק מספיק קוד הצטרפות.
         </p>
       </div>
 
@@ -67,14 +67,14 @@ export function SignUpForm() {
           id="signup-name"
           name="name"
           type="text"
-          label="Your name"
+          label="השם שלכם"
           required
           autoComplete="name"
           maxLength={60}
           autoFocus
-          placeholder="Dana Levi"
+          placeholder="דנה לוי"
           messages={{
-            valueMissing: "Teams will see this name on your broadcasts.",
+            valueMissing: "הקבוצות יראו את השם הזה בהודעות שתשלחו.",
           }}
         />
 
@@ -82,13 +82,13 @@ export function SignUpForm() {
           id="signup-email"
           name="email"
           type="email"
-          label="Email"
+          label="אימייל"
           required
           autoComplete="email"
           placeholder="you@example.com"
           messages={{
-            valueMissing: "We need an email to sign you in later.",
-            typeMismatch: "That doesn't look like an email address.",
+            valueMissing: "צריך אימייל כדי שתוכלו להיכנס אחר כך.",
+            typeMismatch: "זה לא נראה כמו כתובת אימייל.",
           }}
         />
 
@@ -98,9 +98,9 @@ export function SignUpForm() {
           type="password"
           label={
             <>
-              Password{" "}
+              סיסמה{" "}
               <span className="font-normal text-muted-foreground">
-                (at least {MIN_PASSWORD} characters)
+                (לפחות {MIN_PASSWORD} תווים)
               </span>
             </>
           }
@@ -108,21 +108,21 @@ export function SignUpForm() {
           minLength={MIN_PASSWORD}
           autoComplete="new-password"
           messages={{
-            valueMissing: "Choose a password.",
-            tooShort: "Passwords need at least six characters.",
+            valueMissing: "תבחרו סיסמה.",
+            tooShort: "סיסמה צריכה לפחות 6 תווים.",
           }}
         />
 
         <Button type="submit" size="lg" className="w-full" loading={busy}>
-          Create account
+          פותחים חשבון
         </Button>
       </form>
 
       <AuthAltLink
         href="/signin"
         next={next}
-        prompt="Already have an account?"
-        action="Sign in"
+        prompt="כבר יש לכם חשבון?"
+        action="כניסה"
       />
     </div>
   );

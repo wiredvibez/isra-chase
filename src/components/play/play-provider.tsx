@@ -82,7 +82,7 @@ export function PlayProvider({
       setMissionsError(
         error instanceof ApiClientError
           ? error.message
-          : "Couldn't load the missions.",
+          : "לא הצלחנו לטעון את המשימות.",
       );
     } finally {
       setMissionsLoading(false);

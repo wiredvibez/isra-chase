@@ -115,7 +115,7 @@ export function CameraComposer({
       if (seconds !== null && seconds > maxVideoSeconds + 0.5) {
         replacePicked(null);
         setError(
-          `Videos for this mission have to be ${maxVideoSeconds} seconds or shorter — that one is ${Math.round(seconds)} s. Trim it and try again.`,
+          `הסרטון במשימה הזאת יכול להיות עד ${maxVideoSeconds} שניות, וזה ${Math.round(seconds)}. קצצו אותו ותנסו שוב.`,
         );
         return;
       }
@@ -149,7 +149,7 @@ export function CameraComposer({
           ? caught.message
           : caught instanceof Error
             ? caught.message
-            : "That didn't go through. Try again.";
+            : "ההעלאה נתקעה. תנסו שוב.";
       setError(message);
       toast.error(message);
     } finally {
@@ -160,7 +160,11 @@ export function CameraComposer({
 
   const isVideo = picked ? kindOf(picked.file) === "video" : false;
   const captureLabel =
-    accepts === "videos" ? "Record a video" : accepts === "photos" ? "Take a photo" : "Open camera";
+    accepts === "videos"
+      ? "מצלמים וידאו"
+      : accepts === "photos"
+        ? "מצלמים תמונה"
+        : "פותחים מצלמה";
 
   return (
     <div className="space-y-4">
@@ -197,7 +201,7 @@ export function CameraComposer({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={picked.url}
-              alt="Your submission preview"
+              alt="תצוגה מקדימה של ההגשה שלכם"
               className="max-h-[60dvh] w-full object-contain"
             />
           )}
@@ -205,7 +209,7 @@ export function CameraComposer({
             type="button"
             onClick={() => replacePicked(null)}
             disabled={sending}
-            aria-label="Remove this file and pick another"
+            aria-label="מסירים את הקובץ ובוחרים אחר"
             className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm disabled:opacity-50"
           >
             <X className="size-5" />
@@ -235,39 +239,43 @@ export function CameraComposer({
               onClick={() => libraryRef.current?.click()}
             >
               <ImageIcon className="size-5" aria-hidden />
-              Choose from library
+              בוחרים מהגלריה
             </Button>
           )}
 
           <p className="px-1 text-xs text-muted-foreground">
             {liveOnly
-              ? "This mission is live capture only — uploading from your library is disabled, so shoot it here and now."
+              ? "במשימה הזאת מצלמים בזמן אמת — העלאה מהגלריה חסומה, אז תצלמו כאן ועכשיו."
               : accepts === "photos"
-                ? "Photos only."
+                ? "תמונות בלבד."
                 : accepts === "videos"
-                  ? `Videos only, up to ${maxVideoSeconds} seconds.`
-                  : `Photo or video, videos up to ${maxVideoSeconds} seconds.`}
+                  ? `וידאו בלבד, עד ${maxVideoSeconds} שניות.`
+                  : `תמונה או וידאו, סרטונים עד ${maxVideoSeconds} שניות.`}
           </p>
         </div>
       )}
 
-      <Field label="Caption" htmlFor="caption" hint="Optional — but the feed loves a good caption.">
+      <Field
+        label="כיתוב"
+        htmlFor="caption"
+        hint="לא חובה — אבל הפיד אוהב כיתוב טוב."
+      >
         <Textarea
           id="caption"
           value={caption}
           onChange={(event) => setCaption(event.target.value)}
           maxLength={500}
           rows={2}
-          placeholder="Say something about it…"
+          placeholder="כמה מילים על זה…"
           disabled={sending}
         />
       </Field>
 
       {progress !== null && (
         <div className="space-y-1">
-          <Progress value={progress} label="Upload progress" />
+          <Progress value={progress} label="התקדמות ההעלאה" />
           <p className="text-xs text-muted-foreground tabular-nums" aria-live="polite">
-            Uploading… {progress}%
+            מעלים… {progress}%
           </p>
         </div>
       )}
@@ -285,7 +293,7 @@ export function CameraComposer({
         loading={sending}
       >
         {!sending && <Send className="size-5" aria-hidden />}
-        {sending ? "Sending…" : "Submit mission"}
+        {sending ? "שולחים…" : "שולחים את המשימה"}
       </Button>
     </div>
   );

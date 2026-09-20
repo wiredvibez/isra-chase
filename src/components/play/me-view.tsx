@@ -23,7 +23,6 @@ import { ConfirmDialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { points as fmtPoints, shortDateTime, timeAgo } from "@/lib/format";
-import { plural } from "@/lib/utils";
 import type { Adjustment, Participant, Submission, SubmissionStatus } from "@/lib/domain/types";
 import { usePlay } from "./play-provider";
 import { MissionIcon } from "./mission-icon";
@@ -35,9 +34,9 @@ const STATUS_TONE: Record<SubmissionStatus, "success" | "warning" | "danger"> = 
 };
 
 const STATUS_LABEL: Record<SubmissionStatus, string> = {
-  approved: "Approved",
-  pending: "In review",
-  rejected: "Not accepted",
+  approved: "אושרה",
+  pending: "בבדיקה",
+  rejected: "לא התקבלה",
 };
 
 function Section({
@@ -128,12 +127,12 @@ export function MeView() {
       });
       setDeleting(null);
       await refreshMissions();
-      toast.success("Submission deleted — the mission is open again.");
+      toast.success("ההגשה נמחקה. המשימה פתוחה שוב.");
     } catch (caught) {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't delete that submission.",
+          : "לא הצלחנו למחוק את ההגשה.",
       );
     } finally {
       setBusy(false);
@@ -149,7 +148,7 @@ export function MeView() {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't leave the chase.",
+          : "לא הצלחנו להוציא אתכם מהמרדף.",
       );
       setBusy(false);
     }
@@ -159,17 +158,19 @@ export function MeView() {
     <div className="space-y-6">
       <Card>
         <CardContent className="flex items-center gap-4 p-5">
-          <Avatar name={team?.name ?? "Team"} src={team?.photoUrl} size="lg" />
+          <Avatar name={team?.name ?? "קבוצה"} src={team?.photoUrl} size="lg" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-display text-xl font-bold">
               {team?.name ?? <Skeleton className="h-6 w-32" />}
             </h1>
             <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
               <Badge tone="neutral">
-                {team?.mode === "solo" ? "Solo player" : "Team"}
+                {team?.mode === "solo" ? "משתתף יחיד" : "קבוצה"}
               </Badge>
               <span>
-                {members.length} {plural(members.length, "member")}
+                {members.length === 1
+                  ? "משתתף אחד"
+                  : `${members.length} משתתפים`}
               </span>
             </p>
           </div>
@@ -181,19 +182,17 @@ export function MeView() {
           <p className="font-display text-5xl font-bold tabular-nums text-primary">
             {fmtPoints(team?.points ?? 0)}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {plural(team?.points ?? 0, "point")} in total
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">נקודות בסך הכול</p>
           <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
             <div className="rounded-md bg-surface-muted px-3 py-2">
-              <dt className="text-xs text-muted-foreground">From missions</dt>
+              <dt className="text-xs text-muted-foreground">ממשימות</dt>
               <dd className="font-display text-lg font-bold tabular-nums">
                 {fmtPoints(team?.basePoints ?? 0)}
               </dd>
             </div>
             <div className="rounded-md bg-surface-muted px-3 py-2">
-              <dt className="text-xs text-muted-foreground">Bonus & adjustments</dt>
-              <dd className="font-display text-lg font-bold tabular-nums">
+              <dt className="text-xs text-muted-foreground">בונוסים ותיקונים</dt>
+              <dd dir="ltr" className="font-display text-lg font-bold tabular-nums">
                 {fmtPoints(team?.bonusPoints ?? 0, true)}
               </dd>
             </div>
@@ -201,7 +200,7 @@ export function MeView() {
         </CardContent>
       </Card>
 
-      <Section title="Members">
+      <Section title="חברי הקבוצה">
         <ul className="flex flex-col gap-2">
           {members.length === 0 ? (
             <li>
@@ -223,13 +222,14 @@ export function MeView() {
                     {member.displayName}
                     {member.uid === uid && (
                       <span className="ms-1.5 text-xs font-semibold text-primary">
-                        you
+                        אתם
                       </span>
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {member.submissionCount}{" "}
-                    {plural(member.submissionCount, "submission")}
+                    {member.submissionCount === 1
+                      ? "הגשה אחת"
+                      : `${member.submissionCount} הגשות`}
                   </p>
                 </div>
               </li>
@@ -239,7 +239,7 @@ export function MeView() {
       </Section>
 
       {adjustments.length > 0 && (
-        <Section title="Bonus history">
+        <Section title="היסטוריית בונוסים">
           <ul className="flex flex-col gap-2">
             {adjustments.map((adjustment) => (
               <li
@@ -251,7 +251,8 @@ export function MeView() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">
-                    {fmtPoints(adjustment.points, true)} points
+                    <span dir="ltr">{fmtPoints(adjustment.points, true)}</span>{" "}
+                    נקודות
                   </p>
                   {adjustment.reason && (
                     <p className="text-sm break-words text-muted-foreground">
@@ -268,14 +269,14 @@ export function MeView() {
         </Section>
       )}
 
-      <Section title="Your submissions">
+      <Section title="ההגשות שלכם">
         {submissionsLoading && submissions.length === 0 ? (
           <Skeleton className="h-20 w-full" />
         ) : submissions.length === 0 ? (
           <EmptyState
             icon={<UsersRound className="size-5" />}
-            title="Nothing submitted yet"
-            description="Head to the missions tab and put something on the board."
+            title="עדיין לא שלחתם כלום"
+            description="קפצו ללשונית המשימות ותשלחו משהו ראשון."
           />
         ) : (
           <ul className="flex flex-col gap-2">
@@ -306,7 +307,12 @@ export function MeView() {
                     </Badge>
                     {submission.status === "approved" && (
                       <Badge tone="accent">
-                        +{fmtPoints(submission.points + (submission.bonusPoints ?? 0))}
+                        <span dir="ltr">
+                          +
+                          {fmtPoints(
+                            submission.points + (submission.bonusPoints ?? 0),
+                          )}
+                        </span>
                       </Badge>
                     )}
                   </p>
@@ -325,7 +331,7 @@ export function MeView() {
                   <button
                     type="button"
                     onClick={() => setDeleting(submission)}
-                    aria-label={`Delete your submission for ${submission.missionName}`}
+                    aria-label={`מוחקים את ההגשה שלכם למשימה ${submission.missionName}`}
                     className="flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-danger-surface hover:text-danger"
                   >
                     <Trash className="size-[1.125rem]" aria-hidden />
@@ -337,7 +343,7 @@ export function MeView() {
         )}
       </Section>
 
-      <Section title="Account">
+      <Section title="חשבון">
         <div className="flex flex-col gap-2">
           <Button
             variant="outline"
@@ -346,7 +352,7 @@ export function MeView() {
             onClick={() => setLeaving(true)}
           >
             <DoorOpen className="size-5" aria-hidden />
-            Leave this chase
+            יציאה מהמרדף
           </Button>
           <Button
             variant="ghost"
@@ -357,7 +363,7 @@ export function MeView() {
             }}
           >
             <LogOut className="size-5" aria-hidden />
-            Sign out
+            יציאה מהחשבון
           </Button>
         </div>
       </Section>
@@ -367,9 +373,9 @@ export function MeView() {
         onClose={() => setDeleting(null)}
         onConfirm={deleteSubmission}
         loading={busy}
-        confirmLabel="Delete submission"
-        title="Delete this submission?"
-        description="Its points come off your team's total and the mission opens up again."
+        confirmLabel="למחוק הגשה"
+        title="למחוק את ההגשה?"
+        description="הנקודות שלה יירדו מהסכום של הקבוצה והמשימה תיפתח מחדש."
       />
 
       <ConfirmDialog
@@ -377,9 +383,9 @@ export function MeView() {
         onClose={() => setLeaving(false)}
         onConfirm={leaveChase}
         loading={busy}
-        confirmLabel="Leave chase"
-        title="Leave this chase?"
-        description="You'll drop out of your team. Depending on the organizer's settings you may need the join code to come back."
+        confirmLabel="לצאת מהמרדף"
+        title="לצאת מהמרדף?"
+        description="תצאו מהקבוצה שלכם. תלוי בהגדרות של המארגן — יכול להיות שתצטרכו את קוד ההצטרפות כדי לחזור."
       />
     </div>
   );

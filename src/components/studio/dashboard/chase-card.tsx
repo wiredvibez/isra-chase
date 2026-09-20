@@ -66,17 +66,17 @@ export function ChaseCard({
             </h3>
           </div>
           <Menu
-            label={`Actions for ${chase.name}`}
+            label={`פעולות עבור ${chase.name}`}
             items={[
               {
                 id: "duplicate",
-                label: "Duplicate",
+                label: "שכפול",
                 icon: <Copy className="size-4" aria-hidden />,
                 onSelect: onDuplicate,
               },
               {
                 id: "invite",
-                label: "Invite collaborators",
+                label: "הזמנת שותפים",
                 icon: <UserPlus className="size-4" aria-hidden />,
                 onSelect: onInvite,
               },
@@ -84,7 +84,7 @@ export function ChaseCard({
                 ? [
                     {
                       id: "delete",
-                      label: "Delete chase",
+                      label: "מחיקת המרדף",
                       icon: <Trash2 className="size-4" aria-hidden />,
                       tone: "danger" as const,
                       onSelect: onDelete,
@@ -98,17 +98,18 @@ export function ChaseCard({
         <dl className="mt-auto flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="size-3.5" aria-hidden />
-            <dt className="sr-only">Teams</dt>
+            <dt className="sr-only">קבוצות</dt>
             <dd>
-              {stats.teamCount} {stats.teamCount === 1 ? "team" : "teams"}
+              {stats.teamCount === 1 ? "קבוצה אחת" : `${stats.teamCount} קבוצות`}
             </dd>
           </div>
           <div className="flex items-center gap-1">
             <Camera className="size-3.5" aria-hidden />
-            <dt className="sr-only">Submissions</dt>
+            <dt className="sr-only">הגשות</dt>
             <dd>
-              {stats.submissionCount}{" "}
-              {stats.submissionCount === 1 ? "submission" : "submissions"}
+              {stats.submissionCount === 1
+                ? "הגשה אחת"
+                : `${stats.submissionCount} הגשות`}
             </dd>
           </div>
         </dl>

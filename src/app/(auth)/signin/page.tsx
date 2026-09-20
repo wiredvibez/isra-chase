@@ -4,8 +4,8 @@ import { FormFallback } from "../_components/form-fallback";
 import { SignInForm } from "../_components/sign-in-form";
 
 export const metadata: Metadata = {
-  title: "Sign in",
-  description: "Sign in to Isra Chase to build, run and moderate your chases.",
+  title: "כניסה",
+  description: "נכנסים ל-Isra Chase כדי לבנות מרדפים, להריץ אותם ולנהל את ההגשות.",
   robots: { index: false },
 };
 

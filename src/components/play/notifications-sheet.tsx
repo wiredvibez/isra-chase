@@ -69,7 +69,7 @@ function NotificationRow({
         <p className="mt-1 text-xs text-muted-foreground">
           {timeAgo(notification.createdAt)}
           {unread && (
-            <span className="ms-2 font-bold text-primary">New</span>
+            <span className="ms-2 font-bold text-primary">חדש</span>
           )}
         </p>
       </div>
@@ -91,7 +91,7 @@ export function NotificationsSheet({
   readIds: Set<string>;
 }) {
   return (
-    <Sheet open={open} onClose={onClose} title="Notifications">
+    <Sheet open={open} onClose={onClose} title="התראות">
       {loading ? (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
@@ -101,8 +101,8 @@ export function NotificationsSheet({
       ) : notifications.length === 0 ? (
         <EmptyState
           icon={<BellOff className="size-5" />}
-          title="Nothing yet"
-          description="Bonus points, announcements and mission news will land here."
+          title="עדיין ריק כאן"
+          description="נקודות בונוס, הודעות מהמארגן ועדכונים על משימות ינחתו כאן."
         />
       ) : (
         <ul className="flex flex-col gap-2">

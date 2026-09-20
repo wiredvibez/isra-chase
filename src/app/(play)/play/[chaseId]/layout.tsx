@@ -3,7 +3,7 @@ import { PlayProvider } from "@/components/play/play-provider";
 import { PlayShell } from "@/components/play/play-shell";
 
 export const metadata: Metadata = {
-  title: "Play",
+  title: "המרדף",
 };
 
 /**

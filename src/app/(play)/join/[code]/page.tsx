@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { JoinFlow } from "@/components/play/join-flow";
 
 export const metadata: Metadata = {
-  title: "Join a chase",
+  title: "הצטרפות למרדף",
 };
 
 export default async function JoinWithCodePage({

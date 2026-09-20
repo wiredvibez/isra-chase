@@ -34,6 +34,12 @@ interface StatsResponse {
   engagedTeams?: BarRow[];
 }
 
+const STATUS_LABEL: Record<Submission["status"], string> = {
+  pending: "ממתינה",
+  approved: "אושרה",
+  rejected: "נדחתה",
+};
+
 function Tile({ label, value }: { label: string; value: string }) {
   return (
     <Card>
@@ -68,7 +74,7 @@ function ExportRow({
         >
           <Download className="size-3.5" aria-hidden />
           {format.toUpperCase()}
-          <span className="sr-only"> export of {label}</span>
+          <span className="sr-only"> ייצוא של {label}</span>
         </a>
       ))}
     </div>
@@ -155,57 +161,57 @@ export function StatsTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Stats"
-        description="How the chase is actually going, and every report you can take away."
+        title="נתונים"
+        description="איך המרדף באמת מתקדם, וכל הדוחות שאפשר לקחת החוצה."
       />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile label="Active teams" value={String(tiles.activeTeams)} />
-        <Tile label="Total teams" value={String(tiles.totalTeams)} />
-        <Tile label="Submissions" value={String(tiles.submissions)} />
-        <Tile label="Mission completion" value={`${tiles.completionPct}%`} />
+        <Tile label="קבוצות פעילות" value={String(tiles.activeTeams)} />
+        <Tile label={'סה"כ קבוצות'} value={String(tiles.totalTeams)} />
+        <Tile label="הגשות" value={String(tiles.submissions)} />
+        <Tile label="השלמת משימות" value={`${tiles.completionPct}%`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <BarChart
-          title="Most popular missions"
+          title="המשימות הכי פופולריות"
           rows={popularMissions}
-          emptyMessage="No approved submissions yet."
+          emptyMessage="עוד אין הגשות מאושרות."
         />
         <BarChart
-          title="Most engaged teams"
+          title="הקבוצות הכי פעילות"
           rows={engagedTeams}
           tone="accent"
-          emptyMessage="No team has submitted yet."
+          emptyMessage="אף קבוצה עוד לא שלחה הגשה."
         />
       </div>
 
       <Card>
         <CardContent className="pt-5">
-          <h2 className="font-display text-base font-bold">Exports</h2>
+          <h2 className="font-display text-base font-bold">ייצוא דוחות</h2>
           <div className="mt-2 divide-y divide-border">
-            <ExportRow chaseId={chaseId} report="participants" label="Participants" />
-            <ExportRow chaseId={chaseId} report="submissions" label="Submissions" />
-            <ExportRow chaseId={chaseId} report="leaderboard" label="Leaderboard" />
+            <ExportRow chaseId={chaseId} report="participants" label="משתתפים" />
+            <ExportRow chaseId={chaseId} report="submissions" label="הגשות" />
+            <ExportRow chaseId={chaseId} report="leaderboard" label="טבלת המובילים" />
           </div>
         </CardContent>
       </Card>
 
       <Card className="overflow-x-auto">
         <div className="p-4 pb-0">
-          <h2 className="font-display text-base font-bold">Participants</h2>
+          <h2 className="font-display text-base font-bold">משתתפים</h2>
         </div>
         <table className="w-full min-w-[40rem] text-sm">
-          <caption className="sr-only">Participants and their activity</caption>
+          <caption className="sr-only">המשתתפים והפעילות שלהם</caption>
           <thead>
             <tr className="border-b border-border text-start">
-              <th scope="col" className="px-4 py-3 font-semibold">Name</th>
-              <th scope="col" className="px-4 py-3 font-semibold">Team</th>
-              <th scope="col" className="px-4 py-3 font-semibold">Email</th>
+              <th scope="col" className="px-4 py-3 font-semibold">שם</th>
+              <th scope="col" className="px-4 py-3 font-semibold">קבוצה</th>
+              <th scope="col" className="px-4 py-3 font-semibold">אימייל</th>
               <th scope="col" className="px-4 py-3 text-end font-semibold">
-                Submissions
+                הגשות
               </th>
-              <th scope="col" className="px-4 py-3 font-semibold">Joined</th>
+              <th scope="col" className="px-4 py-3 font-semibold">הצטרפו</th>
             </tr>
           </thead>
           <tbody>
@@ -231,7 +237,7 @@ export function StatsTab() {
             {!participants.length && (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">
-                  Nobody has joined yet.
+                  עוד אף אחד לא הצטרף.
                 </td>
               </tr>
             )}
@@ -242,9 +248,9 @@ export function StatsTab() {
       <Card className="overflow-x-auto">
         <div className="p-4 pb-0">
           <h2 className="font-display text-base font-bold">
-            Submissions{" "}
+            הגשות{" "}
             <span className="text-sm font-normal text-muted-foreground">
-              (most recent 50)
+              (50 האחרונות)
             </span>
           </h2>
         </div>
@@ -254,17 +260,17 @@ export function StatsTab() {
           </div>
         ) : (
           <table className="w-full min-w-[44rem] text-sm">
-            <caption className="sr-only">Most recent submissions</caption>
+            <caption className="sr-only">ההגשות האחרונות</caption>
             <thead>
               <tr className="border-b border-border text-start">
-                <th scope="col" className="px-4 py-3 font-semibold">Mission</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Team</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Player</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Status</th>
+                <th scope="col" className="px-4 py-3 font-semibold">משימה</th>
+                <th scope="col" className="px-4 py-3 font-semibold">קבוצה</th>
+                <th scope="col" className="px-4 py-3 font-semibold">שחקן</th>
+                <th scope="col" className="px-4 py-3 font-semibold">סטטוס</th>
                 <th scope="col" className="px-4 py-3 text-end font-semibold">
-                  Points
+                  נקודות
                 </th>
-                <th scope="col" className="px-4 py-3 font-semibold">When</th>
+                <th scope="col" className="px-4 py-3 font-semibold">מתי</th>
               </tr>
             </thead>
             <tbody>
@@ -275,7 +281,7 @@ export function StatsTab() {
                   </th>
                   <td className="px-4 py-2">{submission.teamName}</td>
                   <td className="px-4 py-2">{submission.participantName}</td>
-                  <td className="px-4 py-2 capitalize">{submission.status}</td>
+                  <td className="px-4 py-2">{STATUS_LABEL[submission.status]}</td>
                   <td className="px-4 py-2 text-end tabular-nums">
                     {submission.points + (submission.bonusPoints ?? 0)}
                   </td>
@@ -287,7 +293,7 @@ export function StatsTab() {
               {!recent.length && (
                 <tr>
                   <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
-                    No submissions yet.
+                    עוד אין הגשות.
                   </td>
                 </tr>
               )}

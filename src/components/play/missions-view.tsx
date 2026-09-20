@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { plural } from "@/lib/utils";
 import { usePlay } from "./play-provider";
 import { MissionCard } from "./mission-card";
 
@@ -54,7 +53,7 @@ export function MissionsView() {
     return (
       <EmptyState
         icon={<TriangleAlert className="size-5" />}
-        title="Couldn't load the missions"
+        title="לא הצלחנו לטעון את המשימות"
         description={missionsError}
       />
     );
@@ -66,13 +65,13 @@ export function MissionsView() {
         icon={<Flag className="size-5" />}
         title={
           chase?.status === "draft" || chase?.status === "scheduled"
-            ? "The chase hasn't started"
-            : "No missions yet"
+            ? "המרדף עוד לא התחיל"
+            : "עדיין אין משימות"
         }
         description={
           chase?.status === "draft" || chase?.status === "scheduled"
-            ? "Missions appear the moment the organizer kicks things off. Keep this page handy."
-            : "The organizer hasn't released any missions you can take on right now."
+            ? "המשימות יופיעו ברגע שהמארגן יפתח את המרדף. תשאירו את המסך הזה פתוח."
+            : "המארגן עוד לא שחרר משימות שאפשר לעשות עכשיו."
         }
       />
     );
@@ -87,7 +86,7 @@ export function MissionsView() {
         <CardContent className="space-y-2 p-4">
           <div className="flex items-baseline justify-between gap-2">
             <p className="font-display text-sm font-bold">
-              {done} of {total} {plural(total, "mission")} done
+              {done} מתוך {total} משימות
             </p>
             <p className="text-xs font-semibold tabular-nums text-muted-foreground">
               {total ? Math.round((done / total) * 100) : 0}%
@@ -96,13 +95,13 @@ export function MissionsView() {
           <Progress
             value={done}
             max={total}
-            label={`${done} of ${total} missions completed`}
+            label={`הושלמו ${done} מתוך ${total} משימות`}
           />
         </CardContent>
       </Card>
 
       {remaining.length > 0 && (
-        <Section title="Remaining" count={remaining.length}>
+        <Section title="נשארו" count={remaining.length}>
           {remaining.map((mission) => (
             <MissionCard key={mission.id} mission={mission} chaseId={chaseId} />
           ))}
@@ -110,7 +109,7 @@ export function MissionsView() {
       )}
 
       {completed.length > 0 && (
-        <Section title="Completed" count={completed.length}>
+        <Section title="הושלמו" count={completed.length}>
           {completed.map((mission) => (
             <MissionCard key={mission.id} mission={mission} chaseId={chaseId} />
           ))}
@@ -120,8 +119,8 @@ export function MissionsView() {
       {remaining.length === 0 && (
         <EmptyState
           icon={<Flag className="size-5" />}
-          title="Every mission done"
-          description="Nothing left on the board. Nice work — keep an eye out for new missions."
+          title="סיימתם הכול"
+          description="לא נשארה אף משימה על הלוח. יפה. שימו עין — לפעמים צצות משימות חדשות."
         />
       )}
     </div>

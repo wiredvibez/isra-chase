@@ -19,6 +19,19 @@ const VALIDITY_KEYS: readonly ValidityKey[] = [
   "patternMismatch",
 ];
 
+/**
+ * The browser's own `validationMessage` follows the browser UI language, which
+ * would drop an English sentence into a Hebrew form. A caller's `messages` win;
+ * these are the safety net underneath them.
+ */
+const DEFAULT_MESSAGES: Record<ValidityKey, string> = {
+  valueMissing: "צריך למלא את השדה הזה.",
+  typeMismatch: "הפורמט כאן לא תקין.",
+  tooShort: "קצר מדי.",
+  tooLong: "ארוך מדי.",
+  patternMismatch: "זה לא בפורמט שמתקבל כאן.",
+};
+
 export interface AuthFieldProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "id"> {
   id: string;
@@ -63,7 +76,8 @@ export function AuthField({
       }
       const kind = VALIDITY_KEYS.find((key) => el.validity[key]);
       setError(
-        (kind && messages?.[kind]) || el.validationMessage || "Check this field.",
+        (kind && (messages?.[kind] || DEFAULT_MESSAGES[kind])) ||
+          "בדקו את השדה הזה.",
       );
     },
     [messages],

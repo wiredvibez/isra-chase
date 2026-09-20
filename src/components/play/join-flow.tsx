@@ -27,7 +27,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, plural } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Participant } from "@/lib/domain/types";
 import { PhotoPicker } from "./photo-picker";
 import {
@@ -62,7 +62,7 @@ function GuestGate({ code }: { code: string }) {
     try {
       await signInGuest(name.trim());
     } catch {
-      toast.error("Couldn't start a guest session. Try again in a moment.");
+      toast.error("הכניסה כאורח נתקעה. תנסו שוב עוד רגע.");
       setBusy(false);
     }
   }
@@ -70,24 +70,27 @@ function GuestGate({ code }: { code: string }) {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-5 px-4 py-10">
       <div className="space-y-2 text-center">
-        <h1 className="font-display text-3xl font-bold">What should we call you?</h1>
+        <h1 className="font-display text-3xl font-bold">איך קוראים לכם?</h1>
         <p className="text-sm text-muted-foreground">
-          Joining code <span className="font-bold text-foreground">{code}</span>.
-          No account needed — a name is enough to play.
+          מצטרפים עם הקוד{" "}
+          <span dir="ltr" className="font-bold text-foreground">
+            {code}
+          </span>
+          . לא צריך חשבון — שם זה כל מה שצריך.
         </p>
       </div>
 
       <Card>
         <CardContent className="p-5">
           <form onSubmit={go} className="space-y-4">
-            <Field label="Your name" htmlFor="guest-name" required>
+            <Field label="השם שלכם" htmlFor="guest-name" required>
               <Input
                 id="guest-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 maxLength={60}
                 autoComplete="nickname"
-                placeholder="Sam"
+                placeholder="נועה"
                 className="h-12"
               />
             </Field>
@@ -98,7 +101,7 @@ function GuestGate({ code }: { code: string }) {
               disabled={!name.trim()}
               loading={busy}
             >
-              Continue as guest
+              ממשיכים כאורח
               <ArrowRight className="size-5 flip-rtl" aria-hidden />
             </Button>
           </form>
@@ -106,12 +109,12 @@ function GuestGate({ code }: { code: string }) {
       </Card>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        כבר יש לכם חשבון?{" "}
         <Link
           href={`/signin?next=${encodeURIComponent(pathname)}`}
           className="font-semibold text-primary underline underline-offset-2"
         >
-          Sign in instead
+          אפשר להיכנס איתו
         </Link>
       </p>
     </main>
@@ -160,22 +163,24 @@ function TeamRow({
             {team.name}
           </span>
           <span className="block text-xs text-muted-foreground">
-            {team.memberCount}
-            {team.maxMembers !== null ? `/${team.maxMembers}` : ""}{" "}
-            {plural(team.memberCount, "member")}
+            {team.maxMembers !== null
+              ? `${team.memberCount}/${team.maxMembers} משתתפים`
+              : team.memberCount === 1
+                ? "משתתף אחד"
+                : `${team.memberCount} משתתפים`}
           </span>
         </span>
 
         {full && (
           <Badge tone="neutral">
             <Lock className="size-3" aria-hidden />
-            Full
+            מלאה
           </Badge>
         )}
         {!full && locked && (
           <KeyRound
             className="size-[1.125rem] text-muted-foreground"
-            aria-label="Passcode required"
+            aria-label="נדרשת סיסמת קבוצה"
           />
         )}
         {selected && !full && (
@@ -214,7 +219,7 @@ export function JoinFlow({ code }: { code: string }) {
           setLoadError(
             caught instanceof ApiClientError
               ? caught.message
-              : "We couldn't find a chase with that code.",
+              : "לא מצאנו מרדף עם הקוד הזה.",
           );
         }
       }
@@ -324,7 +329,7 @@ export function JoinFlow({ code }: { code: string }) {
       toast.error(
         caught instanceof ApiClientError
           ? caught.message
-          : "Couldn't join that chase.",
+          : "ההצטרפות למרדף לא עברה. תנסו שוב.",
       );
       setJoining(false);
     }
@@ -350,14 +355,14 @@ export function JoinFlow({ code }: { code: string }) {
         <EmptyState
           className="w-full"
           icon={<TriangleAlert className="size-5" />}
-          title="That code didn't work"
+          title="הקוד הזה לא עבד"
           description={loadError}
           action={
             <Link
               href="/join"
               className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground"
             >
-              Try another code
+              לנסות קוד אחר
             </Link>
           }
         />
@@ -404,7 +409,7 @@ export function JoinFlow({ code }: { code: string }) {
           className="mb-2 -ms-2 inline-flex h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-[1.125rem] flip-rtl" aria-hidden />
-          Back
+          חזרה
         </button>
       )}
 
@@ -429,16 +434,20 @@ export function JoinFlow({ code }: { code: string }) {
                 </p>
               )}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                <Badge tone="brand">Code {chase.joinCode ?? code}</Badge>
-                {chase.status === "live" && <Badge tone="success">Live now</Badge>}
-                {chase.status === "scheduled" && (
-                  <Badge tone="info">Starting soon</Badge>
+                <Badge tone="brand">
+                  קוד <span dir="ltr">{chase.joinCode ?? code}</span>
+                </Badge>
+                {chase.status === "live" && (
+                  <Badge tone="success">באוויר עכשיו</Badge>
                 )}
-                {chase.status === "ended" && <Badge tone="neutral">Ended</Badge>}
+                {chase.status === "scheduled" && (
+                  <Badge tone="info">מתחיל בקרוב</Badge>
+                )}
+                {chase.status === "ended" && <Badge tone="neutral">הסתיים</Badge>}
                 {chaseRequiresPassword(chase) && (
                   <Badge tone="warning">
                     <Lock className="size-3" aria-hidden />
-                    Password required
+                    נדרשת סיסמה
                   </Badge>
                 )}
               </div>
@@ -448,13 +457,13 @@ export function JoinFlow({ code }: { code: string }) {
               <Card>
                 <CardContent className="space-y-3 p-4">
                   <p className="text-sm font-semibold">
-                    You&rsquo;re already in this chase.
+                    אתם כבר במרדף הזה.
                   </p>
                   <Link
                     href={`/play/${chase.id}`}
                     className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground"
                   >
-                    Continue playing
+                    ממשיכים לשחק
                   </Link>
                 </CardContent>
               </Card>
@@ -462,16 +471,16 @@ export function JoinFlow({ code }: { code: string }) {
 
             {chase.termsUrl && (
               <p className="text-xs text-muted-foreground">
-                By joining you accept the organizer&rsquo;s{" "}
+                בהצטרפות אתם מקבלים את{" "}
                 <a
                   href={chase.termsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-primary underline underline-offset-2"
                 >
-                  terms
-                </a>
-                .
+                  תנאי השימוש
+                </a>{" "}
+                של המארגן.
               </p>
             )}
           </>
@@ -480,7 +489,7 @@ export function JoinFlow({ code }: { code: string }) {
         {step === "mode" && (
           <>
             <h1 className="font-display text-2xl font-bold">
-              How are you playing?
+              איך אתם משחקים?
             </h1>
             <div className="flex flex-col gap-2">
               {(
@@ -488,14 +497,14 @@ export function JoinFlow({ code }: { code: string }) {
                   {
                     id: "team" as const,
                     icon: UsersRound,
-                    title: "With a team",
-                    body: "Join your crew — points are pooled for the team.",
+                    title: "עם קבוצה",
+                    body: "מצטרפים לחברים — כל הנקודות נכנסות לקבוצה אחת.",
                   },
                   {
                     id: "solo" as const,
                     icon: User,
-                    title: "On my own",
-                    body: "Play solo. You get your own spot on the leaderboard.",
+                    title: "לבד",
+                    body: "משחקים לבד, עם שורה משלכם בטבלת המובילים.",
                   },
                 ]
               ).map((option) => {
@@ -532,34 +541,34 @@ export function JoinFlow({ code }: { code: string }) {
         {step === "team" && (
           <>
             <h1 className="font-display text-2xl font-bold">
-              {creating ? "Name your team" : "Pick your team"}
+              {creating ? "איך קוראים לקבוצה?" : "בוחרים קבוצה"}
             </h1>
 
             {creating ? (
               <div className="space-y-4">
                 <PhotoPicker
-                  name={newTeamName || "Team"}
+                  name={newTeamName || "קבוצה"}
                   value={newTeamPhoto}
                   onChange={setNewTeamPhoto}
-                  label="Add a team photo"
+                  label="מוסיפים תמונת קבוצה"
                   pathFor={(ext) =>
                     `chases/${chase.id}/teams/new-${uid}/${Date.now()}.${ext}`
                   }
                 />
-                <Field label="Team name" htmlFor="new-team-name" required>
+                <Field label="שם הקבוצה" htmlFor="new-team-name" required>
                   <Input
                     id="new-team-name"
                     value={newTeamName}
                     onChange={(event) => setNewTeamName(event.target.value)}
                     maxLength={60}
-                    placeholder="The Wandering Ducks"
+                    placeholder="הברווזים הנודדים"
                     className="h-12"
                   />
                 </Field>
                 <Field
-                  label="Passcode"
+                  label="סיסמת כניסה"
                   htmlFor="new-team-passcode"
-                  hint="Optional. Teammates need it to join — and it skips the chase password for them."
+                  hint="לא חובה. מי שמצטרף לקבוצה יצטרך אותה — והיא פוטרת אותו מסיסמת המרדף."
                 >
                   <Input
                     id="new-team-passcode"
@@ -567,7 +576,7 @@ export function JoinFlow({ code }: { code: string }) {
                     onChange={(event) => setNewTeamPasscode(event.target.value)}
                     maxLength={32}
                     autoComplete="off"
-                    placeholder="Leave empty for an open team"
+                    placeholder="ריק = קבוצה פתוחה לכולם"
                     className="h-12"
                   />
                 </Field>
@@ -577,7 +586,7 @@ export function JoinFlow({ code }: { code: string }) {
                   className="w-full"
                   onClick={() => setCreating(false)}
                 >
-                  Pick an existing team instead
+                  לבחור קבוצה קיימת במקום
                 </Button>
               </div>
             ) : (
@@ -585,11 +594,11 @@ export function JoinFlow({ code }: { code: string }) {
                 {teams.length === 0 ? (
                   <EmptyState
                     icon={<UsersRound className="size-5" />}
-                    title="No teams yet"
+                    title="עדיין אין קבוצות"
                     description={
                       canCreateTeam
-                        ? "Be the first — create one below."
-                        : "The organizer hasn&rsquo;t set up any teams. Check back with them."
+                        ? "תהיו הראשונים — פתחו אחת למטה."
+                        : "המארגן עוד לא הגדיר קבוצות. שווה לדבר איתו."
                     }
                   />
                 ) : (
@@ -607,7 +616,7 @@ export function JoinFlow({ code }: { code: string }) {
                         {teamId === team.id && teamRequiresPasscode(team) && (
                           <div className="px-1 pt-2">
                             <Field
-                              label="Team passcode"
+                              label="סיסמת הקבוצה"
                               htmlFor={`passcode-${team.id}`}
                               required
                             >
@@ -641,14 +650,14 @@ export function JoinFlow({ code }: { code: string }) {
                     }}
                   >
                     <Plus className="size-5" aria-hidden />
-                    Create a new team
+                    פותחים קבוצה חדשה
                   </Button>
                 )}
 
                 {chase.participantMode === "organizer_managed" && (
                   <p className="px-1 text-xs text-muted-foreground">
-                    The organizer manages teams for this chase, so you can only
-                    join one they&rsquo;ve already set up.
+                    במרדף הזה המארגן מנהל את הקבוצות, אז אפשר להצטרף רק לקבוצה
+                    שהוא כבר הגדיר.
                   </p>
                 )}
               </div>
@@ -658,16 +667,16 @@ export function JoinFlow({ code }: { code: string }) {
 
         {step === "profile" && (
           <>
-            <h1 className="font-display text-2xl font-bold">Set up your profile</h1>
+            <h1 className="font-display text-2xl font-bold">הפרופיל שלכם</h1>
             <div className="space-y-4">
               <PhotoPicker
-                name={displayName || "You"}
+                name={displayName || "אני"}
                 value={photoURL}
                 onChange={(url) => setPhotoEdit({ url })}
-                label="Add a photo"
+                label="מוסיפים תמונה"
                 pathFor={(ext) => `users/${uid}/avatar/${Date.now()}.${ext}`}
               />
-              <Field label="Display name" htmlFor="display-name" required>
+              <Field label="השם שיוצג" htmlFor="display-name" required>
                 <Input
                   id="display-name"
                   value={displayName}
@@ -680,10 +689,10 @@ export function JoinFlow({ code }: { code: string }) {
 
               {needsChasePassword && (
                 <Field
-                  label="Chase password"
+                  label="סיסמת המרדף"
                   htmlFor="chase-password"
                   required
-                  hint="The organizer set a password for this chase."
+                  hint="המארגן הגדיר סיסמה למרדף הזה."
                 >
                   <Input
                     id="chase-password"
@@ -698,13 +707,13 @@ export function JoinFlow({ code }: { code: string }) {
               )}
 
               <div className="rounded-md bg-surface-muted p-3 text-sm">
-                <p className="font-semibold">You&rsquo;re joining as</p>
+                <p className="font-semibold">אתם מצטרפים בתור</p>
                 <p className="text-muted-foreground">
                   {mode === "solo"
-                    ? "A solo player"
+                    ? "משתתף יחיד"
                     : creating
-                      ? `A new team called “${newTeamName.trim() || "…"}”`
-                      : (selectedTeam?.name ?? "a team")}
+                      ? `קבוצה חדשה בשם "${newTeamName.trim() || "…"}"`
+                      : (selectedTeam?.name ?? "קבוצה")}
                 </p>
               </div>
             </div>
@@ -724,7 +733,7 @@ export function JoinFlow({ code }: { code: string }) {
             else setStepIndex((i) => Math.min(steps.length - 1, i + 1));
           }}
         >
-          {isLast ? "Join the chase" : "Continue"}
+          {isLast ? "מצטרפים למרדף" : "ממשיכים"}
           {!isLast && <ArrowRight className="size-5 flip-rtl" aria-hidden />}
         </Button>
       </div>

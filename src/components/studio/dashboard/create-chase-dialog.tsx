@@ -41,7 +41,7 @@ export function CreateChaseDialog({
       setDescription("");
       router.push(`/studio/${chase.id}/details`);
     } catch (error) {
-      toastError(error, "Couldn't create that chase.");
+      toastError(error, "לא הצלחנו ליצור את המרדף.");
     } finally {
       setSaving(false);
     }
@@ -51,15 +51,15 @@ export function CreateChaseDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title="Create a chase"
-      description="You can change everything later — this just gets you started."
+      title="מרדף חדש"
+      description="אפשר לשנות הכול אחר כך — זה רק כדי להתחיל."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button onClick={() => void create()} loading={saving} disabled={!name.trim()}>
-            Create chase
+            יצירת מרדף
           </Button>
         </>
       }
@@ -71,26 +71,26 @@ export function CreateChaseDialog({
           void create();
         }}
       >
-        <Field label="Chase name" htmlFor="chase-name" required>
+        <Field label="שם המרדף" htmlFor="chase-name" required>
           <Input
             id="chase-name"
             value={name}
             autoFocus
             maxLength={120}
-            placeholder="Summer scavenger hunt"
+            placeholder="ציד המטמון של הקיץ"
             onChange={(e) => setName(e.target.value)}
           />
         </Field>
         <Field
-          label="Description"
+          label="תיאור"
           htmlFor="chase-description"
-          hint={`${description.length}/${DESCRIPTION_MAX} characters`}
+          hint={`${description.length}/${DESCRIPTION_MAX} תווים`}
         >
           <Textarea
             id="chase-description"
             value={description}
             maxLength={DESCRIPTION_MAX}
-            placeholder="What are players doing, and why?"
+            placeholder="מה השחקנים עושים, ולמה?"
             onChange={(e) => setDescription(e.target.value.slice(0, DESCRIPTION_MAX))}
           />
         </Field>

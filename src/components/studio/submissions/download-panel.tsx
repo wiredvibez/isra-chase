@@ -66,15 +66,15 @@ export function DownloadPanel({
     <Card>
       <CardContent className="space-y-4 pt-5">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="font-display text-base font-bold">Download media</h2>
+          <h2 className="font-display text-base font-bold">הורדת מדיה</h2>
           <Select
-            aria-label="Group downloads by"
+            aria-label="קיבוץ ההורדות לפי"
             className="ms-auto max-w-44"
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value as "team" | "mission")}
           >
-            <option value="team">Grouped by team</option>
-            <option value="mission">Grouped by mission</option>
+            <option value="team">לפי קבוצה</option>
+            <option value="mission">לפי משימה</option>
           </Select>
           <Button
             variant="outline"
@@ -82,13 +82,13 @@ export function DownloadPanel({
             disabled={!withMedia.length}
           >
             <FolderDown className="size-4" aria-hidden />
-            Manifest for everything
+            רשימת קישורים לכל המדיה
           </Button>
         </div>
 
         {!withMedia.length ? (
           <p className="text-sm text-muted-foreground">
-            No photo or video submissions to download yet.
+            עוד אין הגשות עם תמונה או וידאו להורדה.
           </p>
         ) : (
           <ul className="divide-y divide-border">
@@ -98,12 +98,12 @@ export function DownloadPanel({
                   {name}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {rows.length} files ·{" "}
+                  {rows.length} קבצים ·{" "}
                   {bytes(rows.reduce((sum, s) => sum + (s.media?.bytes ?? 0), 0))}
                 </span>
                 <Button size="sm" variant="ghost" onClick={() => manifest(name, rows)}>
                   <Download className="size-4" aria-hidden />
-                  Manifest
+                  רשימת קישורים
                 </Button>
               </li>
             ))}
