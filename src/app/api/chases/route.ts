@@ -69,24 +69,26 @@ export async function GET(request: Request) {
     const caller = await requireCaller(request);
     const db = adminDb();
 
+    // Deliberately single-field queries sorted in memory. Adding orderBy here
+    // would demand a composite index, and this is the dashboard — the first
+    // page a new organizer sees. It must not 500 on a fresh project whose
+    // indexes have not finished building. A person's own chases are few.
     const [owned, invited] = await Promise.all([
-      db
-        .collection("chases")
-        .where("ownerUid", "==", caller.uid)
-        .orderBy("updatedAt", "desc")
-        .get(),
+      db.collection("chases").where("ownerUid", "==", caller.uid).get(),
       caller.email
         ? db
             .collection("chases")
             .where("collaboratorEmails", "array-contains", caller.email.toLowerCase())
-            .orderBy("updatedAt", "desc")
             .get()
         : null,
     ]);
 
-    const collaborating = (invited?.docs ?? []).map(
-      (doc) => ({ id: doc.id, ...doc.data() }) as Chase,
-    );
+    const byRecency = (a: Chase, b: Chase) =>
+      (b.updatedAt?.toMillis() ?? 0) - (a.updatedAt?.toMillis() ?? 0);
+
+    const collaborating = (invited?.docs ?? [])
+      .map((doc) => ({ id: doc.id, ...doc.data() }) as Chase)
+      .sort(byRecency);
 
     // An invite is issued against an email before we know the uid. Claim it on
     // first sight so the Firestore rules (which key off uid) start matching.
@@ -99,7 +101,9 @@ export async function GET(request: Request) {
     );
 
     return {
-      owned: owned.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
+      owned: owned.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }) as Chase)
+        .sort(byRecency),
       collaborating,
     };
   });
