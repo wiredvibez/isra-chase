@@ -71,7 +71,7 @@ export function missionAvailability(
   now = Date.now(),
 ): MissionAvailability {
   if (mission.isDraft) {
-    return { state: "draft", reason: "Mission is still a draft." };
+    return { state: "draft", reason: "המשימה עדיין טיוטה." };
   }
 
   const alreadyCompleted = Boolean(progress.completed[mission.id]);
@@ -85,7 +85,7 @@ export function missionAvailability(
     if (!satisfied && !alreadyCompleted) {
       return {
         state: "locked",
-        reason: "Unlocked by completing another mission.",
+        reason: "נפתחת אחרי שמשלימים משימה אחרת.",
         releasesAt: null,
       };
     }
@@ -93,7 +93,7 @@ export function missionAvailability(
     if (progress.points < gate.points && !alreadyCompleted) {
       return {
         state: "locked",
-        reason: `Unlocks at ${gate.points} points.`,
+        reason: `נפתחת ב-${gate.points} נקודות.`,
         releasesAt: null,
       };
     }
@@ -102,7 +102,7 @@ export function missionAvailability(
     if (releasesAt !== null && now < releasesAt) {
       return {
         state: "locked",
-        reason: "Not released yet.",
+        reason: "עוד לא נפתחה.",
         releasesAt,
       };
     }
@@ -110,14 +110,14 @@ export function missionAvailability(
     if (releasesAt === null && chase.status !== "live" && chase.status !== "ended") {
       return {
         state: "locked",
-        reason: "The chase hasn't started yet.",
+        reason: "המרדף עוד לא התחיל.",
         releasesAt: null,
       };
     }
   }
 
   if (expiresAt !== null && now > expiresAt && !alreadyCompleted) {
-    return { state: "expired", reason: "This mission has expired." };
+    return { state: "expired", reason: "המשימה נסגרה." };
   }
 
   return { state: "available", expiresAt };

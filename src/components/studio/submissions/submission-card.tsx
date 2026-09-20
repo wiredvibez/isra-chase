@@ -13,16 +13,16 @@ import { Menu, type MenuItem } from "../menu";
 export function SubmissionStatusBadges({ submission }: { submission: Submission }) {
   return (
     <>
-      {submission.status === "pending" && <Badge tone="warning">Pending</Badge>}
-      {submission.status === "rejected" && <Badge tone="danger">Rejected</Badge>}
+      {submission.status === "pending" && <Badge tone="warning">ממתינה</Badge>}
+      {submission.status === "rejected" && <Badge tone="danger">נדחתה</Badge>}
       {submission.hidden && (
         <Badge tone="neutral">
-          <EyeOff className="size-3" aria-hidden /> Hidden
+          <EyeOff className="size-3" aria-hidden /> מוסתרת
         </Badge>
       )}
       {submission.flagged && (
         <Badge tone="danger">
-          <Flag className="size-3" aria-hidden /> Flagged
+          <Flag className="size-3" aria-hidden /> מסומנת
         </Badge>
       )}
     </>
@@ -59,7 +59,7 @@ export function SubmissionMedia({
           )}
         >
           <MapPin className="size-4 text-muted-foreground" aria-hidden />
-          {distance(submission.location.distanceM)} from the target
+          {distance(submission.location.distanceM)} מהיעד
         </p>
       );
     }
@@ -86,7 +86,7 @@ export function SubmissionMedia({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={media.url}
-      alt={submission.caption ?? `Submission for ${submission.missionName}`}
+      alt={submission.caption ?? `הגשה למשימה ${submission.missionName}`}
       loading="lazy"
       className={cn("w-full rounded-md object-cover", className)}
     />
@@ -123,7 +123,7 @@ export function SubmissionCard({
             type="checkbox"
             checked={Boolean(selected)}
             onChange={onToggleSelect}
-            aria-label={`Select submission from ${submission.teamName}`}
+            aria-label={`לבחור את ההגשה של ${submission.teamName}`}
             className="mt-1.5 size-4"
           />
         )}
@@ -136,7 +136,7 @@ export function SubmissionCard({
         </div>
         {menuItems && (
           <Menu
-            label={`Actions for ${submission.teamName}'s submission`}
+            label={`פעולות על ההגשה של ${submission.teamName}`}
             items={menuItems}
           />
         )}
@@ -150,9 +150,9 @@ export function SubmissionCard({
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge tone="brand">{submission.missionName}</Badge>
           <Badge tone={total > 0 ? "success" : "neutral"}>
-            {formatPoints(total)} pts
+            {formatPoints(total)} נק'
             {submission.bonusPoints
-              ? ` (${formatPoints(submission.bonusPoints, true)} bonus)`
+              ? ` (${formatPoints(submission.bonusPoints, true)} בונוס)`
               : ""}
           </Badge>
           <SubmissionStatusBadges submission={submission} />
@@ -165,7 +165,7 @@ export function SubmissionCard({
         <p className="flex items-center gap-1 text-xs text-muted-foreground">
           <Heart className="size-3.5" aria-hidden />
           {submission.likeCount ?? 0}{" "}
-          {submission.likeCount === 1 ? "like" : "likes"}
+          {submission.likeCount === 1 ? "לייק" : "לייקים"}
           {submission.gradeReason ? ` · ${submission.gradeReason}` : ""}
         </p>
       </div>

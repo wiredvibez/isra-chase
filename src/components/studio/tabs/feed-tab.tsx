@@ -29,12 +29,12 @@ export function FeedTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Activity feed"
-        description="Everything as it lands, newest first."
+        title="פיד הפעילות"
+        description="כל מה שנכנס, מהחדש לישן."
       />
 
       <p aria-live="polite" className="sr-only">
-        {submissions.length} submissions loaded
+        נטענו {submissions.length} הגשות
       </p>
 
       {loading && (
@@ -48,8 +48,8 @@ export function FeedTab() {
       {!loading && !submissions.length && (
         <EmptyState
           icon={<Activity className="size-6" aria-hidden />}
-          title="Nothing submitted yet"
-          description="As soon as a team completes a mission it shows up here, live."
+          title="עוד לא נשלחה אף הגשה"
+          description="ברגע שקבוצה תשלים משימה, ההגשה שלה תופיע כאן בזמן אמת."
         />
       )}
 

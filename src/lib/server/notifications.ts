@@ -137,7 +137,7 @@ export async function materialiseBroadcasts(
         {
           teamId,
           type: "broadcast",
-          title: broadcast.createdByName || "Announcement",
+          title: broadcast.createdByName || "הודעה",
           body: broadcast.body,
           linkUrl: broadcast.linkUrl,
         },

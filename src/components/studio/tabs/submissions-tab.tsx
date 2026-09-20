@@ -107,9 +107,9 @@ export function SubmissionsTab() {
       );
       const failed = results.filter((r) => r.status === "rejected").length;
       if (failed) {
-        toastError(new Error(`${failed} of ${targets.length} could not be updated.`));
+        toastError(new Error(`${failed} מתוך ${targets.length} הגשות לא עודכנו.`));
       } else {
-        toast.success(`${targets.length} submissions updated.`);
+        toast.success(`${targets.length} הגשות עודכנו.`);
       }
       setSelected(new Set());
     } finally {
@@ -120,14 +120,14 @@ export function SubmissionsTab() {
   return (
     <div className="space-y-5">
       <TabHeader
-        title="Submissions"
-        description="Judge, group and export everything players have sent in."
+        title="הגשות"
+        description="לבדוק, לקבץ ולייצא את כל מה שהשחקנים שלחו."
       />
 
       {chase.moderationMode === "review" && (
         <section className="space-y-2">
           <h2 className="font-display text-lg font-bold">
-            Review queue{" "}
+            תור בדיקה{" "}
             <span className="text-muted-foreground">({pending.length})</span>
           </h2>
           <ReviewQueue
@@ -141,7 +141,7 @@ export function SubmissionsTab() {
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-wrap gap-2">
           <label htmlFor="group-by" className="sr-only">
-            Group submissions by
+            קיבוץ ההגשות לפי
           </label>
           <Select
             id="group-by"
@@ -149,13 +149,13 @@ export function SubmissionsTab() {
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value as GroupBy)}
           >
-            <option value="mission">Group by mission</option>
-            <option value="team_points">Group by team — by points</option>
-            <option value="team_alpha">Group by team — alphabetical</option>
+            <option value="mission">קיבוץ לפי משימה</option>
+            <option value="team_points">קיבוץ לפי קבוצה — לפי נקודות</option>
+            <option value="team_alpha">קיבוץ לפי קבוצה — לפי א"ב</option>
           </Select>
 
           <label htmlFor="status-filter" className="sr-only">
-            Filter by status
+            סינון לפי סטטוס
           </label>
           <Select
             id="status-filter"
@@ -163,12 +163,12 @@ export function SubmissionsTab() {
             value={status}
             onChange={(e) => setStatus(e.target.value as StatusFilter)}
           >
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="hidden">Hidden</option>
-            <option value="flagged">Flagged</option>
+            <option value="all">כל הסטטוסים</option>
+            <option value="pending">ממתינות לבדיקה</option>
+            <option value="approved">אושרו</option>
+            <option value="rejected">נדחו</option>
+            <option value="hidden">מוסתרות</option>
+            <option value="flagged">מסומנות</option>
           </Select>
         </div>
       </div>
@@ -176,24 +176,24 @@ export function SubmissionsTab() {
       {selected.size > 0 && (
         <div
           role="region"
-          aria-label="Bulk actions"
+          aria-label="פעולות על ההגשות שנבחרו"
           className="sticky top-16 z-20 flex flex-wrap items-center gap-2 rounded-md border border-border bg-surface p-3 shadow-card"
         >
-          <p className="text-sm font-semibold">{selected.size} selected</p>
+          <p className="text-sm font-semibold">{selected.size} נבחרו</p>
           <Button size="sm" variant="success" loading={bulkBusy} onClick={() => void bulk("approve")}>
             <Check className="size-4" aria-hidden />
-            Approve
+            לאשר
           </Button>
           <Button size="sm" variant="danger" loading={bulkBusy} onClick={() => void bulk("reject")}>
             <X className="size-4" aria-hidden />
-            Reject
+            לדחות
           </Button>
           <Button size="sm" variant="outline" loading={bulkBusy} onClick={() => void bulk("hide")}>
             <EyeOff className="size-4" aria-hidden />
-            Hide
+            להסתיר
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
-            Clear
+            לבטל בחירה
           </Button>
         </div>
       )}
@@ -209,11 +209,11 @@ export function SubmissionsTab() {
       {!loading && !filtered.length && (
         <EmptyState
           icon={<ClipboardCheck className="size-6" aria-hidden />}
-          title="Nothing matches this filter"
-          description="Try a different status, or wait for the next submission to land."
+          title="אין הגשות שמתאימות לסינון"
+          description="אפשר לנסות סטטוס אחר, או פשוט לחכות להגשה הבאה."
           action={
             <Button variant="outline" onClick={() => setStatus("all")}>
-              Show everything
+              להציג הכל
             </Button>
           }
         />
@@ -242,7 +242,7 @@ export function SubmissionsTab() {
                 })
               }
             >
-              Select group
+              לבחור הכל
             </Button>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">

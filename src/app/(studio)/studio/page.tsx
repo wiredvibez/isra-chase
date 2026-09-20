@@ -36,7 +36,7 @@ export default function StudioDashboardPage() {
     try {
       setData(await apiGet<ChaseListResponse>("/api/chases"));
     } catch (error) {
-      toastError(error, "Couldn't load your chases.");
+      toastError(error, "לא הצלחנו לטעון את המרדפים שלכם.");
     } finally {
       setLoading(false);
     }
@@ -51,10 +51,10 @@ export default function StudioDashboardPage() {
       const res = await apiPost<{ chase: Chase }>(
         `/api/chases/${chase.id}/duplicate`,
       );
-      toast.success(`Duplicated as “${res.chase.name}”.`);
+      toast.success(`שוכפל בשם "${res.chase.name}".`);
       router.push(`/studio/${res.chase.id}/details`);
     } catch (error) {
-      toastError(error, "Couldn't duplicate that chase.");
+      toastError(error, "לא הצלחנו לשכפל את המרדף.");
     }
   }
 
@@ -63,11 +63,11 @@ export default function StudioDashboardPage() {
     setBusy(true);
     try {
       await apiDelete(`/api/chases/${deleteTarget.id}`);
-      toast.success("Chase deleted.");
+      toast.success("המרדף נמחק.");
       setDeleteTarget(null);
       await load();
     } catch (error) {
-      toastError(error, "Couldn't delete that chase.");
+      toastError(error, "לא הצלחנו למחוק את המרדף.");
     } finally {
       setBusy(false);
     }
@@ -114,12 +114,12 @@ export default function StudioDashboardPage() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6">
       <TabHeader
-        title="Your chases"
-        description="Build, run and review every chase from here."
+        title="המרדפים שלכם"
+        description="בונים, מריצים ובודקים כאן כל מרדף."
         actions={
           <Button onClick={() => setCreating(true)}>
             <Plus className="size-4" aria-hidden />
-            Create chase
+            מרדף חדש
           </Button>
         }
       />
@@ -135,19 +135,19 @@ export default function StudioDashboardPage() {
       {empty && (
         <EmptyState
           icon={<Compass className="size-6" aria-hidden />}
-          title="No chases yet"
-          description="A chase is one game: your missions, your teams, your leaderboard."
+          title="עדיין אין מרדפים"
+          description="מרדף אחד הוא משחק אחד: המשימות שלכם, הקבוצות שלכם, טבלת המובילים שלכם."
           action={
             <Button onClick={() => setCreating(true)}>
               <Plus className="size-4" aria-hidden />
-              Create your first chase
+              יוצרים מרדף ראשון
             </Button>
           }
         />
       )}
 
-      {section("Created by me", data?.owned ?? [], true)}
-      {section("Shared with me", data?.collaborating ?? [], false)}
+      {section("שיצרתי", data?.owned ?? [], true)}
+      {section("ששיתפו איתי", data?.collaborating ?? [], false)}
 
       <CreateChaseDialog open={creating} onClose={() => setCreating(false)} />
 
@@ -165,9 +165,9 @@ export default function StudioDashboardPage() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
         loading={busy}
-        title={`Delete “${deleteTarget?.name ?? ""}”?`}
-        description="Every mission, team, submission and point in this chase is deleted permanently. This cannot be undone."
-        confirmLabel="Delete chase"
+        title={`למחוק את "${deleteTarget?.name ?? ""}"?`}
+        description="כל המשימות, הקבוצות, ההגשות והנקודות של המרדף הזה יימחקו לצמיתות. אי אפשר לשחזר."
+        confirmLabel="מחיקת המרדף"
       />
     </div>
   );

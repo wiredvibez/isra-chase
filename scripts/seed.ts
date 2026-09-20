@@ -62,7 +62,7 @@ const JOIN_CODE = "TLV24X";
 const ORGANIZER = {
   uid: "seed-organizer",
   email: "organizer@isra-chase.demo",
-  name: "Dana Organizer",
+  name: "דנה מארגנת",
 };
 
 const HOUR = 3_600_000;
@@ -106,9 +106,9 @@ async function reset() {
 const missions = [
   {
     id: "m-selfie",
-    name: "Team selfie at the fountain",
+    name: "סלפי קבוצתי במזרקה",
     description:
-      "Get everyone in frame at the Dizengoff Square fountain. Bonus character for a synchronised pose.",
+      "תכניסו את כל הקבוצה לפריים במזרקה בכיכר דיזנגוף. פוזה מסונכרנת שווה נקודות בונוס.",
     points: 200,
     type: "camera",
     feedVisibility: "shown",
@@ -122,9 +122,9 @@ const missions = [
   },
   {
     id: "m-video",
-    name: "Film a 20-second street performance",
+    name: "תצלמו 20 שניות של אמן רחוב",
     description:
-      "Find a busker and film them — with their permission — for up to 20 seconds. Live capture only, no camera roll.",
+      "תמצאו אמן רחוב ותצלמו אותו — באישור שלו — עד 20 שניות. צילום חי בלבד, בלי גלריה.",
     points: 350,
     type: "camera",
     feedVisibility: "shown",
@@ -138,9 +138,9 @@ const missions = [
   },
   {
     id: "m-trivia",
-    name: "What year was the Bauhaus Center founded?",
+    name: "באיזו שנה נוסד מרכז באוהאוס?",
     description:
-      "The answer is on a plaque by the entrance. Numbers must be exact.",
+      "התשובה על השלט בכניסה. מספרים חייבים להיות מדויקים.",
     points: 150,
     type: "text",
     feedVisibility: "hidden",
@@ -154,15 +154,15 @@ const missions = [
   },
   {
     id: "m-riddle",
-    name: "Name the market",
+    name: "איך קוראים לשוק?",
     description:
-      "Spice stalls, fresh juice, and a name that means 'the vineyard'. Close spelling counts.",
+      "דוכני תבלינים, מיץ סחוט, ושם שמזכיר כרם. כתיב בערך נכון מספיק.",
     points: 175,
     type: "text",
     feedVisibility: "hidden",
     camera: null,
     text: {
-      acceptedResponses: ["Carmel Market", "Shuk HaCarmel"],
+      acceptedResponses: ["שוק הכרמל", "הכרמל"],
       approximate: true,
     },
     gps: null,
@@ -173,15 +173,15 @@ const missions = [
   },
   {
     id: "m-checkin",
-    name: "Check in at the Old Port",
+    name: "צ'ק-אין בנמל הישן",
     description:
-      "Make your way to the boardwalk. Your phone will confirm when you're close enough.",
+      "תגיעו לטיילת. הטלפון יאשר כשתהיו מספיק קרובים.",
     points: 250,
     type: "gps",
     feedVisibility: "shown",
     camera: null,
     text: null,
-    gps: { lat: 32.0975, lng: 34.7742, radiusM: 250, address: "Tel Aviv Port" },
+    gps: { lat: 32.0975, lng: 34.7742, radiusM: 250, address: "נמל תל אביב" },
     release: { kind: "chase_start" },
     expiry: { kind: "chase_end" },
     isDraft: false,
@@ -189,9 +189,9 @@ const missions = [
   },
   {
     id: "m-combo",
-    name: "Part 2: photograph what you found",
+    name: "חלק 2: תצלמו את מה שמצאתם",
     description:
-      "Unlocked by checking in at the Old Port. Photograph the thing the clue pointed to.",
+      "נפתחת אחרי צ'ק-אין בנמל הישן. תצלמו את מה שהרמז הוביל אליו.",
     points: 300,
     type: "camera",
     feedVisibility: "shown",
@@ -205,9 +205,9 @@ const missions = [
   },
   {
     id: "m-threshold",
-    name: "Finale: the 700-point challenge",
+    name: "פיינלה: אתגר ה-700 נקודות",
     description:
-      "Appears once your team reaches 700 points. Capture the whole team jumping at once.",
+      "נפתחת כשהקבוצה מגיעה ל-700 נקודות. תצלמו את כולם קופצים ביחד.",
     points: 500,
     type: "camera",
     feedVisibility: "shown",
@@ -221,13 +221,13 @@ const missions = [
   },
   {
     id: "m-draft",
-    name: "Tiebreaker (staged, not yet live)",
-    description: "Held back in draft until the organizer needs a sudden-death round.",
+    name: "שובר שוויון (טיוטה, עוד לא באוויר)",
+    description: "מחכה בטיוטה עד שהמארגן יצטרך סיבוב הכרעה.",
     points: 400,
     type: "text",
     feedVisibility: "hidden",
     camera: null,
-    text: { acceptedResponses: ["jaffa"], approximate: true },
+    text: { acceptedResponses: ["יפו"], approximate: true },
     gps: null,
     release: { kind: "chase_start" },
     expiry: { kind: "chase_end" },
@@ -237,9 +237,9 @@ const missions = [
 ];
 
 const teams = [
-  { id: "t-falafel", name: "Flying Falafel", members: ["Noa", "Amir", "Yael"] },
-  { id: "t-sabich", name: "Sabich Squad", members: ["Tal", "Roni"] },
-  { id: "t-shakshuka", name: "Shakshuka Crew", members: ["Omer"] },
+  { id: "t-falafel", name: "פלאפל מעופף", members: ["נועה", "אמיר", "יעל"] },
+  { id: "t-sabich", name: "חבורת הסביח", members: ["טל", "רוני"] },
+  { id: "t-shakshuka", name: "צוות שקשוקה", members: ["עומר"] },
 ];
 
 /** [teamId, missionId, status, points, minutesAgo] */
@@ -280,11 +280,11 @@ async function seed() {
     workspaceId: null,
     collaborators: {},
     collaboratorEmails: [],
-    name: "Tel Aviv City Chase",
+    name: "מרדף תל אביב",
     description:
-      "A two-hour sprint through the city centre. Photo, trivia and check-in missions.",
+      "ספרינט של שעתיים במרכז העיר. משימות צילום, טריוויה וצ'ק-אין.",
     imageUrl: null,
-    location: { label: "Tel Aviv-Yafo", lat: 32.0853, lng: 34.7818 },
+    location: { label: "תל אביב-יפו", lat: 32.0853, lng: 34.7818 },
     hasPassword: false,
     searchVisibility: "hidden",
     splashImageUrl: null,
@@ -392,7 +392,7 @@ async function seed() {
         participantName: team.members[0],
         status,
         caption:
-          mission.type === "camera" ? "Got it on the first try!" : null,
+          mission.type === "camera" ? "תפסנו בניסיון הראשון!" : null,
         media: null,
         textAnswer:
           mission.type === "text"
@@ -410,10 +410,10 @@ async function seed() {
         gradeReason:
           mission.type === "text"
             ? status === "rejected"
-              ? "No exact match."
-              : "Exact match."
+              ? "לא בדיוק."
+              : "בול."
             : mission.type === "gps"
-              ? "Checked in 34 m from the target (within 250 m)."
+              ? "צ'ק-אין מ-34 מ' מהיעד (בתוך 250 מ')."
               : null,
         likeCount: status === "approved" ? Math.floor(Math.random() * 6) : 0,
         feedVisible: mission.feedVisibility === "shown",
@@ -433,7 +433,7 @@ async function seed() {
     teamId: "t-falafel",
     submissionId: "t-falafel--m-selfie",
     points: 50,
-    reason: "Outstanding synchronised pose",
+    reason: "פוזה מסונכרנת ברמה אחרת",
     byUid: ORGANIZER.uid,
     byName: ORGANIZER.name,
     createdAt: stamp(70 * 60_000),
@@ -444,7 +444,7 @@ async function seed() {
     teamId: "t-sabich",
     submissionId: null,
     points: -25,
-    reason: "Late to the checkpoint briefing",
+    reason: "איחרו לתדריך",
     byUid: ORGANIZER.uid,
     byName: ORGANIZER.name,
     createdAt: stamp(45 * 60_000),
@@ -454,7 +454,7 @@ async function seed() {
 
   await chaseRef.collection("broadcasts").doc("b-welcome").set({
     chaseId: CHASE_ID,
-    body: "Welcome to the Tel Aviv City Chase! Missions unlock as you go — start with the fountain selfie.",
+    body: "ברוכים הבאים למרדף תל אביב! משימות נפתחות תוך כדי — תתחילו מהסלפי במזרקה.",
     imageUrl: null,
     linkUrl: null,
     teamIds: null,
@@ -467,7 +467,7 @@ async function seed() {
   });
   await chaseRef.collection("broadcasts").doc("b-final").set({
     chaseId: CHASE_ID,
-    body: "Thirty minutes left. Get your last submissions in!",
+    body: "נשארה חצי שעה. תכניסו את ההגשות האחרונות!",
     imageUrl: null,
     linkUrl: null,
     teamIds: null,

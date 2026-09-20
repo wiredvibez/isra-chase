@@ -24,9 +24,9 @@ export function DurationField({
   }
 
   const cells: Array<{ key: "days" | "hours" | "minutes"; label: string }> = [
-    ...(showDays ? [{ key: "days" as const, label: "Days" }] : []),
-    { key: "hours", label: "Hours" },
-    { key: "minutes", label: "Minutes" },
+    ...(showDays ? [{ key: "days" as const, label: "ימים" }] : []),
+    { key: "hours", label: "שעות" },
+    { key: "minutes", label: "דקות" },
   ];
 
   return (

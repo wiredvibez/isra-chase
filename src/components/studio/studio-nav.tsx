@@ -33,30 +33,30 @@ interface NavSection {
 export const NAV_SECTIONS: NavSection[] = [
   {
     id: "create",
-    label: "Create",
+    label: "יצירה",
     tabs: [
-      { slug: "details", label: "Details", icon: <Settings2 className="size-4" aria-hidden /> },
-      { slug: "missions", label: "Missions", icon: <ListChecks className="size-4" aria-hidden /> },
-      { slug: "branding", label: "Branding", icon: <Palette className="size-4" aria-hidden /> },
-      { slug: "broadcasts", label: "Broadcasts", icon: <Megaphone className="size-4" aria-hidden /> },
+      { slug: "details", label: "פרטים", icon: <Settings2 className="size-4" aria-hidden /> },
+      { slug: "missions", label: "משימות", icon: <ListChecks className="size-4" aria-hidden /> },
+      { slug: "branding", label: "מיתוג", icon: <Palette className="size-4" aria-hidden /> },
+      { slug: "broadcasts", label: "הודעות", icon: <Megaphone className="size-4" aria-hidden /> },
     ],
   },
   {
     id: "publish",
-    label: "Publish",
+    label: "פרסום",
     tabs: [
-      { slug: "participants", label: "Participants", icon: <Users className="size-4" aria-hidden /> },
-      { slug: "schedule", label: "Start & end", icon: <CalendarClock className="size-4" aria-hidden /> },
+      { slug: "participants", label: "משתתפים", icon: <Users className="size-4" aria-hidden /> },
+      { slug: "schedule", label: "התחלה וסיום", icon: <CalendarClock className="size-4" aria-hidden /> },
     ],
   },
   {
     id: "review",
-    label: "Review",
+    label: "בדיקה",
     tabs: [
-      { slug: "feed", label: "Activity feed", icon: <Activity className="size-4" aria-hidden /> },
-      { slug: "submissions", label: "Submissions", icon: <ClipboardCheck className="size-4" aria-hidden /> },
-      { slug: "leaderboard", label: "Leaderboard", icon: <Trophy className="size-4" aria-hidden /> },
-      { slug: "stats", label: "Stats", icon: <BarChart3 className="size-4" aria-hidden /> },
+      { slug: "feed", label: "פיד הפעילות", icon: <Activity className="size-4" aria-hidden /> },
+      { slug: "submissions", label: "הגשות", icon: <ClipboardCheck className="size-4" aria-hidden /> },
+      { slug: "leaderboard", label: "טבלת המובילים", icon: <Trophy className="size-4" aria-hidden /> },
+      { slug: "stats", label: "סטטיסטיקה", icon: <BarChart3 className="size-4" aria-hidden /> },
     ],
   },
 ];
@@ -72,7 +72,7 @@ export function StudioNav({ chaseId }: { chaseId: string }) {
   const active = useActiveSlug(chaseId);
 
   return (
-    <nav aria-label="Chase sections">
+    <nav aria-label="אזורי המרדף">
       {/* Phone / tablet: one scrolling rail, sections marked inline. */}
       <div className="no-scrollbar -mx-4 flex gap-1 overflow-x-auto border-b border-border px-4 lg:hidden">
         {NAV_SECTIONS.flatMap((section, sectionIndex) => [

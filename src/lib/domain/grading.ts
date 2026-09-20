@@ -110,14 +110,14 @@ export function gradeText(answer: string, config: TextConfig): TextVerdict {
     return {
       correct: true,
       matched: null,
-      reason: "Open-ended mission — all responses accepted.",
+      reason: "משימה פתוחה — כל תשובה מתקבלת.",
       score: 1,
     };
   }
 
   const given = normalizeAnswer(answer);
   if (!given) {
-    return { correct: false, matched: null, reason: "Empty response.", score: 0 };
+    return { correct: false, matched: null, reason: "לא כתבתם כלום.", score: 0 };
   }
 
   for (const candidate of accepted) {
@@ -125,7 +125,7 @@ export function gradeText(answer: string, config: TextConfig): TextVerdict {
       return {
         correct: true,
         matched: candidate,
-        reason: "Exact match.",
+        reason: "בול.",
         score: 1,
       };
     }
@@ -135,7 +135,7 @@ export function gradeText(answer: string, config: TextConfig): TextVerdict {
     return {
       correct: false,
       matched: null,
-      reason: "No exact match.",
+      reason: "לא בדיוק.",
       score: 0,
     };
   }
@@ -173,7 +173,7 @@ export function gradeText(answer: string, config: TextConfig): TextVerdict {
     return {
       correct: true,
       matched: bestCandidate,
-      reason: `Approximate match (${Math.round(best * 100)}% similar).`,
+      reason: `מספיק קרוב (${Math.round(best * 100)}% התאמה).`,
       score: best,
     };
   }
@@ -182,8 +182,8 @@ export function gradeText(answer: string, config: TextConfig): TextVerdict {
     correct: false,
     matched: null,
     reason: best
-      ? `Closest accepted answer was only ${Math.round(best * 100)}% similar.`
-      : "No accepted answer matched.",
+      ? `הכי קרוב שהגעתם זה ${Math.round(best * 100)}% התאמה.`
+      : "לא בדיוק. תנסו שוב.",
     score: best,
   };
 }
@@ -230,7 +230,7 @@ export function gradeGps(
     correct,
     distanceM,
     reason: correct
-      ? `Checked in ${distanceM} m from the target (within ${config.radiusM} m).`
-      : `You're ${distanceM} m away — get within ${config.radiusM} m to check in.`,
+      ? `צ'ק-אין מ-${distanceM} מ' מהיעד (בתוך ${config.radiusM} מ').`
+      : `אתם ${distanceM} מ' משם. תתקרבו ל-${config.radiusM} מ' בשביל צ'ק-אין.`,
   };
 }

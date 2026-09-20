@@ -41,15 +41,15 @@ export default function StudioLayout({
               <Rocket className="size-4" aria-hidden />
             </span>
             Isra Chase
-            <span className="text-muted-foreground">Studio</span>
+            <span className="text-muted-foreground">סטודיו</span>
           </Link>
           <div className="flex-1" />
           {user && (
             <Menu
-              label="Account menu"
+              label="תפריט החשבון"
               trigger={
                 <Avatar
-                  name={user.displayName ?? user.email ?? "You"}
+                  name={user.displayName ?? user.email ?? "משתמש"}
                   src={user.photoURL}
                   size="sm"
                 />
@@ -57,7 +57,7 @@ export default function StudioLayout({
               items={[
                 {
                   id: "signout",
-                  label: "Sign out",
+                  label: "יציאה",
                   icon: <LogOut className="size-4" aria-hidden />,
                   onSelect: () => void signOut(),
                 },

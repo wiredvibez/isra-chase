@@ -20,7 +20,7 @@ export interface MenuItem {
  */
 export function Menu({
   items,
-  label = "More actions",
+  label = "עוד פעולות",
   align = "end",
   trigger,
   className,

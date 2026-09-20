@@ -33,7 +33,9 @@ describe("gradeText — open-ended", () => {
   it("accepts anything when no responses are configured", () => {
     const v = gradeText("literally whatever", exact([]));
     expect(v.correct).toBe(true);
-    expect(v.reason).toMatch(/open-ended/i);
+    // Copy is Hebrew now, so assert on the fact rather than the wording.
+    expect(v.matched).toBeNull();
+    expect(v.score).toBe(1);
   });
 
   it("treats whitespace-only accepted responses as open-ended", () => {
@@ -54,7 +56,7 @@ describe("gradeText — exact mode", () => {
   it("rejects a near miss when approximate is off", () => {
     const v = gradeText("eiffle tower", exact(["Eiffel Tower"]));
     expect(v.correct).toBe(false);
-    expect(v.reason).toMatch(/no exact match/i);
+    expect(v.score).toBe(0);
   });
 
   it("rejects an empty response", () => {
@@ -142,7 +144,9 @@ describe("gradeGps", () => {
   it("rejects a check-in outside the radius and says how far", () => {
     const v = gradeGps({ lat: 48.8738, lng: 2.295 }, target);
     expect(v.correct).toBe(false);
-    expect(v.reason).toMatch(/get within 100 m/i);
+    // The radius has to appear in the feedback for it to be actionable.
+    expect(v.reason).toContain("100");
+    expect(v.reason).toContain(String(v.distanceM));
   });
 });
 

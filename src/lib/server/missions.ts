@@ -38,15 +38,15 @@ export async function assertTriggerCanGrade(
   release: { kind: string; missionId?: string; requireCorrect?: boolean },
 ) {
   if (release.kind !== "mission" || !release.requireCorrect) return;
-  if (!release.missionId) throw badRequest("Pick a mission to unlock from.");
+  if (!release.missionId) throw badRequest("בחרו משימה שפותחת את זו.");
 
   const snap = await missionsRef(chaseId).doc(release.missionId).get();
-  if (!snap.exists) throw badRequest("That unlocking mission doesn't exist.");
+  if (!snap.exists) throw badRequest("המשימה הפותחת לא קיימת.");
 
   const type = snap.data()?.type as string | undefined;
   if (type === "camera") {
     throw badRequest(
-      "Camera missions are always accepted, so they have no correct answer to wait for. Use a text or GPS mission as the trigger, or drop the correct-answer requirement.",
+      "משימות צילום תמיד מתקבלות, אז אין להן תשובה נכונה לחכות לה. בחרו משימת טקסט או מיקום כטריגר, או בטלו את הדרישה לתשובה נכונה.",
     );
   }
 }

@@ -46,7 +46,7 @@ export async function claimJoinCode(chaseId: string, attempts = 8): Promise<stri
       continue;
     }
   }
-  throw new Error("Could not allocate a unique join code.");
+  throw new Error("לא הצלחנו לייצר קוד הצטרפות ייחודי.");
 }
 
 /* ------------------------------------------------------------- bulk delete */

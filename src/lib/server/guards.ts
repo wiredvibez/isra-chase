@@ -56,7 +56,7 @@ export async function requireCaller(request?: Request): Promise<Caller> {
 
 export async function loadChase(chaseId: string): Promise<Chase> {
   const snap = await adminDb().collection("chases").doc(chaseId).get();
-  if (!snap.exists) throw notFound("That chase doesn't exist.");
+  if (!snap.exists) throw notFound("המרדף הזה לא קיים.");
   return { id: snap.id, ...snap.data() } as Chase;
 }
 
@@ -72,7 +72,7 @@ export async function requireOrganizer(
   const caller = await requireCaller(request);
   const chase = await loadChase(chaseId);
   if (!isOrganizerOf(chase, caller.uid)) {
-    throw forbidden("Only this chase's organizers can do that.");
+    throw forbidden("רק המארגנים של המרדף יכולים לעשות את זה.");
   }
   return { caller, chase };
 }
@@ -85,7 +85,7 @@ export async function requireOwner(
   const caller = await requireCaller(request);
   const chase = await loadChase(chaseId);
   if (chase.ownerUid !== caller.uid) {
-    throw forbidden("Only the chase owner can do that.");
+    throw forbidden("רק מי שיצר את המרדף יכול לעשות את זה.");
   }
   return { caller, chase };
 }
@@ -110,7 +110,7 @@ export async function requireParticipant(
   const caller = await requireCaller(request);
   const chase = await loadChase(chaseId);
   const participant = await loadParticipant(chaseId, caller.uid);
-  if (!participant) throw forbidden("You haven't joined this chase.");
+  if (!participant) throw forbidden("עוד לא הצטרפתם למרדף הזה.");
   return { caller, chase, participant };
 }
 
@@ -129,7 +129,7 @@ export async function requireMember(
   const organizer = isOrganizerOf(chase, caller.uid);
   const participant = await loadParticipant(chaseId, caller.uid);
   if (!organizer && !participant) {
-    throw forbidden("You haven't joined this chase.");
+    throw forbidden("עוד לא הצטרפתם למרדף הזה.");
   }
   return { caller, chase, participant, organizer };
 }

@@ -36,7 +36,7 @@ export function SaveBar({
   onSave,
   onDiscard,
   className,
-  label = "Save changes",
+  label = "שמירת שינויים",
 }: {
   state: SaveState;
   onSave: () => void;
@@ -58,15 +58,15 @@ export function SaveBar({
         {state === "saved" && (
           <>
             <Check className="size-4 text-success" aria-hidden />
-            <span className="text-success">Saved</span>
+            <span className="text-success">נשמר</span>
           </>
         )}
-        {state === "dirty" && "Unsaved changes"}
-        {state === "saving" && "Saving…"}
+        {state === "dirty" && "יש שינויים שלא נשמרו"}
+        {state === "saving" && "בשמירה…"}
       </p>
       {onDiscard && state === "dirty" && (
         <Button type="button" variant="ghost" size="sm" onClick={onDiscard}>
-          Discard
+          ביטול השינויים
         </Button>
       )}
       <Button

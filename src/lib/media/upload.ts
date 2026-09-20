@@ -26,6 +26,11 @@ export interface UploadedMedia {
   durationSec?: number;
 }
 
+/** Hebrew name for a media kind, for use inside sentences. */
+export function kindLabel(kind: MediaKind): string {
+  return { image: "תמונה", video: "סרטון", audio: "הקלטה" }[kind];
+}
+
 export function kindOf(file: File): MediaKind | null {
   if (file.type.startsWith("image/")) return "image";
   if (file.type.startsWith("video/")) return "video";
@@ -90,16 +95,16 @@ async function videoMeta(file: File): Promise<{
 
 export function validateMedia(file: File, allowed: MediaKind[]) {
   const kind = kindOf(file);
-  if (!kind) return "That file type isn't supported.";
+  if (!kind) return "סוג הקובץ הזה לא נתמך.";
   if (!allowed.includes(kind))
-    return `This mission accepts ${allowed.join(" or ")} only.`;
+    return `המשימה הזאת מקבלת ${allowed.map(kindLabel).join(" או ")} בלבד.`;
   const limits: Record<MediaKind, number> = {
     image: MAX_IMAGE_BYTES,
     video: MAX_VIDEO_BYTES,
     audio: MAX_AUDIO_BYTES,
   };
   if (file.size > limits[kind]) {
-    return `That ${kind} is too large (max ${Math.round(limits[kind] / 1024 / 1024)} MB).`;
+    return `ה${kindLabel(kind)} כבד מדי (עד ${Math.round(limits[kind] / 1024 / 1024)} MB).`;
   }
   return null;
 }
@@ -109,18 +114,18 @@ export function uploadErrorMessage(error: unknown): string {
   const code = (error as { code?: string })?.code ?? "";
   switch (code) {
     case "storage/unauthorized":
-      return "You're not allowed to upload here. Try rejoining the chase.";
+      return "אין לכם הרשאה להעלות לכאן. נסו להצטרף מחדש למרדף.";
     case "storage/canceled":
-      return "Upload cancelled.";
+      return "ההעלאה בוטלה.";
     case "storage/quota-exceeded":
-      return "This chase is out of storage space. Tell the organiser.";
+      return "נגמר המקום למרדף הזה. תגידו למארגן.";
     case "storage/unauthenticated":
-      return "You've been signed out. Sign in and try again.";
+      return "התנתקתם. תתחברו ותנסו שוב.";
     case "storage/retry-limit-exceeded":
     case "storage/unknown":
-      return "Couldn't reach the photo server. Check your connection and try again.";
+      return "לא הצלחנו להגיע לשרת התמונות. תבדקו חיבור ותנסו שוב.";
     default:
-      return (error as Error)?.message || "That upload failed. Try again.";
+      return (error as Error)?.message || "ההעלאה נכשלה. תנסו שוב.";
   }
 }
 
@@ -134,7 +139,7 @@ export async function uploadMedia(
   onProgress?: (pct: number) => void,
 ): Promise<UploadedMedia> {
   const kind = kindOf(file);
-  if (!kind) throw new Error("Unsupported file type.");
+  if (!kind) throw new Error("סוג הקובץ לא נתמך.");
 
   const prepared = await prepare(file);
   const meta =
@@ -162,7 +167,7 @@ export async function uploadMedia(
         task.cancel();
         reject(
           new Error(
-            "The upload stopped responding. Check your connection and try again.",
+            "ההעלאה נתקעה. תבדקו חיבור ותנסו שוב.",
           ),
         );
       }, STALL_TIMEOUT_MS);

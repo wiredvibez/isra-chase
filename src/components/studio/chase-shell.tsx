@@ -8,13 +8,12 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Sheet } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { countdown } from "@/lib/format";
 import { useChase } from "./chase-context";
 import { InvitePanel } from "./invite-panel";
 import { StudioNav } from "./studio-nav";
-import { STATUS_LABEL, STATUS_TONE, stampMs } from "./studio-utils";
+import { countdownLabel, STATUS_LABEL, STATUS_TONE, stampMs } from "./studio-utils";
 
-/** Ticking "2 d 4 h left" next to the status badge while a chase is live. */
+/** Ticking "נשארו 2 ימים 4 שע'" next to the status badge while a chase is live. */
 function Countdown({ endMs }: { endMs: number }) {
   const [now, setNow] = React.useState(() => Date.now());
   React.useEffect(() => {
@@ -23,7 +22,7 @@ function Countdown({ endMs }: { endMs: number }) {
   }, []);
   return (
     <span className="text-sm font-semibold text-muted-foreground tabular-nums">
-      {countdown(endMs, now)}
+      {countdownLabel(endMs, now)}
     </span>
   );
 }
@@ -47,14 +46,14 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
       <div className="mx-auto w-full max-w-3xl p-6">
         <EmptyState
           icon={<TriangleAlert className="size-6" aria-hidden />}
-          title="This chase isn't available"
+          title="המרדף הזה לא זמין"
           description={
             error?.message ??
-            "It may have been deleted, or you no longer have access to it."
+            "ייתכן שהוא נמחק, או שאין לכם יותר גישה אליו."
           }
           action={
             <Button onClick={() => window.location.reload()}>
-              Try again
+              טעינה מחדש
             </Button>
           }
         />
@@ -73,7 +72,7 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
             className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="size-3.5 flip-rtl" aria-hidden />
-            All chases
+            כל המרדפים
           </Link>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
@@ -91,7 +90,7 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
           onClick={() => setInviteOpen(true)}
         >
           <QrCode className="size-4" aria-hidden />
-          Invite
+          הזמנה
         </Button>
       </div>
 
@@ -99,7 +98,7 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
         <div className="lg:sticky lg:top-20 lg:self-start">
           <StudioNav chaseId={chaseId} />
           <div className="mt-4 hidden rounded-lg border border-border bg-surface p-4 shadow-card lg:block">
-            <p className="mb-3 font-display text-sm font-bold">Invite players</p>
+            <p className="mb-3 font-display text-sm font-bold">הזמנת שחקנים</p>
             <InvitePanel chase={chase} />
           </div>
         </div>
@@ -110,7 +109,7 @@ export function ChaseShell({ children }: { children: React.ReactNode }) {
       <Sheet
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
-        title="Invite players"
+        title="הזמנת שחקנים"
       >
         <InvitePanel chase={chase} />
       </Sheet>

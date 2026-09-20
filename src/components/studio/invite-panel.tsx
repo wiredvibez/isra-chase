@@ -24,9 +24,9 @@ function useCopy() {
       try {
         await navigator.clipboard.writeText(value);
         setCopied(key);
-        toast.success(`${label} copied.`);
+        toast.success(`${label} הועתק.`);
       } catch {
-        toast.error("Your browser blocked the clipboard. Copy it manually.");
+        toast.error("הדפדפן חסם את הלוח. אפשר להעתיק ידנית.");
       }
     },
   };
@@ -70,18 +70,21 @@ export function InvitePanel({
     <div className={cn("space-y-3", className)}>
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Join code
+          קוד הצטרפות
         </p>
         <div className="mt-1 flex items-center gap-2">
-          <code className="flex-1 rounded-md bg-surface-inset px-3 py-2 font-mono text-lg font-bold tracking-[0.2em]">
+          <code
+            dir="ltr"
+            className="flex-1 rounded-md bg-surface-inset px-3 py-2 text-start font-mono text-lg font-bold tracking-[0.2em]"
+          >
             {chase.joinCode}
           </code>
           <Button
             type="button"
             size="icon"
             variant="outline"
-            aria-label="Copy join code"
-            onClick={() => void copy(chase.joinCode, "code", "Join code")}
+            aria-label="העתקת קוד ההצטרפות"
+            onClick={() => void copy(chase.joinCode, "code", "קוד ההצטרפות")}
           >
             {copied === "code" ? (
               <Check className="size-4 text-success" aria-hidden />
@@ -94,22 +97,23 @@ export function InvitePanel({
 
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Invite link
+          קישור הזמנה
         </p>
         <div className="mt-1 flex items-center gap-2">
           <input
             readOnly
+            dir="ltr"
             value={link}
-            aria-label="Invite link"
-            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2 text-xs"
+            aria-label="קישור ההזמנה"
+            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2 text-start text-xs"
             onFocus={(e) => e.currentTarget.select()}
           />
           <Button
             type="button"
             size="icon"
             variant="outline"
-            aria-label="Copy invite link"
-            onClick={() => void copy(link, "link", "Invite link")}
+            aria-label="העתקת קישור ההזמנה"
+            onClick={() => void copy(link, "link", "קישור ההזמנה")}
           >
             {copied === "link" ? (
               <Check className="size-4 text-success" aria-hidden />
@@ -124,23 +128,23 @@ export function InvitePanel({
         <div
           ref={qrRef}
           className="rounded-md bg-white p-2"
-          aria-label="QR code for the invite link"
+          aria-label="קוד QR של קישור ההזמנה"
           role="img"
         >
           <QRCodeSVG value={link || chase.joinCode} size={104} level="M" />
         </div>
         <div className="space-y-2 text-xs text-muted-foreground">
-          <p>Players scan this, or enter the code in the app.</p>
+          <p>השחקנים סורקים אותו, או מקלידים את הקוד באפליקציה.</p>
           <Button type="button" size="sm" variant="outline" onClick={downloadQr}>
             <Download className="size-4" aria-hidden />
-            Download QR
+            הורדת ה-QR
           </Button>
         </div>
       </div>
 
       {chase.hasPassword && (
         <p className="rounded-md bg-warning-surface px-3 py-2 text-xs text-warning">
-          This chase is password protected — share the password too.
+          המרדף הזה מוגן בסיסמה — כדאי לשתף גם אותה.
         </p>
       )}
     </div>

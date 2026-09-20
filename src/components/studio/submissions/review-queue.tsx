@@ -90,8 +90,8 @@ export function ReviewQueue({
     return (
       <EmptyState
         icon={<Check className="size-6" aria-hidden />}
-        title="Queue clear"
-        description="Every submission has been reviewed. New ones land here automatically."
+        title="התור ריק"
+        description="כל ההגשות נבדקו. חדשות ייכנסו לכאן אוטומטית."
       />
     );
   }
@@ -102,15 +102,15 @@ export function ReviewQueue({
     <Card>
       <CardContent className="space-y-4 pt-5">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="warning">Pending review</Badge>
+          <Badge tone="warning">ממתינה לבדיקה</Badge>
           <p aria-live="polite" className="text-sm font-semibold">
-            {safeIndex + 1} of {submissions.length}
+            {safeIndex + 1} מתוך {submissions.length}
           </p>
           <p className="ms-auto hidden text-xs text-muted-foreground sm:block">
-            <kbd className="rounded border border-border px-1">A</kbd> approve ·{" "}
-            <kbd className="rounded border border-border px-1">R</kbd> reject ·{" "}
+            <kbd className="rounded border border-border px-1">A</kbd> לאשר ·{" "}
+            <kbd className="rounded border border-border px-1">R</kbd> לדחות ·{" "}
             <kbd className="rounded border border-border px-1">←</kbd>
-            <kbd className="rounded border border-border px-1">→</kbd> move
+            <kbd className="rounded border border-border px-1">→</kbd> מעבר בין הגשות
           </p>
         </div>
 
@@ -126,10 +126,10 @@ export function ReviewQueue({
             {current.caption && (
               <p className="text-sm whitespace-pre-wrap">{current.caption}</p>
             )}
-            <Badge tone="brand">{formatPoints(current.points)} pts on approval</Badge>
+            <Badge tone="brand">{formatPoints(current.points)} נק' עם האישור</Badge>
             {current.flagged && (
               <p className="rounded-md bg-danger-surface px-3 py-2 text-xs text-danger">
-                Flagged{current.flagReason ? `: ${current.flagReason}` : ""}
+                מסומנת{current.flagReason ? `: ${current.flagReason}` : ""}
               </p>
             )}
           </div>
@@ -143,7 +143,7 @@ export function ReviewQueue({
             onClick={() => void act("approve")}
           >
             <Check className="size-5" aria-hidden />
-            Approve
+            לאשר
           </Button>
           <Button
             variant="danger"
@@ -152,13 +152,13 @@ export function ReviewQueue({
             onClick={() => void act("reject")}
           >
             <X className="size-5" aria-hidden />
-            Reject
+            לדחות
           </Button>
           <div className="ms-auto flex gap-1">
             <Button
               variant="outline"
               size="icon"
-              aria-label="Previous submission"
+              aria-label="ההגשה הקודמת"
               disabled={safeIndex === 0}
               onClick={() => setIndex((i) => step(i, -1, last))}
             >
@@ -167,7 +167,7 @@ export function ReviewQueue({
             <Button
               variant="outline"
               size="icon"
-              aria-label="Next submission"
+              aria-label="ההגשה הבאה"
               disabled={safeIndex >= last}
               onClick={() => setIndex((i) => step(i, 1, last))}
             >

@@ -11,11 +11,11 @@ export class ApiError extends Error {
   }
 }
 
-export const unauthorized = (m = "You need to sign in.") =>
+export const unauthorized = (m = "צריך להתחבר.") =>
   new ApiError(401, m, "unauthenticated");
-export const forbidden = (m = "You don't have access to this.") =>
+export const forbidden = (m = "אין לכם גישה לזה.") =>
   new ApiError(403, m, "forbidden");
-export const notFound = (m = "Not found.") => new ApiError(404, m, "not_found");
+export const notFound = (m = "לא מצאנו את זה.") => new ApiError(404, m, "not_found");
 export const badRequest = (m: string) => new ApiError(400, m, "bad_request");
 export const conflict = (m: string) => new ApiError(409, m, "conflict");
 
@@ -37,7 +37,7 @@ export function handler<T>(fn: () => Promise<T>) {
         const first = error.issues[0];
         return NextResponse.json(
           {
-            error: first ? `${first.path.join(".")}: ${first.message}` : "Invalid input.",
+            error: first ? `${first.path.join(".")}: ${first.message}` : "קלט לא תקין.",
             code: "invalid_input",
             issues: error.issues,
           },
@@ -46,7 +46,7 @@ export function handler<T>(fn: () => Promise<T>) {
       }
       console.error("[api] unhandled", error);
       return NextResponse.json(
-        { error: "Something went wrong on our end.", code: "internal" },
+        { error: "משהו השתבש אצלנו. תנסו שוב.", code: "internal" },
         { status: 500 },
       );
     },
@@ -57,6 +57,6 @@ export async function readJson<T>(request: Request): Promise<T> {
   try {
     return (await request.json()) as T;
   } catch {
-    throw badRequest("Expected a JSON body.");
+    throw badRequest("הבקשה לא תקינה.");
   }
 }
