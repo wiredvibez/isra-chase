@@ -104,6 +104,29 @@ export function validateMedia(file: File, allowed: MediaKind[]) {
   return null;
 }
 
+/** Turn a Storage error code into something a 13-year-old can act on. */
+export function uploadErrorMessage(error: unknown): string {
+  const code = (error as { code?: string })?.code ?? "";
+  switch (code) {
+    case "storage/unauthorized":
+      return "You're not allowed to upload here. Try rejoining the chase.";
+    case "storage/canceled":
+      return "Upload cancelled.";
+    case "storage/quota-exceeded":
+      return "This chase is out of storage space. Tell the organiser.";
+    case "storage/unauthenticated":
+      return "You've been signed out. Sign in and try again.";
+    case "storage/retry-limit-exceeded":
+    case "storage/unknown":
+      return "Couldn't reach the photo server. Check your connection and try again.";
+    default:
+      return (error as Error)?.message || "That upload failed. Try again.";
+  }
+}
+
+/** No byte moved in this long ⇒ treat the upload as dead rather than pending. */
+const STALL_TIMEOUT_MS = 25_000;
+
 /** Upload with progress. `path` must match the Storage security rules. */
 export async function uploadMedia(
   file: File,
@@ -128,16 +151,36 @@ export async function uploadMedia(
   });
 
   await new Promise<void>((resolve, reject) => {
+    let stallTimer: ReturnType<typeof setTimeout>;
+    const settle = (fn: () => void) => {
+      clearTimeout(stallTimer);
+      fn();
+    };
+    const armStallTimer = () => {
+      clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => {
+        task.cancel();
+        reject(
+          new Error(
+            "The upload stopped responding. Check your connection and try again.",
+          ),
+        );
+      }, STALL_TIMEOUT_MS);
+    };
+
+    armStallTimer();
     task.on(
       "state_changed",
-      (snap: UploadTaskSnapshot) =>
+      (snap: UploadTaskSnapshot) => {
+        armStallTimer();
         onProgress?.(
           snap.totalBytes
             ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
             : 0,
-        ),
-      reject,
-      () => resolve(),
+        );
+      },
+      (error) => settle(() => reject(new Error(uploadErrorMessage(error)))),
+      () => settle(resolve),
     );
   });
 

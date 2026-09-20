@@ -41,6 +41,12 @@ function init() {
   dbInstance = getFirestore(app);
   storageInstance = getStorage(app);
 
+  // The SDK retries a failing upload for ten minutes by default, reporting no
+  // progress and no error the whole time — which looks exactly like a stuck
+  // 0%. Players on a phone deserve to be told quickly that it failed.
+  storageInstance.maxUploadRetryTime = 20_000;
+  storageInstance.maxOperationRetryTime = 20_000;
+
   if (useEmulator) {
     connectAuthEmulator(authInstance, "http://127.0.0.1:9099", {
       disableWarnings: true,
