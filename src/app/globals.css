@@ -1,26 +1,218 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Isra Chase design tokens
+   Playful, high-contrast, mobile-first. Light theme is the
+   product default; dark theme is a full first-class variant.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand — "chase teal" primary with a warm coral accent */
+  --brand-50: #eafaf7;
+  --brand-100: #c9f2ea;
+  --brand-200: #95e5d6;
+  --brand-300: #5bd2bd;
+  --brand-400: #2bb8a1;
+  --brand-500: #109b86;
+  --brand-600: #077c6c;
+  --brand-700: #076357;
+  --brand-800: #094f46;
+  --brand-900: #0a413b;
+
+  --accent-300: #ffb59c;
+  --accent-400: #ff8f6b;
+  --accent-500: #f96a3f;
+  --accent-600: #e04e22;
+
+  --gold-400: #ffc94d;
+  --gold-500: #f5ad1b;
+
+  /* Semantic surfaces */
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --surface-muted: #f1f3f6;
+  --surface-inset: #e9edf2;
+  --foreground: #10161c;
+  --muted-foreground: #5a6672;
+  --border: #dde3ea;
+  --border-strong: #c3ccd6;
+
+  --primary: var(--brand-600);
+  --primary-hover: var(--brand-700);
+  --primary-foreground: #ffffff;
+  --accent: var(--accent-500);
+  --accent-foreground: #ffffff;
+
+  --success: #12855f;
+  --success-surface: #e4f7ef;
+  --warning: #a86200;
+  --warning-surface: #fdf2dc;
+  --danger: #c02a34;
+  --danger-surface: #fdeaec;
+  --info: #1f5fb8;
+  --info-surface: #e8f1fd;
+
+  --ring: var(--brand-400);
+
+  --radius-sm: 0.5rem;
+  --radius: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  --shadow-card: 0 1px 2px rgb(16 22 28 / 0.05), 0 4px 16px rgb(16 22 28 / 0.06);
+  --shadow-pop: 0 8px 32px rgb(16 22 28 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0b1014;
+    --surface: #141b21;
+    --surface-muted: #1b242c;
+    --surface-inset: #222d36;
+    --foreground: #eef3f7;
+    --muted-foreground: #9aa8b4;
+    --border: #273239;
+    --border-strong: #3a4751;
+
+    --primary: var(--brand-400);
+    --primary-hover: var(--brand-300);
+    --primary-foreground: #06201c;
+
+    --success: #4cd39f;
+    --success-surface: #102c23;
+    --warning: #f0b54a;
+    --warning-surface: #2e230f;
+    --danger: #f4808a;
+    --danger-surface: #34161a;
+    --info: #79b0f5;
+    --info-surface: #10223a;
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.35);
+    --shadow-pop: 0 8px 32px rgb(0 0 0 / 0.55);
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #0b1014;
+  --surface: #141b21;
+  --surface-muted: #1b242c;
+  --surface-inset: #222d36;
+  --foreground: #eef3f7;
+  --muted-foreground: #9aa8b4;
+  --border: #273239;
+  --border-strong: #3a4751;
+
+  --primary: var(--brand-400);
+  --primary-hover: var(--brand-300);
+  --primary-foreground: #06201c;
+
+  --success: #4cd39f;
+  --success-surface: #102c23;
+  --warning: #f0b54a;
+  --warning-surface: #2e230f;
+  --danger: #f4808a;
+  --danger-surface: #34161a;
+  --info: #79b0f5;
+  --info-surface: #10223a;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.35);
+  --shadow-pop: 0 8px 32px rgb(0 0 0 / 0.55);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-inset: var(--surface-inset);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+  --color-info: var(--info);
+  --color-info-surface: var(--info-surface);
+
+  --color-ring: var(--ring);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --font-sans: var(--font-app-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-app-display), var(--font-app-sans), sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--font-app-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep the app from bouncing horizontally on phones. */
+html {
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Utility: hide scrollbars on horizontal chip rails */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
