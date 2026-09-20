@@ -70,7 +70,12 @@ export function PlayProvider({
   const refreshMissions = React.useCallback(async () => {
     if (!uid) return;
     try {
-      const payload = await apiGet<unknown>(`/api/chases/${chaseId}/missions`);
+      // `as=play` matters for an organizer playing their own chase: without
+      // it the endpoint hands back the full mission documents, answer key
+      // and all, which is not what this surface should ever render.
+      const payload = await apiGet<unknown>(
+        `/api/chases/${chaseId}/missions?as=play`,
+      );
       setMissions(unwrapMissions(payload));
       setMissionsError(null);
     } catch (error) {

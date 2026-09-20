@@ -65,11 +65,14 @@ export function DetailsTab() {
   }, [chaseId]);
 
   // Re-seed only when the console switches chase; live server writes must not
-  // stomp on half-typed edits.
-  React.useEffect(() => {
+  // stomp on half-typed edits. Adjusted during render rather than in an effect
+  // so the seeded values land in the same pass the new chase arrives in — the
+  // fetch above resolves later and still wins for the password.
+  const [seededFor, setSeededFor] = React.useState(chaseId);
+  if (seededFor !== chaseId) {
+    setSeededFor(chaseId);
     setForm(fromChase(chase));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chaseId]);
+  }
 
   function set<K extends keyof DetailsForm>(key: K, value: DetailsForm[K]) {
     setForm((f) => ({ ...f, [key]: value }));

@@ -14,7 +14,9 @@ import { toastError } from "../studio-utils";
 interface TeamForm {
   name: string;
   photoUrl: string | null;
+  /** Blank means "leave whatever passcode is already set alone". */
   passcode: string;
+  clearPasscode: boolean;
   mode: "team" | "solo";
   maxMembers: string;
 }
@@ -34,26 +36,36 @@ export function TeamEditor({
     name: "",
     photoUrl: null,
     passcode: "",
+    clearPasscode: false,
     mode: "team",
     maxMembers: "",
   }));
   const [saving, setSaving] = React.useState(false);
 
-  const uploadId = React.useMemo(
-    () => team?.id ?? `draft-${Math.random().toString(36).slice(2, 10)}`,
-    [team?.id],
-  );
+  // A team being created has no id yet, so its photo needs a scratch folder.
+  // useId is stable and SSR-safe; its separators are stripped for the path.
+  const draftId = React.useId().replace(/[^a-zA-Z0-9]/g, "");
+  const uploadId = team?.id ?? `draft-${draftId}`;
 
-  React.useEffect(() => {
-    if (!open) return;
-    setForm({
-      name: team?.name ?? "",
-      photoUrl: team?.photoUrl ?? null,
-      passcode: team?.passcode ?? "",
-      mode: team?.mode ?? "team",
-      maxMembers: team?.maxMembers ? String(team.maxMembers) : "",
-    });
-  }, [open, team]);
+  // Re-seed as the dialog opens, or as it is pointed at another team. Adjusted
+  // during render rather than in an effect so the form never paints once with
+  // the previously edited team's values.
+  const [seeded, setSeeded] = React.useState({ open, team });
+  if (seeded.open !== open || seeded.team !== team) {
+    setSeeded({ open, team });
+    if (open) {
+      setForm({
+        name: team?.name ?? "",
+        photoUrl: team?.photoUrl ?? null,
+        // Passcodes live in a private document, so an existing one is never
+        // echoed back into the field.
+        passcode: "",
+        clearPasscode: false,
+        mode: team?.mode ?? "team",
+        maxMembers: team?.maxMembers ? String(team.maxMembers) : "",
+      });
+    }
+  }
 
   async function save() {
     if (!form.name.trim()) {
@@ -61,13 +73,14 @@ export function TeamEditor({
       return;
     }
     setSaving(true);
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: form.name.trim(),
       photoUrl: form.photoUrl,
-      passcode: form.passcode.trim() || null,
       mode: form.mode,
       maxMembers: form.maxMembers ? Number(form.maxMembers) : null,
     };
+    if (form.passcode.trim()) payload.passcode = form.passcode.trim();
+    else if (form.clearPasscode || !team) payload.passcode = null;
     try {
       if (team) {
         await apiPatch(`/api/chases/${chaseId}/teams/${team.id}`, payload);
@@ -124,16 +137,33 @@ export function TeamEditor({
         <Field
           label="Passcode"
           htmlFor="team-passcode"
-          hint="Players who know it skip the chase password."
+          hint={
+            team?.hasPasscode
+              ? "A passcode is already set. Type a new one to replace it."
+              : "Players who know it skip the chase password."
+          }
         >
           <Input
             id="team-passcode"
             value={form.passcode}
             maxLength={32}
             autoComplete="off"
-            placeholder="No passcode"
+            disabled={form.clearPasscode}
+            placeholder={team?.hasPasscode ? "Unchanged" : "No passcode"}
             onChange={(e) => setForm((f) => ({ ...f, passcode: e.target.value }))}
           />
+          {team?.hasPasscode && (
+            <label className="mt-2 flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.clearPasscode}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, clearPasscode: e.target.checked }))
+                }
+              />
+              Remove the existing passcode
+            </label>
+          )}
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">

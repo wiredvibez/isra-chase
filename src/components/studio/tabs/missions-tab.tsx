@@ -44,7 +44,7 @@ export function MissionsTab() {
   const { chaseId, chase } = useLoadedChase();
   const { data: missions, loading } = useMissions(chaseId);
 
-  const [order, setOrder] = React.useState<Mission[]>([]);
+  const [order, setOrder] = React.useState<Mission[]>(missions);
   const [dragging, setDragging] = React.useState<number | null>(null);
   const [overIndex, setOverIndex] = React.useState<number | null>(null);
   const [editing, setEditing] = React.useState<Mission | null>(null);
@@ -52,10 +52,14 @@ export function MissionsTab() {
   const [deleteTarget, setDeleteTarget] = React.useState<Mission | null>(null);
   const [busy, setBusy] = React.useState(false);
 
-  // Live data is the source of truth except while a drag is in flight.
-  React.useEffect(() => {
+  // Live data is the source of truth except while a drag is in flight. Taken
+  // during render rather than in an effect: the list then never paints a frame
+  // of the previous order.
+  const [seeded, setSeeded] = React.useState({ missions, dragging });
+  if (seeded.missions !== missions || seeded.dragging !== dragging) {
+    setSeeded({ missions, dragging });
     if (dragging === null) setOrder(missions);
-  }, [missions, dragging]);
+  }
 
   async function persist(next: Mission[]) {
     setOrder(next);

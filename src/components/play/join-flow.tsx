@@ -41,6 +41,9 @@ type Step = "welcome" | "mode" | "team" | "profile";
 type Mode = "team" | "solo";
 
 function teamIsFull(team: PublicTeam): boolean {
+  // The server works out capacity from the team *and* the chase default, so
+  // its answer wins when it sends one.
+  if (typeof team.full === "boolean") return team.full;
   return team.maxMembers !== null && team.memberCount >= team.maxMembers;
 }
 
@@ -105,7 +108,7 @@ function GuestGate({ code }: { code: string }) {
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
-          href={`/login?next=${encodeURIComponent(pathname)}`}
+          href={`/signin?next=${encodeURIComponent(pathname)}`}
           className="font-semibold text-primary underline underline-offset-2"
         >
           Sign in instead

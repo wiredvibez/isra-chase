@@ -33,12 +33,16 @@ while preserving participants, submissions and points.
 
 | Method | Path | Guard | Body schema | Returns |
 |---|---|---|---|---|
-| GET | `/api/chases/[chaseId]/missions` | member | — | organizer: full `Mission[]`; participant: `PlayMission[]` |
+| GET | `/api/chases/[chaseId]/missions?as=play` | member | — | organizer: full `Mission[]`; participant: `PlayMission[]` |
 | POST | `/api/chases/[chaseId]/missions` | organizer | `missionInputSchema` | `{ mission }` |
 | PATCH | `/api/chases/[chaseId]/missions/[missionId]` | organizer | `missionInputSchema.partial()` | `{ mission }` |
 | DELETE | `/api/chases/[chaseId]/missions/[missionId]` | organizer | — | `{ ok }` — also deletes its submissions and reverses their points |
 | POST | `/api/chases/[chaseId]/missions/[missionId]/duplicate` | organizer | — | `{ mission }` |
 | POST | `/api/chases/[chaseId]/missions/reorder` | organizer | `reorderMissionsSchema` | `{ ok }` |
+
+The response envelope is `{ missions, organizer }`. A participant **always**
+receives the `PlayMission[]` projection — `?as=play` only affects an organizer
+who has also joined as a player, letting them see what their participants see.
 
 **`PlayMission`** is the participant-safe projection. It NEVER includes
 `text.acceptedResponses` or `gps.lat/lng`, and locked missions are omitted
@@ -64,6 +68,11 @@ type PlayMission = {
 |---|---|---|---|---|
 | GET | `/api/join/[code]` | signed in | — | `{ chase: PublicChase, teams: PublicTeam[] }` |
 | POST | `/api/chases/[chaseId]/join` | signed in | `joinChaseSchema` | `{ participant, team }` |
+
+Joining solo means sending `newTeam: { name, mode: "solo" }` (or omitting
+`newTeam` entirely). The handler decides team-vs-solo from the **mode**, not
+from whether `newTeam` was sent, so a solo join is never blocked by
+`allowSelfCreatedTeams` or by a `solo_only` chase.
 | POST | `/api/chases/[chaseId]/leave` | participant | — | `{ ok }` |
 | POST | `/api/chases/[chaseId]/teams` | organizer | `createTeamSchema` | `{ team }` |
 | PATCH | `/api/chases/[chaseId]/teams/[teamId]` | organizer | `updateTeamSchema` | `{ team }` |

@@ -76,7 +76,11 @@ export async function POST(request: Request, { params }: Params) {
         throw forbidden("The organizer assigns teams in this chase.");
       }
 
-      const wantsTeam = Boolean(input.newTeam);
+      // Judge by the requested MODE, not by whether newTeam was sent: the
+      // player app sends `newTeam: { mode: "solo" }` for a solo join, and that
+      // is a one-seater profile, not a team someone else could join.
+      const wantsTeam = input.newTeam ? input.newTeam.mode !== "solo" : false;
+
       if (wantsTeam && !chase.allowSelfCreatedTeams) {
         throw forbidden("Only the organizer can create teams here.");
       }
@@ -90,11 +94,14 @@ export async function POST(request: Request, { params }: Params) {
       creating = wantsTeam
         ? {
             name: input.newTeam!.name?.trim() || input.displayName,
-            // A "solo" team created from the join form is still a one-seater.
-            mode: input.newTeam!.mode === "solo" ? "solo" : "team",
+            mode: "team",
             passcode: input.newTeam!.passcode?.trim() || null,
           }
-        : { name: input.displayName, mode: "solo", passcode: null };
+        : {
+            name: input.newTeam?.name?.trim() || input.displayName,
+            mode: "solo",
+            passcode: null,
+          };
 
       teamRefDoc = teamsRef(chaseId).doc();
     }

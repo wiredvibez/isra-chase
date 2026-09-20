@@ -59,10 +59,13 @@ export function ParticipantsTab() {
   const [moveTarget, setMoveTarget] = React.useState("");
   const [busy, setBusy] = React.useState(false);
 
-  React.useEffect(() => {
+  // Re-seed when the console switches chase, adjusted during render rather than
+  // in an effect — an effect would cost an extra pass showing the old settings.
+  const [seededFor, setSeededFor] = React.useState(chaseId);
+  if (seededFor !== chaseId) {
+    setSeededFor(chaseId);
     setForm(fromChase(chase));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chaseId]);
+  }
 
   function set<K extends keyof SettingsForm>(key: K, value: SettingsForm[K]) {
     setForm((f) => ({ ...f, [key]: value }));

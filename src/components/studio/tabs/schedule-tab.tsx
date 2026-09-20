@@ -43,10 +43,18 @@ export function ScheduleTab() {
   const [busy, setBusy] = React.useState<ScheduleAction | null>(null);
   const [confirm, setConfirm] = React.useState<"end" | "reset" | null>(null);
 
+  // "Starts now" anchors the end time on the clock, which renders must not read
+  // directly. Ticking it keeps the preview — and the end time we submit — current.
+  const [nowMs, setNowMs] = React.useState(() => Date.now());
+  React.useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const liveMissions = missions.filter((m) => !m.isDraft);
 
   const anchorMs =
-    stampMs(chase.startAt) ?? (startMode === "scheduled" ? startAtMs : Date.now());
+    stampMs(chase.startAt) ?? (startMode === "scheduled" ? startAtMs : nowMs);
 
   const resolvedEndMs =
     endMode === "duration"

@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import type { Chase } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
+/** The origin never changes within a page, so there is nothing to subscribe to. */
+const subscribeToNothing = () => () => {};
+
 function useCopy() {
   const [copied, setCopied] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -38,10 +41,15 @@ export function InvitePanel({
   className?: string;
 }) {
   const { copied, copy } = useCopy();
-  const [origin, setOrigin] = React.useState("");
   const qrRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => setOrigin(window.location.origin), []);
+  // The origin is a browser-only value, so it is read as an external store:
+  // the server snapshot is blank and hydration fills it in without a mismatch.
+  const origin = React.useSyncExternalStore(
+    subscribeToNothing,
+    () => window.location.origin,
+    () => "",
+  );
   const link = `${origin}/join/${chase.joinCode}`;
 
   function downloadQr() {

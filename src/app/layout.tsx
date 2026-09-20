@@ -17,6 +17,14 @@ const display = Baloo_2({
 });
 
 export const metadata: Metadata = {
+  // Without this, next/og and any relative OG asset resolve against an unknown
+  // host and Next warns on every production build.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "http://localhost:3000"),
+  ),
   title: {
     default: "Isra Chase — scavenger hunts that actually get people moving",
     template: "%s · Isra Chase",

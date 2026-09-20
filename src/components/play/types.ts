@@ -70,6 +70,8 @@ export interface PublicTeam {
   mode: "team" | "solo";
   memberCount: number;
   maxMembers: number | null;
+  /** The server's own capacity verdict, which accounts for the chase default. */
+  full?: boolean;
   /** `requiresPasscode` per the contract, `hasPasscode` on the document. */
   requiresPasscode?: boolean;
   hasPasscode?: boolean;

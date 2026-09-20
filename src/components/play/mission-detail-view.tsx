@@ -27,6 +27,18 @@ import { GpsComposer } from "./gps-composer";
 import { SubmissionSuccess } from "./submission-success";
 import type { CreateSubmissionResponse } from "./types";
 
+/** Shown when the team's last attempt at this mission was graded wrong. */
+function PriorMiss() {
+  return (
+    <div className="rounded-lg border border-warning/30 bg-warning-surface p-4">
+      <p className="font-display text-base font-bold">Your last try missed</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Nothing was lost — submit again whenever you&rsquo;re ready.
+      </p>
+    </div>
+  );
+}
+
 const TEXT_BADGE_LABEL = {
   open: "Open answer",
   exact: "Exact match",
@@ -107,6 +119,10 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
 
   const expired = mission.availability.state === "expired";
   const rejected = result?.submission.status === "rejected";
+  // A wrong auto-graded answer from an earlier session: the server keeps the
+  // rejected submission but leaves the mission open, so say so plainly.
+  const previouslyMissed =
+    result === null && mission.submission?.status === "rejected";
   const succeeded = result !== null && !rejected;
   const chaseClosed = chase !== null && chase.status !== "live";
 
@@ -236,6 +252,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
           </div>
         ) : !uid ? null : mission.type === "camera" ? (
           <>
+            {previouslyMissed && <PriorMiss />}
             {rejected && (
               <div role="status" aria-live="polite" className="rounded-lg border border-warning/30 bg-warning-surface p-4">
                 <p className="font-display text-base font-bold">Not accepted</p>
@@ -253,21 +270,27 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
             />
           </>
         ) : mission.type === "text" ? (
-          <TextComposer
-            chaseId={chaseId}
-            mission={mission}
-            rejection={rejected ? result : null}
-            onResult={(next) => void handleResult(next)}
-            onRetry={() => setResult(null)}
-          />
+          <>
+            {previouslyMissed && <PriorMiss />}
+            <TextComposer
+              chaseId={chaseId}
+              mission={mission}
+              rejection={rejected ? result : null}
+              onResult={(next) => void handleResult(next)}
+              onRetry={() => setResult(null)}
+            />
+          </>
         ) : (
-          <GpsComposer
-            chaseId={chaseId}
-            mission={mission}
-            rejection={rejected ? result : null}
-            onResult={(next) => void handleResult(next)}
-            onRetry={() => setResult(null)}
-          />
+          <>
+            {previouslyMissed && <PriorMiss />}
+            <GpsComposer
+              chaseId={chaseId}
+              mission={mission}
+              rejection={rejected ? result : null}
+              onResult={(next) => void handleResult(next)}
+              onRetry={() => setResult(null)}
+            />
+          </>
         )}
       </main>
 

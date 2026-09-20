@@ -114,17 +114,22 @@ export function MissionEditor({
 
   // A brand-new mission has no id yet, so its attachment needs a scratch
   // folder that still matches the Storage rules' chases/{id}/missions/{x} shape.
-  const uploadId = React.useMemo(
-    () => mission?.id ?? `draft-${Math.random().toString(36).slice(2, 10)}`,
-    [mission?.id],
-  );
+  // useId is stable and SSR-safe; its separators are stripped for the path.
+  const draftId = React.useId().replace(/[^a-zA-Z0-9]/g, "");
+  const uploadId = mission?.id ?? `draft-${draftId}`;
 
-  React.useEffect(() => {
-    if (!open) return;
-    setForm(mission ? toForm(mission) : blankForm());
-    setPane("basics");
-    setError(null);
-  }, [open, mission]);
+  // Re-seed as the dialog opens, or as it is pointed at another mission.
+  // Adjusted during render rather than in an effect so the form never paints
+  // once with the previously edited mission's values.
+  const [seeded, setSeeded] = React.useState({ open, mission });
+  if (seeded.open !== open || seeded.mission !== mission) {
+    setSeeded({ open, mission });
+    if (open) {
+      setForm(mission ? toForm(mission) : blankForm());
+      setPane("basics");
+      setError(null);
+    }
+  }
 
   function set<K extends keyof MissionForm>(key: K, value: MissionForm[K]) {
     setForm((f) => ({ ...f, [key]: value }));

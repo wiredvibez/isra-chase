@@ -138,14 +138,9 @@ export const missionInputSchema = z
     if (value.type === "gps" && !value.gps) {
       ctx.addIssue({ code: "custom", path: ["gps"], message: "Pick a location for this mission." });
     }
-    // Goosechase cannot gate an unlock on a camera mission being "correct".
-    if (value.release.kind === "mission" && value.release.requireCorrect && value.type === "camera") {
-      ctx.addIssue({
-        code: "custom",
-        path: ["release"],
-        message: "Camera missions have no correct answer to wait for.",
-      });
-    }
+    // Whether an unlock may require a *correct* answer depends on the TRIGGER
+    // mission's type, not this one's, so it cannot be checked here — the route
+    // handler loads the trigger and validates it (see assertTriggerCanGrade).
   });
 
 export const reorderMissionsSchema = z.object({

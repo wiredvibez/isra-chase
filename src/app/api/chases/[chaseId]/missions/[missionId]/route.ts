@@ -3,7 +3,11 @@ import { missionInputSchema } from "@/lib/domain/schemas";
 import { requireOrganizer } from "@/lib/server/guards";
 import { handler, notFound, readJson } from "@/lib/server/http";
 import { missionsRef, submissionsRef } from "@/lib/server/collections";
-import { expiryFromInput, releaseFromInput } from "@/lib/server/missions";
+import {
+  assertTriggerCanGrade,
+  expiryFromInput,
+  releaseFromInput,
+} from "@/lib/server/missions";
 import { purgeSubmissions } from "@/lib/server/purge";
 import { chaseRef } from "@/lib/server/scoring";
 
@@ -16,6 +20,7 @@ export async function PATCH(request: Request, { params }: Params) {
     const { chaseId, missionId } = await params;
     await requireOrganizer(chaseId, request);
     const input = missionInputSchema.partial().parse(await readJson(request));
+    if (input.release) await assertTriggerCanGrade(chaseId, input.release);
 
     const ref = missionsRef(chaseId).doc(missionId);
     const existing = await ref.get();

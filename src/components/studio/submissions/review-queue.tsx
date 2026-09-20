@@ -10,6 +10,10 @@ import type { Submission } from "@/lib/domain/types";
 import { points as formatPoints, timeAgo } from "@/lib/format";
 import { SubmissionMedia } from "./submission-card";
 
+/** Moves the cursor, clamped to a queue that may have shrunk underneath it. */
+const step = (index: number, delta: number, last: number) =>
+  Math.min(Math.max(Math.min(index, last) + delta, 0), last);
+
 /**
  * Our moderation addition: a keyboard-driven approve/reject queue.
  * A approves, R rejects, arrow keys move — so a backlog can be cleared
@@ -26,11 +30,11 @@ export function ReviewQueue({
 }) {
   const [index, setIndex] = React.useState(0);
   const [busy, setBusy] = React.useState(false);
-  const current = submissions[Math.min(index, submissions.length - 1)];
-
-  React.useEffect(() => {
-    if (index > submissions.length - 1) setIndex(Math.max(0, submissions.length - 1));
-  }, [submissions.length, index]);
+  // The queue shrinks under us as items are reviewed, so the cursor is clamped
+  // where it is read rather than corrected afterwards by an effect.
+  const last = Math.max(0, submissions.length - 1);
+  const safeIndex = Math.min(index, last);
+  const current = submissions[safeIndex];
 
   const act = React.useCallback(
     async (verdict: "approve" | "reject") => {
@@ -70,17 +74,17 @@ export function ReviewQueue({
           break;
         case "arrowright":
           event.preventDefault();
-          setIndex((i) => Math.min(i + 1, submissions.length - 1));
+          setIndex((i) => step(i, 1, last));
           break;
         case "arrowleft":
           event.preventDefault();
-          setIndex((i) => Math.max(i - 1, 0));
+          setIndex((i) => step(i, -1, last));
           break;
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [act, submissions.length]);
+  }, [act, last]);
 
   if (!submissions.length) {
     return (
@@ -100,7 +104,7 @@ export function ReviewQueue({
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone="warning">Pending review</Badge>
           <p aria-live="polite" className="text-sm font-semibold">
-            {index + 1} of {submissions.length}
+            {safeIndex + 1} of {submissions.length}
           </p>
           <p className="ml-auto hidden text-xs text-muted-foreground sm:block">
             <kbd className="rounded border border-border px-1">A</kbd> approve ·{" "}
@@ -155,8 +159,8 @@ export function ReviewQueue({
               variant="outline"
               size="icon"
               aria-label="Previous submission"
-              disabled={index === 0}
-              onClick={() => setIndex((i) => Math.max(0, i - 1))}
+              disabled={safeIndex === 0}
+              onClick={() => setIndex((i) => step(i, -1, last))}
             >
               <ChevronLeft className="size-4" aria-hidden />
             </Button>
@@ -164,10 +168,8 @@ export function ReviewQueue({
               variant="outline"
               size="icon"
               aria-label="Next submission"
-              disabled={index >= submissions.length - 1}
-              onClick={() =>
-                setIndex((i) => Math.min(submissions.length - 1, i + 1))
-              }
+              disabled={safeIndex >= last}
+              onClick={() => setIndex((i) => step(i, 1, last))}
             >
               <ChevronRight className="size-4" aria-hidden />
             </Button>

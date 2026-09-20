@@ -22,10 +22,17 @@ const EMPTY = "[]";
 
 function subscribe(onChange: () => void) {
   listeners.add(onChange);
-  window.addEventListener("storage", onChange);
+  // Another tab wrote to storage: our cached snapshot is stale, so drop it
+  // before React asks for a new one.
+  const onStorage = (event: StorageEvent) => {
+    if (event.key) cache.delete(event.key);
+    else cache.clear();
+    onChange();
+  };
+  window.addEventListener("storage", onStorage);
   return () => {
     listeners.delete(onChange);
-    window.removeEventListener("storage", onChange);
+    window.removeEventListener("storage", onStorage);
   };
 }
 

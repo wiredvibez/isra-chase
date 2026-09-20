@@ -31,10 +31,13 @@ export function BrandingTab() {
   const [error, setError] = React.useState<string | null>(null);
   const save = useSaveState();
 
-  React.useEffect(() => {
+  // Re-seed when the console switches chase, the documented "adjust state
+  // during render" way — an effect here would cost an extra render pass.
+  const [seededFor, setSeededFor] = React.useState(chaseId);
+  if (seededFor !== chaseId) {
+    setSeededFor(chaseId);
     setForm(fromChase(chase));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chaseId]);
+  }
 
   function set<K extends keyof BrandingForm>(key: K, value: BrandingForm[K]) {
     setForm((f) => ({ ...f, [key]: value }));

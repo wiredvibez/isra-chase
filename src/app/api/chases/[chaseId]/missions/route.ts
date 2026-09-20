@@ -4,7 +4,11 @@ import type { Mission, Submission, Team } from "@/lib/domain/types";
 import { requireMember, requireOrganizer } from "@/lib/server/guards";
 import { handler, notFound, readJson } from "@/lib/server/http";
 import { missionsRef, submissionsRef, teamsRef } from "@/lib/server/collections";
-import { expiryFromInput, releaseFromInput } from "@/lib/server/missions";
+import {
+  assertTriggerCanGrade,
+  expiryFromInput,
+  releaseFromInput,
+} from "@/lib/server/missions";
 import { playMissions } from "@/lib/server/projections";
 import { chaseRef } from "@/lib/server/scoring";
 
@@ -54,6 +58,7 @@ export async function POST(request: Request, { params }: Params) {
     const { chaseId } = await params;
     await requireOrganizer(chaseId, request);
     const input = missionInputSchema.parse(await readJson(request));
+    await assertTriggerCanGrade(chaseId, input.release);
 
     // Append to the end of the custom order.
     const last = await missionsRef(chaseId).orderBy("order", "desc").limit(1).get();
