@@ -33,6 +33,14 @@ export interface AuthState {
 
 const AuthContext = React.createContext<AuthState | null>(null);
 
+async function postSession(idToken: string) {
+  return fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+}
+
 /** Mirror the Firebase ID token into an httpOnly cookie for server routes. */
 async function syncSession(user: User | null) {
   try {
@@ -40,15 +48,27 @@ async function syncSession(user: User | null) {
       await fetch("/api/auth/session", { method: "DELETE" });
       return;
     }
-    const idToken = await user.getIdToken();
-    await fetch("/api/auth/session", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ idToken }),
-    });
+
+    let response = await postSession(await user.getIdToken());
+
+    // A 401 here means the server would not mint a cookie from the cached
+    // token — usually because the session expired, so the refresh path no
+    // longer applies. One forced token refresh is worth trying before we
+    // give up and leave server-rendered pages unauthenticated.
+    if (response.status === 401) {
+      response = await postSession(await user.getIdToken(true));
+    }
+
+    if (!response.ok && process.env.NODE_ENV !== "production") {
+      const body = await response.json().catch(() => null);
+      console.warn(
+        `[auth] session sync failed (${response.status})`,
+        body?.code ?? body?.error ?? "",
+      );
+    }
   } catch {
-    // A failed sync only costs us server-side rendering of private data;
-    // the client SDK remains authenticated either way.
+    // Beyond that, a failed sync only costs server-side rendering of private
+    // data; the client SDK remains authenticated either way.
   }
 }
 

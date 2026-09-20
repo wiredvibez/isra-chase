@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { adminAuth, isAdminConfigured } from "@/lib/firebase/admin";
 import { SESSION_COOKIE, SESSION_MAX_AGE_MS } from "@/lib/auth/session";
+import { canMintSession } from "@/lib/auth/session-policy";
 
 export const runtime = "nodejs";
 
@@ -14,15 +16,32 @@ export async function POST(request: Request) {
   }
   const { idToken } = await request.json().catch(() => ({ idToken: null }));
   if (typeof idToken !== "string" || !idToken) {
-    return NextResponse.json({ error: "Missing idToken." }, { status: 400 });
+    return NextResponse.json({ error: "חסר idToken." }, { status: 400 });
   }
 
   try {
-    // Reject stale tokens: the client must have authenticated in the last 5 min.
     const decoded = await adminAuth().verifyIdToken(idToken, true);
-    if (Date.now() / 1000 - decoded.auth_time > 5 * 60) {
+
+    // A token refresh carries the ORIGINAL auth_time, so recency alone cannot
+    // decide this — see lib/auth/session-policy.ts.
+    const existing = (await cookies()).get(SESSION_COOKIE)?.value;
+    let existingSessionUid: string | null = null;
+    if (existing) {
+      try {
+        existingSessionUid = (await adminAuth().verifySessionCookie(existing, true)).uid;
+      } catch {
+        existingSessionUid = null;
+      }
+    }
+
+    const decision = canMintSession({
+      authTimeSec: decoded.auth_time,
+      uid: decoded.uid,
+      existingSessionUid,
+    });
+    if (!decision.allow) {
       return NextResponse.json(
-        { error: "Recent sign-in required." },
+        { error: "צריך להתחבר מחדש.", code: decision.reason },
         { status: 401 },
       );
     }
@@ -41,7 +60,7 @@ export async function POST(request: Request) {
     });
     return response;
   } catch {
-    return NextResponse.json({ error: "Invalid ID token." }, { status: 401 });
+    return NextResponse.json({ error: "טוקן לא תקין." }, { status: 401 });
   }
 }
 
