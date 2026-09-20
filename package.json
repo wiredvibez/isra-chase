@@ -16,7 +16,8 @@
     "deploy:rules": "tsx scripts/deploy-rules.ts",
     "deploy:indexes": "tsx scripts/deploy-indexes.ts",
     "check:storage": "tsx scripts/check-storage.ts",
-    "test:rules": "vitest run --config vitest.rules.config.mts"
+    "test:rules": "vitest run --config vitest.rules.config.mts",
+    "index:links": "tsx scripts/index-links.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

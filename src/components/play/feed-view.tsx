@@ -167,9 +167,11 @@ export function FeedView() {
     [chaseId],
   );
 
-  const { data: submissions, loading } = useLiveQuery<Submission>(feedQuery, [
-    chaseId,
-  ]);
+  const {
+    data: submissions,
+    loading,
+    error,
+  } = useLiveQuery<Submission>(feedQuery, [chaseId]);
 
   const { liked, set: setLiked } = useLikedCache(uid, chaseId);
   // Optimistic deltas keyed by submission id, folded over the live count.
@@ -209,6 +211,18 @@ export function FeedView() {
           <Skeleton key={i} className="h-80 w-full" />
         ))}
       </div>
+    );
+  }
+
+  // A failed subscription used to fall through to the empty state, so a broken
+  // feed was indistinguishable from a quiet one. Say which it is.
+  if (error) {
+    return (
+      <EmptyState
+        icon={<Rss className="size-5" />}
+        title="הפיד לא נטען"
+        description="משהו השתבש בדרך. תרעננו את הדף — ואם זה חוזר, תגידו למארגן."
+      />
     );
   }
 

@@ -38,7 +38,24 @@ so do this in the console:
 3. Once the app is deployed, add the Vercel domain under
    Authentication → Settings → **Authorized domains**.
 
-### 3. Grant the service account index permissions  → unblocks composite indexes
+### 3. Create the composite indexes  → unblocks the feed, leaderboard and notifications
+
+**This is the last functional gap.** Without these indexes the activity feed,
+the leaderboard, a team's own submission history and the notifications list
+all come back empty, because the query fails rather than returning nothing.
+
+Fastest route — one command, then one deploy:
+
+```
+firebase login
+firebase deploy --only firestore:indexes,storage --project isra-chase
+```
+
+If you would rather not log in, `npm run index:links` prints a one-click
+Firebase console link for every index that is still missing, with a plain
+description of what each one is for.
+
+### 3b. Or grant the service account index permissions
 
 `npm run deploy:indexes` currently fails with *The caller does not have
 permission*. The `firebase-adminsdk` service account can read and write data

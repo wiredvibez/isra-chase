@@ -103,7 +103,11 @@ export function Dialog({
           </button>
         )}
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
+      {/* A confirm dialog often has nothing but a title and a description, and
+          an always-rendered body left an empty bordered strip between them. */}
+      {children ? (
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
+      ) : null}
       {footer && (
         <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-border p-5">
           {footer}
