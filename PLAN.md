@@ -206,3 +206,61 @@ an ended chase to draft while preserving participants, submissions and points.
 5. Marketing landing.
 6. Seed script, unit tests for grading/scoring, Playwright E2E.
 7. Push to GitHub, deploy to Vercel.
+
+---
+
+## 12. Research corrections and known limitations
+
+A late research pass over ~90 help-centre articles corrected several of the
+assumptions above. Recorded here so the behaviour is deliberate, not accidental.
+
+### Corrections already reflected in the build
+
+- **"Hidden in feed" hides submissions from *opposing* teams only** — a
+  player's own teammates still see them. Our Firestore rules already encode
+  this: the `teamId == myTeamId` branch is checked before the feed-visibility
+  branch, so your own team's submissions are always readable.
+- **Random mission order is per-team, stable.** `orderMissions` seeds the
+  shuffle with the team id, so a team sees one consistent order and different
+  teams see different ones.
+- **Unlockable missions are fully invisible**, with a re-lock state machine:
+  deleting the unlocking submission hides the dependent mission again *unless*
+  it has already been completed. `missionAvailability` implements exactly this,
+  and it is covered by tests.
+- **Hidden leaderboard shows a participant only their own total** — not other
+  teams, not rankings, not even their own rank.
+- **Text answers**: approximate matching accepts multi-word answers in any
+  order and tolerates one added/missing/replaced letter, but numbers must
+  match exactly and are never fuzzy-matched.
+- **One submission per mission per team**, enforced server-side.
+- **Video is capped at 30 seconds**; geolocation uses `enableHighAccuracy`
+  with a 15-second timeout.
+- **Bonus points are public** — everyone sees them in the feed, not just the
+  recipient — and remain assignable after a chase ends.
+
+### Deliberate decisions where Goosechase's own docs disagree
+
+- **Tie-breaking.** One help article says ties break by who reached the score
+  first with Olympic place-skipping (1st, 2nd, 2nd, 2nd, 5th); another says
+  alphabetically. We implement **earliest-to-the-total with Olympic
+  numbering**, because it rewards play rather than team naming. This is
+  asserted in `leaderboard.test.ts`.
+
+### Known limitations
+
+- **The activity feed is not unlock-gated.** Goosechase hides feed items for
+  missions a team has not yet unlocked. Our feed is a direct Firestore
+  subscription, and security rules cannot evaluate per-team unlock state
+  without a prohibitive per-document read. A determined user issuing raw
+  Firestore queries could therefore see that a locked mission exists and view
+  another team's submission to it — a spoiler leak, not a data-integrity or
+  answer-key leak, and the mission's own document (with the answer key and GPS
+  target) remains unreadable. The fix is to serve the feed from an API route
+  that filters by availability, at the cost of live updates; it is worth doing
+  before this is used for a chase that leans heavily on secret combo missions.
+- **A third feed-visibility mode exists in Goosechase's shipped enum**
+  (`VISIBLE_ON_EXPERIENCE_END`) that their help centre never documents. We
+  ship `shown` and `hidden` only; adding the third is a small additive change
+  to `Mission.feedVisibility`.
+- **No offline submission queue.** Goosechase has none either, but it is the
+  most obvious thing to add for real-world field use with patchy signal.
