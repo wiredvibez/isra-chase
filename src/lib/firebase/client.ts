@@ -5,11 +5,6 @@ import {
   connectFirestoreEmulator,
   type Firestore,
 } from "firebase/firestore";
-import {
-  getStorage,
-  connectStorageEmulator,
-  type FirebaseStorage,
-} from "firebase/storage";
 
 const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,7 +20,6 @@ const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true";
 let app: FirebaseApp;
 let authInstance: Auth;
 let dbInstance: Firestore;
-let storageInstance: FirebaseStorage;
 
 function ensureApp(): FirebaseApp {
   if (getApps().length) return getApp();
@@ -39,20 +33,12 @@ function init() {
   app = ensureApp();
   authInstance = getAuth(app);
   dbInstance = getFirestore(app);
-  storageInstance = getStorage(app);
-
-  // The SDK retries a failing upload for ten minutes by default, reporting no
-  // progress and no error the whole time — which looks exactly like a stuck
-  // 0%. Players on a phone deserve to be told quickly that it failed.
-  storageInstance.maxUploadRetryTime = 20_000;
-  storageInstance.maxOperationRetryTime = 20_000;
 
   if (useEmulator) {
     connectAuthEmulator(authInstance, "http://127.0.0.1:9099", {
       disableWarnings: true,
     });
     connectFirestoreEmulator(dbInstance, "127.0.0.1", 8080);
-    connectStorageEmulator(storageInstance, "127.0.0.1", 9199);
   }
 }
 
@@ -64,11 +50,6 @@ export function getFirebaseAuth(): Auth {
 export function getDb(): Firestore {
   init();
   return dbInstance;
-}
-
-export function getFirebaseStorage(): FirebaseStorage {
-  init();
-  return storageInstance;
 }
 
 export function isFirebaseConfigured(): boolean {

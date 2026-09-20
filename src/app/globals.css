@@ -188,9 +188,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Keep the app from bouncing horizontally on phones. */
+/* Keep the app from bouncing horizontally on phones.
+   `clip` rather than `hidden`: `hidden` makes <html> a scroll container, and
+   in an RTL document a wide descendant leaves it parked at a negative
+   scrollLeft, which shifts the whole page and cuts off the right edge. `clip`
+   creates no scroll container, so there is no offset to get stuck at. */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 :focus-visible {
@@ -202,6 +206,14 @@ html {
    an RTL document. Icons that are symmetric or bidirectional are left alone. */
 [dir="rtl"] .flip-rtl {
   transform: scaleX(-1);
+}
+
+/* The UA stylesheet gives every popover a border and padding of its own.
+   Ours bring their own, so strip the defaults rather than fight them. */
+[popover] {
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 /* Utility: hide scrollbars on horizontal chip rails */

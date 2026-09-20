@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-  type UploadTaskSnapshot,
-} from "firebase/storage";
 import imageCompression from "browser-image-compression";
-import { getFirebaseStorage } from "@/lib/firebase/client";
+import { api } from "@/lib/api-client";
 
 export const MAX_IMAGE_BYTES = 12 * 1024 * 1024; // 12 MB before compression
 export const MAX_VIDEO_BYTES = 200 * 1024 * 1024; // 200 MB
@@ -109,30 +103,19 @@ export function validateMedia(file: File, allowed: MediaKind[]) {
   return null;
 }
 
-/** Turn a Storage error code into something a 13-year-old can act on. */
-export function uploadErrorMessage(error: unknown): string {
-  const code = (error as { code?: string })?.code ?? "";
-  switch (code) {
-    case "storage/unauthorized":
-      return "אין לכם הרשאה להעלות לכאן. נסו להצטרף מחדש למרדף.";
-    case "storage/canceled":
-      return "ההעלאה בוטלה.";
-    case "storage/quota-exceeded":
-      return "נגמר המקום למרדף הזה. תגידו למארגן.";
-    case "storage/unauthenticated":
-      return "התנתקתם. תתחברו ותנסו שוב.";
-    case "storage/retry-limit-exceeded":
-    case "storage/unknown":
-      return "לא הצלחנו להגיע לשרת התמונות. תבדקו חיבור ותנסו שוב.";
-    default:
-      return (error as Error)?.message || "ההעלאה נכשלה. תנסו שוב.";
-  }
-}
-
 /** No byte moved in this long ⇒ treat the upload as dead rather than pending. */
 const STALL_TIMEOUT_MS = 25_000;
 
-/** Upload with progress. `path` must match the Storage security rules. */
+/**
+ * Uploads straight to Cloud Storage with a short-lived signed URL.
+ *
+ * The browser PUTs to the bucket rather than to us, which keeps a 200 MB video
+ * off the serverless function entirely. `/api/uploads/sign` is where the
+ * upload is authorized — it checks that this caller may write to this path.
+ *
+ * XMLHttpRequest rather than fetch, because fetch still cannot report upload
+ * progress and a player watching a photo upload needs to see it move.
+ */
 export async function uploadMedia(
   file: File,
   path: string,
@@ -149,52 +132,70 @@ export async function uploadMedia(
         ? await videoMeta(prepared)
         : {};
 
-  const storageRef = ref(getFirebaseStorage(), path);
-  const task = uploadBytesResumable(storageRef, prepared, {
-    contentType: prepared.type,
-    cacheControl: "public,max-age=31536000,immutable",
+  const contentType = prepared.type || "application/octet-stream";
+  const signed = await api<{
+    uploadUrl: string;
+    publicUrl: string;
+    path: string;
+    requiredHeaders: Record<string, string>;
+  }>("/api/uploads/sign", {
+    method: "POST",
+    json: { path, contentType, bytes: prepared.size },
   });
 
   await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
     let stallTimer: ReturnType<typeof setTimeout>;
-    const settle = (fn: () => void) => {
-      clearTimeout(stallTimer);
-      fn();
-    };
+
     const armStallTimer = () => {
       clearTimeout(stallTimer);
       stallTimer = setTimeout(() => {
-        task.cancel();
-        reject(
-          new Error(
-            "ההעלאה נתקעה. תבדקו חיבור ותנסו שוב.",
-          ),
-        );
+        xhr.abort();
+        reject(new Error("ההעלאה נתקעה. תבדקו חיבור ותנסו שוב."));
       }, STALL_TIMEOUT_MS);
     };
 
+    xhr.open("PUT", signed.uploadUrl, true);
+    for (const [header, value] of Object.entries(signed.requiredHeaders)) {
+      xhr.setRequestHeader(header, value);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      armStallTimer();
+      if (event.lengthComputable) {
+        onProgress?.(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      clearTimeout(stallTimer);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(100);
+        resolve();
+        return;
+      }
+      reject(
+        new Error(
+          xhr.status === 403
+            ? "ההרשאה להעלאה פגה. תנסו שוב."
+            : "ההעלאה נכשלה. תנסו שוב.",
+        ),
+      );
+    };
+    xhr.onerror = () => {
+      clearTimeout(stallTimer);
+      reject(new Error("לא הצלחנו להגיע לשרת התמונות. תבדקו חיבור ותנסו שוב."));
+    };
+    xhr.onabort = () => clearTimeout(stallTimer);
+
     armStallTimer();
-    task.on(
-      "state_changed",
-      (snap: UploadTaskSnapshot) => {
-        armStallTimer();
-        onProgress?.(
-          snap.totalBytes
-            ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
-            : 0,
-        );
-      },
-      (error) => settle(() => reject(new Error(uploadErrorMessage(error)))),
-      () => settle(resolve),
-    );
+    xhr.send(prepared);
   });
 
-  const url = await getDownloadURL(task.snapshot.ref);
   return {
-    url,
-    path,
+    url: signed.publicUrl,
+    path: signed.path,
     kind,
-    contentType: prepared.type,
+    contentType,
     bytes: prepared.size,
     ...meta,
   };

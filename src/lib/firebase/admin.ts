@@ -26,7 +26,7 @@ function credentials() {
   });
 }
 
-function adminApp(): App {
+export function adminApp(): App {
   const existing = getApps().find((a) => a.name === ADMIN_APP);
   if (existing) return existing;
   return initializeApp(

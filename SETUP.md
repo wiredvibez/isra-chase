@@ -13,16 +13,30 @@ The Firebase project `isra-chase` is live and reachable with the Admin SDK:
 These three steps need console access or an interactive login, and each one
 is called out below with exactly what it unblocks.
 
-### 1. Upgrade the Firebase project to Blaze  → unblocks photo/video uploads
+### 1. Media uploads — done, and deliberately not Firebase Storage
 
-Storage cannot be provisioned on the Spark plan. Attempting it returns
-`The billing account for the owning project is disabled in state absent`.
+Uploads go to a plain Cloud Storage bucket (`isra-chase-media`), not Firebase
+Storage. Firebase Storage needs the **Cloud Storage for Firebase API** enabled,
+which is a console action the `firebase-adminsdk` service account has no
+permission to perform — so provisioning it could not be automated, and the
+bucket name `isra-chase.firebasestorage.app` is Google-reserved and cannot be
+created through the storage API either.
 
-1. Open <https://console.firebase.google.com/project/isra-chase/usage/details>
-2. Upgrade to **Blaze (pay as you go)**. Normal usage for this app sits inside
-   the free allowance; a card just has to be on file.
-3. Then Build → **Storage** → **Get started** (accept the default rules; ours
-   overwrite them in step 4).
+A plain bucket needs none of that. `npm run setup:bucket` creates it, sets its
+CORS policy and leaves uniform bucket-level access off so per-object ACLs work.
+The flow:
+
+1. The browser asks `POST /api/uploads/sign` for permission to write one path.
+2. That route checks the caller may write there — for a submission, that they
+   have actually *joined the chase*, which a Storage rule could not check
+   without a Firestore read.
+3. It returns a ten-minute V4 signed PUT url carrying `x-goog-acl: public-read`.
+4. The browser PUTs straight to Cloud Storage, so a 200 MB video never passes
+   through a serverless function, and the object is readable the moment it
+   lands.
+
+Object paths carry a random segment, so they are not enumerable — the same
+bargain Firebase Storage's tokenised download URLs make.
 
 ### 2. Enable the auth providers  → unblocks sign-in
 

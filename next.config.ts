@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
    */
   serverExternalPackages: ["firebase-admin"],
 
+  /**
+   * Without this, opening the dev server on 127.0.0.1 rather than localhost
+   * makes Next treat /_next/hmr as a cross-origin request. The Turbopack
+   * client never connects and the page renders but never hydrates — it looks
+   * like the app is simply broken, with nothing in the console to say why.
+   */
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+
   images: {
     remotePatterns: [
       // Submission media and artwork served from Firebase Storage.

@@ -115,9 +115,14 @@ export function LeaderboardTab() {
         />
       )}
 
+      {/* The scroller is an inner div rather than the Card itself: as the Card
+          it let a 46rem table widen the whole page on a phone instead of
+          scrolling inside its own box. overflow-hidden keeps the table within
+          the Card's rounded corners. */}
       {ranked.length > 0 && (
-        <Card className="overflow-x-auto">
-          <table className="w-full min-w-[46rem] text-sm">
+        <Card className="overflow-hidden [contain:paint]">
+          <div className="w-full max-w-full overflow-x-auto">
+            <table className="w-full min-w-[46rem] text-sm">
             <caption className="sr-only">
               טבלת המובילים, מדורגת לפי סך הנקודות
             </caption>
@@ -212,6 +217,7 @@ export function LeaderboardTab() {
               ))}
             </tbody>
           </table>
+          </div>
         </Card>
       )}
 
