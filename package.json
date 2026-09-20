@@ -12,7 +12,11 @@
     "e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "emulators": "firebase emulators:start --only auth,firestore,storage",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "deploy:rules": "tsx scripts/deploy-rules.ts",
+    "deploy:indexes": "tsx scripts/deploy-indexes.ts",
+    "check:storage": "tsx scripts/check-storage.ts",
+    "test:rules": "vitest run --config vitest.rules.config.mts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -32,9 +36,11 @@
     "react-leaflet": "^5.0.0",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/leaflet": "^1.9.22",
