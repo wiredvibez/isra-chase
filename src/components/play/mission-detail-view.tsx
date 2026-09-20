@@ -197,7 +197,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
             <p className="font-display text-lg font-bold">
               {mission.submission?.status === "pending"
                 ? "Waiting on the organizer"
-                : "You've done this one"}
+                : "You&rsquo;ve done this one"}
             </p>
             <p className="text-sm text-muted-foreground">
               {mission.submission?.status === "pending"
@@ -220,7 +220,7 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
               This mission has expired
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              The window for it has closed, so it can't be submitted any more.
+              The window for it has closed, so it can&rsquo;t be submitted any more.
             </p>
           </div>
         ) : chaseClosed ? (

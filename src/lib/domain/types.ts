@@ -59,7 +59,14 @@ export interface Chase {
   imageUrl: string | null;
   location: ChaseLocation | null;
 
-  password: string | null;
+  /**
+   * The join password is NOT stored here — any signed-in user can read a chase
+   * document, so it lives in `chases/{id}/private/settings`, which the rules
+   * restrict to organizers. This flag is the safe, public projection.
+   */
+  hasPassword: boolean;
+  /** Populated only on organizer-facing API responses, never in a snapshot. */
+  password?: string | null;
   searchVisibility: "hidden" | "public";
 
   splashImageUrl: string | null;
@@ -178,7 +185,10 @@ export interface Team {
   chaseId: string;
   name: string;
   photoUrl: string | null;
-  passcode: string | null;
+  /** Like the chase password, the real passcode lives in private/settings. */
+  hasPasscode: boolean;
+  /** Populated only on organizer-facing API responses, never in a snapshot. */
+  passcode?: string | null;
   mode: "team" | "solo";
   maxMembers: number | null;
   memberCount: number;

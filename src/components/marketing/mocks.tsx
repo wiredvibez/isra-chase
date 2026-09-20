@@ -65,22 +65,53 @@ export function CameraMissionMock({ className }: { className?: string }) {
 
 export function TextMissionMock({ className }: { className?: string }) {
   return (
-    <MockFrame className={cn("p-3", className)}>
-      <p className="text-xs font-semibold">
-        What year was the old water tower built?
-      </p>
-      <div className="mt-2.5 flex items-center gap-2 rounded-md border border-success/40 bg-success-surface px-2.5 py-2">
-        <span className="font-mono text-sm font-bold text-foreground">1932</span>
-        <Check className="ml-auto size-4 text-success" />
+    <MockFrame className={className}>
+      {/* Same 200x118 canvas as the other two mocks, so the three cards line up
+          at every breakpoint without hard-coded heights. */}
+      <svg viewBox="0 0 200 118" className="block w-full">
+        <rect width="200" height="118" className="fill-surface-muted" />
+
+        <rect x="14" y="14" width="172" height="34" rx="7" className="fill-surface stroke-border" strokeWidth="1.5" />
+        <g className="fill-muted-foreground/45">
+          <rect x="24" y="24" width="122" height="5" rx="2.5" />
+          <rect x="24" y="35" width="86" height="5" rx="2.5" />
+        </g>
+
+        <rect
+          x="14"
+          y="58"
+          width="172"
+          height="30"
+          rx="7"
+          className="fill-success-surface stroke-success/45"
+          strokeWidth="1.5"
+        />
+        <text x="26" y="78" className="fill-foreground" fontSize="14" fontWeight="700">
+          1932
+        </text>
+        <path
+          d="m162 73 4 4 8-8"
+          fill="none"
+          className="stroke-success"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <rect x="14" y="96" width="76" height="14" rx="7" className="fill-brand-400/30" />
+        <text x="24" y="106" className="fill-foreground" fontSize="8" fontWeight="700">
+          92% match
+        </text>
+      </svg>
+
+      <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+        <p className="truncate text-xs font-semibold">
+          When was the water tower built?
+        </p>
+        <Badge tone="info" className="shrink-0">
+          approximate
+        </Badge>
       </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        <Badge tone="brand">exact</Badge>
-        <Badge tone="info">approximate</Badge>
-        <Badge tone="neutral">open</Badge>
-      </div>
-      <p className="mt-2.5 text-[11px] leading-snug text-muted-foreground">
-        &ldquo;the Vasquez Bridge&rdquo; still matches &ldquo;Vasquez bridge&rdquo;.
-      </p>
     </MockFrame>
   );
 }

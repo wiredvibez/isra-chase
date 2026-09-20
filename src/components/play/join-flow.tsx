@@ -30,7 +30,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn, plural } from "@/lib/utils";
 import type { Participant } from "@/lib/domain/types";
 import { PhotoPicker } from "./photo-picker";
-import type { JoinPreview, PublicTeam } from "./types";
+import {
+  chaseRequiresPassword,
+  teamRequiresPasscode,
+  type JoinPreview,
+  type PublicTeam,
+} from "./types";
 
 type Step = "welcome" | "mode" | "team" | "profile";
 type Mode = "team" | "solo";
@@ -124,6 +129,7 @@ function TeamRow({
   children?: React.ReactNode;
 }) {
   const full = teamIsFull(team);
+  const locked = teamRequiresPasscode(team);
   return (
     <li>
       <button
@@ -163,7 +169,7 @@ function TeamRow({
             Full
           </Badge>
         )}
-        {!full && team.requiresPasscode && (
+        {!full && locked && (
           <KeyRound
             className="size-[1.125rem] text-muted-foreground"
             aria-label="Passcode required"
@@ -237,11 +243,10 @@ export function JoinFlow({ code }: { code: string }) {
     chase?.participantMode !== "organizer_managed" &&
     !soloOnly;
 
-  const [mode, setMode] = React.useState<Mode>("team");
-  React.useEffect(() => {
-    if (soloOnly) setMode("solo");
-    else if (mustPickTeam) setMode("team");
-  }, [soloOnly, mustPickTeam]);
+  // The chase's participant mode wins; the player only chooses when both are
+  // on the table, so this is derived rather than synchronised.
+  const [chosenMode, setChosenMode] = React.useState<Mode>("team");
+  const mode: Mode = soloOnly ? "solo" : mustPickTeam ? "team" : chosenMode;
 
   const steps = React.useMemo<Step[]>(() => {
     const list: Step[] = ["welcome"];
@@ -261,23 +266,28 @@ export function JoinFlow({ code }: { code: string }) {
   const [newTeamPhoto, setNewTeamPhoto] = React.useState<string | null>(null);
   const [newTeamPasscode, setNewTeamPasscode] = React.useState("");
 
-  const [displayName, setDisplayName] = React.useState("");
-  const [photoURL, setPhotoURL] = React.useState<string | null>(null);
+  // Both fields start from the signed-in profile and switch to the player's
+  // own value the moment they touch them — `null` means "not edited yet", which
+  // is what lets someone deliberately clear their photo.
+  const [nameEdit, setNameEdit] = React.useState<string | null>(null);
+  const [photoEdit, setPhotoEdit] = React.useState<{ url: string | null } | null>(
+    null,
+  );
   const [chasePassword, setChasePassword] = React.useState("");
   const [joining, setJoining] = React.useState(false);
 
-  React.useEffect(() => {
-    if (!displayName && user?.displayName) setDisplayName(user.displayName);
-    if (!photoURL && user?.photoURL) setPhotoURL(user.photoURL);
-    // Seeding once from the signed-in profile; the player owns it after that.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.displayName, user?.photoURL]);
+  const displayName = nameEdit ?? user?.displayName ?? "";
+  const photoURL = photoEdit ? photoEdit.url : (user?.photoURL ?? null);
 
   const selectedTeam = teams.find((t) => t.id === teamId) ?? null;
   // A team passcode stands in for the chase password, as Goosechase does.
   const needsChasePassword =
-    Boolean(chase?.requiresPassword) &&
-    !(selectedTeam?.requiresPasscode && teamPasscode.trim());
+    Boolean(chase && chaseRequiresPassword(chase)) &&
+    !(
+      selectedTeam &&
+      teamRequiresPasscode(selectedTeam) &&
+      teamPasscode.trim()
+    );
 
   async function join() {
     if (!chase) return;
@@ -374,7 +384,9 @@ export function JoinFlow({ code }: { code: string }) {
           ? creating
             ? newTeamName.trim().length > 0
             : Boolean(teamId) &&
-              (!selectedTeam?.requiresPasscode || teamPasscode.trim().length > 0)
+              (!selectedTeam ||
+                !teamRequiresPasscode(selectedTeam) ||
+                teamPasscode.trim().length > 0)
           : displayName.trim().length > 0 &&
             (!needsChasePassword || chasePassword.trim().length > 0);
 
@@ -420,7 +432,7 @@ export function JoinFlow({ code }: { code: string }) {
                   <Badge tone="info">Starting soon</Badge>
                 )}
                 {chase.status === "ended" && <Badge tone="neutral">Ended</Badge>}
-                {chase.requiresPassword && (
+                {chaseRequiresPassword(chase) && (
                   <Badge tone="warning">
                     <Lock className="size-3" aria-hidden />
                     Password required
@@ -433,7 +445,7 @@ export function JoinFlow({ code }: { code: string }) {
               <Card>
                 <CardContent className="space-y-3 p-4">
                   <p className="text-sm font-semibold">
-                    You're already in this chase.
+                    You&rsquo;re already in this chase.
                   </p>
                   <Link
                     href={`/play/${chase.id}`}
@@ -447,7 +459,7 @@ export function JoinFlow({ code }: { code: string }) {
 
             {chase.termsUrl && (
               <p className="text-xs text-muted-foreground">
-                By joining you accept the organizer's{" "}
+                By joining you accept the organizer&rsquo;s{" "}
                 <a
                   href={chase.termsUrl}
                   target="_blank"
@@ -490,7 +502,7 @@ export function JoinFlow({ code }: { code: string }) {
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => setMode(option.id)}
+                    onClick={() => setChosenMode(option.id)}
                     aria-pressed={active}
                     className={cn(
                       "flex min-h-14 items-start gap-3 rounded-lg border bg-surface p-4 text-left",
@@ -574,7 +586,7 @@ export function JoinFlow({ code }: { code: string }) {
                     description={
                       canCreateTeam
                         ? "Be the first — create one below."
-                        : "The organizer hasn't set up any teams. Check back with them."
+                        : "The organizer hasn&rsquo;t set up any teams. Check back with them."
                     }
                   />
                 ) : (
@@ -589,7 +601,7 @@ export function JoinFlow({ code }: { code: string }) {
                           setTeamPasscode("");
                         }}
                       >
-                        {teamId === team.id && team.requiresPasscode && (
+                        {teamId === team.id && teamRequiresPasscode(team) && (
                           <div className="px-1 pt-2">
                             <Field
                               label="Team passcode"
@@ -633,7 +645,7 @@ export function JoinFlow({ code }: { code: string }) {
                 {chase.participantMode === "organizer_managed" && (
                   <p className="px-1 text-xs text-muted-foreground">
                     The organizer manages teams for this chase, so you can only
-                    join one they've already set up.
+                    join one they&rsquo;ve already set up.
                   </p>
                 )}
               </div>
@@ -648,7 +660,7 @@ export function JoinFlow({ code }: { code: string }) {
               <PhotoPicker
                 name={displayName || "You"}
                 value={photoURL}
-                onChange={setPhotoURL}
+                onChange={(url) => setPhotoEdit({ url })}
                 label="Add a photo"
                 pathFor={(ext) => `users/${uid}/avatar/${Date.now()}.${ext}`}
               />
@@ -656,7 +668,7 @@ export function JoinFlow({ code }: { code: string }) {
                 <Input
                   id="display-name"
                   value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
+                  onChange={(event) => setNameEdit(event.target.value)}
                   maxLength={60}
                   autoComplete="nickname"
                   className="h-12"
@@ -683,7 +695,7 @@ export function JoinFlow({ code }: { code: string }) {
               )}
 
               <div className="rounded-md bg-surface-muted p-3 text-sm">
-                <p className="font-semibold">You're joining as</p>
+                <p className="font-semibold">You&rsquo;re joining as</p>
                 <p className="text-muted-foreground">
                   {mode === "solo"
                     ? "A solo player"

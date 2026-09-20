@@ -2,10 +2,10 @@ import Link from "next/link";
 import { LogoMark } from "@/components/marketing/logo";
 
 const sections = [
-  { href: "#missions", label: "Mission types" },
-  { href: "#live", label: "Running a chase" },
-  { href: "#moderation", label: "Moderation" },
-  { href: "#how-it-works", label: "How it works" },
+  { href: "/#missions", label: "Mission types" },
+  { href: "/#live", label: "Running a chase" },
+  { href: "/#moderation", label: "Moderation" },
+  { href: "/#how-it-works", label: "How it works" },
 ];
 
 export function SiteHeader() {
@@ -25,12 +25,12 @@ export function SiteHeader() {
           <ul className="flex items-center gap-1">
             {sections.map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
                   className="rounded-sm px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

@@ -25,6 +25,7 @@ export async function POST(request: Request, { params }: Params) {
       photoUrl: input.photoUrl,
       // The real passcode lives in private/settings; see lib/server/secrets.ts.
       passcode: null,
+      hasPasscode: Boolean(input.passcode),
       mode: input.mode,
       maxMembers: input.mode === "solo" ? 1 : input.maxMembers,
       memberCount: 0,
@@ -37,7 +38,7 @@ export async function POST(request: Request, { params }: Params) {
       createdAt: Timestamp.now(),
     };
 
-    await ref.set({ ...team, hasPasscode: Boolean(input.passcode) });
+    await ref.set(team);
     if (input.passcode) await setTeamPasscode(chaseId, ref.id, input.passcode);
     await chaseRef(chaseId).update({
       "stats.teamCount": FieldValue.increment(1),

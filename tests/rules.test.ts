@@ -74,6 +74,10 @@ beforeEach(async () => {
       teamIds: null,
       body: "Go!",
     });
+    await setDoc(doc(db, `chases/${CHASE}/private`, "settings"), {
+      password: "super-secret",
+      teamPasscodes: { teamA: "teamA-code" },
+    });
     await setDoc(doc(db, `chases/${CHASE}/broadcasts`, "scheduled"), {
       status: "scheduled",
       teamIds: null,
@@ -232,6 +236,47 @@ describe("chases and profiles", () => {
 
   it("denies unmatched collections via the catch-all", async () => {
     await assertFails(getDoc(doc(as(OWNER), "somethingElse", "x")));
+  });
+});
+
+describe("join secrets never reach a client", () => {
+  // The chase document is readable by any signed-in user, so the password and
+  // team passcodes live in this organizer-only subdocument instead.
+  it("denies a participant reading private/settings", async () => {
+    await assertFails(getDoc(doc(as(PLAYER), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("denies a rival", async () => {
+    await assertFails(getDoc(doc(as(RIVAL), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("denies a stranger", async () => {
+    await assertFails(getDoc(doc(as(STRANGER), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("denies an anonymous reader", async () => {
+    await assertFails(getDoc(doc(anon(), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("allows the owner", async () => {
+    await assertSucceeds(getDoc(doc(as(OWNER), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("allows a collaborator", async () => {
+    await assertSucceeds(getDoc(doc(as(COLLAB), `chases/${CHASE}/private`, "settings")));
+  });
+
+  it("denies even the owner writing it from a client", async () => {
+    await assertFails(
+      updateDoc(doc(as(OWNER), `chases/${CHASE}/private`, "settings"), {
+        password: "changed",
+      }),
+    );
+  });
+
+  it("confirms the public chase document carries no password", async () => {
+    const snap = await getDoc(doc(as(PLAYER), "chases", CHASE));
+    expect(snap.data()?.password).toBeUndefined();
   });
 });
 

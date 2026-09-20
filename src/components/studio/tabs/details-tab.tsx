@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input, Select, Textarea } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { apiPatch } from "@/lib/api-client";
+import { apiGet, apiPatch } from "@/lib/api-client";
 import type { Chase } from "@/lib/domain/types";
 import { useLoadedChase } from "../chase-context";
 import { ImageUpload } from "../image-upload";
@@ -45,7 +45,24 @@ function fromChase(chase: Chase): DetailsForm {
 export function DetailsTab() {
   const { chase, chaseId } = useLoadedChase();
   const [form, setForm] = React.useState<DetailsForm>(() => fromChase(chase));
+  // The password is not in the chase snapshot (any signed-in user can read
+  // that); it only comes back on the organizer-facing GET.
+  const [passwordLoaded, setPasswordLoaded] = React.useState(false);
   const save = useSaveState();
+
+  React.useEffect(() => {
+    let cancelled = false;
+    apiGet<{ chase: Chase }>(`/api/chases/${chaseId}`)
+      .then((res) => {
+        if (cancelled) return;
+        setForm((f) => ({ ...f, password: res.chase.password ?? "" }));
+        setPasswordLoaded(true);
+      })
+      .catch(() => setPasswordLoaded(true));
+    return () => {
+      cancelled = true;
+    };
+  }, [chaseId]);
 
   // Re-seed only when the console switches chase; live server writes must not
   // stomp on half-typed edits.
@@ -65,18 +82,23 @@ export function DetailsTab() {
       return;
     }
     save.markSaving();
+    const payload: Record<string, unknown> = {
+      name: form.name.trim(),
+      description: form.description.trim(),
+      imageUrl: form.imageUrl,
+      location: form.location,
+      searchVisibility: form.searchVisibility,
+      moderationMode: form.moderationMode,
+      profanityFilter: form.profanityFilter,
+      collectEmails: form.collectEmails,
+    };
+    // Only touch the password when we either have a new one or know we are
+    // clearing a real, loaded value.
+    if (form.password.trim()) payload.password = form.password.trim();
+    else if (passwordLoaded) payload.password = null;
+
     try {
-      await apiPatch(`/api/chases/${chaseId}`, {
-        name: form.name.trim(),
-        description: form.description.trim(),
-        imageUrl: form.imageUrl,
-        location: form.location,
-        password: form.password.trim() ? form.password.trim() : null,
-        searchVisibility: form.searchVisibility,
-        moderationMode: form.moderationMode,
-        profanityFilter: form.profanityFilter,
-        collectEmails: form.collectEmails,
-      });
+      await apiPatch(`/api/chases/${chaseId}`, payload);
       save.markSaved();
     } catch (error) {
       save.markFailed();
@@ -155,7 +177,11 @@ export function DetailsTab() {
         <CardContent className="pt-5">
           <SettingRow
             label="Chase password"
-            hint="Leave blank for no password. Team passcodes bypass it."
+            hint={
+              chase.hasPassword && !passwordLoaded
+                ? "A password is set. Type a new one to replace it."
+                : "Leave blank for no password. Team passcodes bypass it."
+            }
             htmlFor="details-password"
           >
             <Input

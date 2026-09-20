@@ -130,7 +130,7 @@ export function InvitePanel({
         </div>
       </div>
 
-      {chase.password && (
+      {chase.hasPassword && (
         <p className="rounded-md bg-warning-surface px-3 py-2 text-xs text-warning">
           This chase is password protected — share the password too.
         </p>

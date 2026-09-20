@@ -50,7 +50,13 @@ export interface PublicChase {
   participantMode: ParticipantMode;
   allowSelfCreatedTeams: boolean;
   maxTeamMembers: number | null;
-  requiresPassword: boolean;
+  /**
+   * The contract calls this `requiresPassword`; the Chase document calls the
+   * same fact `hasPassword`. Accept either so a projection change on the server
+   * can't silently stop asking players for the password.
+   */
+  requiresPassword?: boolean;
+  hasPassword?: boolean;
   leaderboardVisibility?: LeaderboardVisibility;
   termsUrl?: string | null;
   startAtMs?: number | null;
@@ -64,7 +70,17 @@ export interface PublicTeam {
   mode: "team" | "solo";
   memberCount: number;
   maxMembers: number | null;
-  requiresPasscode: boolean;
+  /** `requiresPasscode` per the contract, `hasPasscode` on the document. */
+  requiresPasscode?: boolean;
+  hasPasscode?: boolean;
+}
+
+export function chaseRequiresPassword(chase: PublicChase): boolean {
+  return chase.requiresPassword ?? chase.hasPassword ?? false;
+}
+
+export function teamRequiresPasscode(team: PublicTeam): boolean {
+  return team.requiresPasscode ?? team.hasPasscode ?? false;
 }
 
 export interface JoinPreview {

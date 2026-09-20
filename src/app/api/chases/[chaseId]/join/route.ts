@@ -140,6 +140,7 @@ export async function POST(request: Request, { params }: Params) {
           photoUrl: input.newTeam?.photoUrl ?? null,
           // Passcodes live in private/settings, never on the readable team doc.
           passcode: null,
+          hasPasscode: Boolean(creating.passcode),
           mode: creating.mode,
           maxMembers:
             creating.mode === "solo" ? 1 : (input.newTeam?.maxMembers ?? null),
@@ -152,7 +153,7 @@ export async function POST(request: Request, { params }: Params) {
           lastSubmissionAt: null,
           createdAt: joinedAt,
         };
-        tx.set(targetTeam, { ...team, hasPasscode: Boolean(creating.passcode) });
+        tx.set(targetTeam, team);
       } else {
         tx.update(targetTeam, { memberCount: FieldValue.increment(1) });
       }

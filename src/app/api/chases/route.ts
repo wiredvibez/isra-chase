@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       location: null,
       // The real password lives in private/settings; see lib/server/secrets.ts.
       password: null,
+      hasPassword: false,
       searchVisibility: "hidden",
       splashImageUrl: null,
       termsUrl: null,
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
       },
     };
 
-    await ref.set({ ...chase, hasPassword: false, createdAt: now, updatedAt: now });
+    await ref.set({ ...chase, createdAt: now, updatedAt: now });
     const snap = await ref.get();
     return { chase: { id: snap.id, ...snap.data() } };
   });
