@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { collection, limit, orderBy, query, where } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { toast } from "sonner";
 import { Flag, Heart, Rss } from "lucide-react";
 import { getDb } from "@/lib/firebase/client";
 import { useLiveQuery } from "@/lib/hooks/use-firestore";
+import { byNewest } from "@/lib/format";
 import { apiPost, ApiClientError } from "@/lib/api-client";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -158,20 +159,27 @@ export function FeedView() {
     () =>
       query(
         collection(getDb(), "chases", chaseId, "submissions"),
+        // Equality filters only: adding orderBy here would need a composite
+        // index, and without one the whole feed errors instead of loading.
+        // The rules require all three filters, so they stay; the ordering
+        // moves into the client.
         where("status", "==", "approved"),
         where("hidden", "==", false),
         where("feedVisible", "==", true),
-        orderBy("createdAt", "desc"),
-        limit(PAGE),
       ),
     [chaseId],
   );
 
   const {
-    data: submissions,
+    data: allSubmissions,
     loading,
     error,
   } = useLiveQuery<Submission>(feedQuery, [chaseId]);
+
+  const submissions = React.useMemo(
+    () => [...allSubmissions].sort(byNewest).slice(0, PAGE),
+    [allSubmissions],
+  );
 
   const { liked, set: setLiked } = useLikedCache(uid, chaseId);
   // Optimistic deltas keyed by submission id, folded over the live count.

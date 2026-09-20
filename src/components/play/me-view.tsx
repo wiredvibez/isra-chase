@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { collection, orderBy, query, where } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { toast } from "sonner";
 import {
   DoorOpen,
@@ -22,7 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { points as fmtPoints, shortDateTime, timeAgo } from "@/lib/format";
+import { byNewest, points as fmtPoints, shortDateTime, timeAgo } from "@/lib/format";
 import type { Adjustment, Participant, Submission, SubmissionStatus } from "@/lib/domain/types";
 import { usePlay } from "./play-provider";
 import { MissionIcon } from "./mission-icon";
@@ -89,13 +89,13 @@ export function MeView() {
       teamId
         ? query(
             collection(getDb(), "chases", chaseId, "submissions"),
+            // Equality only — see byNewest in lib/format for why.
             where("teamId", "==", teamId),
-            orderBy("createdAt", "desc"),
           )
         : null,
     [chaseId, teamId],
   );
-  const { data: submissions, loading: submissionsLoading } =
+  const { data: unsortedSubmissions, loading: submissionsLoading } =
     useLiveQuery<Submission>(submissionsQuery, [chaseId, teamId]);
 
   const adjustmentsQuery = React.useMemo(
@@ -103,16 +103,27 @@ export function MeView() {
       teamId
         ? query(
             collection(getDb(), "chases", chaseId, "adjustments"),
+            // Equality only — see byNewest in lib/format for why.
             where("teamId", "==", teamId),
-            orderBy("createdAt", "desc"),
           )
         : null,
     [chaseId, teamId],
   );
-  const { data: adjustments } = useLiveQuery<Adjustment>(adjustmentsQuery, [
+  const { data: unsortedAdjustments } = useLiveQuery<Adjustment>(adjustmentsQuery, [
     chaseId,
     teamId,
   ]);
+
+  // The queries dropped their orderBy to avoid needing a composite index, so
+  // the ordering happens here.
+  const submissions = React.useMemo(
+    () => [...unsortedSubmissions].sort(byNewest),
+    [unsortedSubmissions],
+  );
+  const adjustments = React.useMemo(
+    () => [...unsortedAdjustments].sort(byNewest),
+    [unsortedAdjustments],
+  );
 
   const [deleting, setDeleting] = React.useState<Submission | null>(null);
   const [busy, setBusy] = React.useState(false);

@@ -47,8 +47,10 @@ export async function POST(request: Request, { params }: Params) {
     await writeNotification(chaseId, {
       teamId: input.teamId,
       type: "adjustment",
-      title: input.points > 0 ? "Points added" : "Points deducted",
-      body: `${input.points > 0 ? "+" : ""}${input.points} — ${input.reason}`,
+      title: input.points > 0 ? "נוספו נקודות" : "ירדו נקודות",
+      body: `${Math.abs(input.points)} נקודות ${
+        input.points > 0 ? "נוספו" : "ירדו"
+      } — ${input.reason}`,
     });
 
     const snap = await ref.get();

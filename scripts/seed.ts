@@ -458,9 +458,12 @@ async function seed() {
     imageUrl: null,
     linkUrl: null,
     teamIds: null,
+    // Left scheduled rather than pre-sent: the first /tick materialises it into
+    // a real notification, so the demo exercises the delivery path instead of
+    // faking its result.
     schedule: { kind: "at_start" },
-    status: "sent",
-    sentAt: startAt,
+    status: "scheduled",
+    sentAt: null,
     createdByUid: ORGANIZER.uid,
     createdByName: ORGANIZER.name,
     createdAt: stamp(3 * HOUR),

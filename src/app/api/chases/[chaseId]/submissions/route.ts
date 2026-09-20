@@ -266,10 +266,10 @@ async function announceUnlocks(
   await writeNotification(chaseId, {
     teamId,
     type: "mission_unlocked",
-    title: unlocked.length === 1 ? "New mission unlocked" : "New missions unlocked",
+    title: unlocked.length === 1 ? "נפתחה משימה חדשה" : "נפתחו משימות חדשות",
     body:
       unlocked.length === 1
-        ? `"${unlocked[0].name}" is now available.`
-        : `${unlocked.length} missions just became available.`,
+        ? `"${unlocked[0].name}" פתוחה עכשיו. יאללה.`
+        : `${unlocked.length} משימות חדשות נפתחו עכשיו.`,
   });
 }

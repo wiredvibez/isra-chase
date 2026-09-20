@@ -107,8 +107,12 @@ export async function PATCH(request: Request, { params }: Params) {
       await writeNotification(chaseId, {
         teamId,
         type: approved ? "submission_approved" : "submission_rejected",
-        title: approved ? "Submission approved" : "Submission rejected",
-        body: note ?? (approved ? "Your submission earned its points." : "An organizer rejected your submission."),
+        title: approved ? "ההגשה אושרה" : "ההגשה נדחתה",
+        body:
+          note ??
+          (approved
+            ? "הנקודות נכנסו לקבוצה."
+            : "המארגן לא אישר את ההגשה הזאת."),
       });
     }
 
@@ -169,10 +173,10 @@ export async function DELETE(request: Request, { params }: Params) {
       await writeNotification(chaseId, {
         teamId: removed.teamId,
         type: "submission_deleted",
-        title: `"${removed.missionName}" was removed`,
+        title: `ההגשה ל"${removed.missionName}" נמחקה`,
         body:
           body.reason ??
-          "An organizer deleted your submission. You can submit this mission again.",
+          "המארגן מחק את ההגשה. אפשר לשלוח את המשימה הזאת שוב.",
       });
     }
 

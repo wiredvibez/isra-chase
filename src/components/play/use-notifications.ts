@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { collection, limit, orderBy, query, where } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { getDb } from "@/lib/firebase/client";
 import { useLiveQuery } from "@/lib/hooks/use-firestore";
+import { byNewest } from "@/lib/format";
 import type { AppNotification } from "@/lib/domain/types";
 import { useLocalSet } from "./use-local-set";
 
@@ -19,9 +20,8 @@ export function useNotifications(chaseId: string, teamId: string | null) {
     () =>
       query(
         collection(getDb(), "chases", chaseId, "notifications"),
+        // Equality only — see byNewest in lib/format for why.
         where("teamId", "==", null),
-        orderBy("createdAt", "desc"),
-        limit(PAGE),
       ),
     [chaseId],
   );
@@ -32,8 +32,6 @@ export function useNotifications(chaseId: string, teamId: string | null) {
         ? query(
             collection(getDb(), "chases", chaseId, "notifications"),
             where("teamId", "==", teamId),
-            orderBy("createdAt", "desc"),
-            limit(PAGE),
           )
         : null,
     [chaseId, teamId],
@@ -42,14 +40,12 @@ export function useNotifications(chaseId: string, teamId: string | null) {
   const broadcastLive = useLiveQuery<AppNotification>(everyone, [chaseId]);
   const teamLive = useLiveQuery<AppNotification>(mine, [chaseId, teamId]);
 
-  const notifications = React.useMemo(() => {
-    const all = [...broadcastLive.data, ...teamLive.data];
-    all.sort(
-      (a, b) =>
-        (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0),
-    );
-    return all;
-  }, [broadcastLive.data, teamLive.data]);
+  const notifications = React.useMemo(
+    // The queries no longer carry a limit — without an orderBy, a limit would
+    // return an arbitrary slice rather than the newest — so cap after sorting.
+    () => [...broadcastLive.data, ...teamLive.data].sort(byNewest).slice(0, PAGE),
+    [broadcastLive.data, teamLive.data],
+  );
 
   return {
     notifications,

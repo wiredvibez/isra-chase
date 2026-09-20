@@ -75,8 +75,10 @@ export async function DELETE(request: Request, { params }: Params) {
     await writeNotification(chaseId, {
       teamId: removed.teamId,
       type: "adjustment",
-      title: "Score adjustment reversed",
-      body: `${removed.points > 0 ? "+" : ""}${removed.points} was undone by an organizer.`,
+      title: "עדכון ניקוד בוטל",
+      body: `${Math.abs(removed.points)} נקודות ${
+        removed.points > 0 ? "שנוספו" : "שירדו"
+      } בוטלו על ידי המארגן.`,
     });
 
     return { ok: true };

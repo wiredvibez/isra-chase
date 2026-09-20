@@ -52,10 +52,12 @@ export async function POST(request: Request, { params }: Params) {
     await writeNotification(chaseId, {
       teamId,
       type: "bonus",
-      title: input.points > 0 ? "Bonus points!" : "Points deducted",
-      body: `${input.points > 0 ? "+" : ""}${input.points} on "${missionName}"${
-        input.reason ? ` — ${input.reason}` : ""
-      }`,
+      title: input.points > 0 ? "נקודות בונוס!" : "ירדו נקודות",
+      // A leading + or − lands on the wrong side of the digits in an RTL
+      // sentence, so the direction is said in words instead.
+      body: `${Math.abs(input.points)} נקודות ${
+        input.points > 0 ? "נוספו על" : "ירדו על"
+      } "${missionName}"${input.reason ? ` — ${input.reason}` : ""}`,
     });
 
     const snap = await ref.get();

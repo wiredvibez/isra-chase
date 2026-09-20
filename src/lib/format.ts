@@ -120,6 +120,19 @@ export function bytes(n: number): string {
 }
 
 /**
+ * Newest first, for lists we sort in memory.
+ *
+ * Several live queries deliberately omit `orderBy`: combining it with a
+ * `where` demands a composite index, and a chase that has not had its indexes
+ * built would then show an error instead of a feed. Equality-only queries are
+ * served by Firestore's automatic single-field indexes, so we filter in the
+ * query and order here. A single chase holds hundreds of documents at most.
+ */
+export function byNewest<T extends { createdAt?: Stamp | null }>(a: T, b: T) {
+  return (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0);
+}
+
+/**
  * Wrap a Latin run so it renders in its own direction inside a Hebrew
  * sentence. Uses the Unicode isolate characters, which work in plain strings
  * where a <span dir="ltr"> cannot reach — toasts, aria-labels, title text.
