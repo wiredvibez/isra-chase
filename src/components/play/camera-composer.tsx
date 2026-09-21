@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Camera, Image as ImageIcon, Send, VolumeX, X } from "lucide-react";
+import { Camera, Image as ImageIcon, Mic, Send, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/input";
@@ -10,6 +10,11 @@ import { Progress } from "@/components/ui/progress";
 import { apiPost, ApiClientError } from "@/lib/api-client";
 import { kindOf, uploadMedia, validateMedia, type MediaKind } from "@/lib/media/upload";
 import { detectAudioTrack } from "@/lib/media/audio-track";
+import {
+  microphoneState,
+  requestMicrophone,
+  type MicrophoneState,
+} from "@/lib/media/microphone";
 import { bytes as fmtBytes } from "@/lib/format";
 import type { CreateSubmissionResponse, PlayMission } from "./types";
 
@@ -77,6 +82,7 @@ export function CameraComposer({
   const [caption, setCaption] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [silent, setSilent] = React.useState(false);
+  const [mic, setMic] = React.useState<MicrophoneState>("granted");
   const [progress, setProgress] = React.useState<number | null>(null);
   const [sending, setSending] = React.useState(false);
 
@@ -97,6 +103,24 @@ export function CameraComposer({
       : null;
     pickedRef.current = replacement;
     setPicked(replacement);
+  }
+
+  // Only video missions care about the microphone.
+  const wantsAudio = accepts !== "photos";
+
+  React.useEffect(() => {
+    if (!wantsAudio) return;
+    let cancelled = false;
+    void microphoneState().then((state) => {
+      if (!cancelled) setMic(state);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [wantsAudio]);
+
+  async function enableMicrophone() {
+    setMic(await requestMicrophone());
   }
 
   async function onPick(event: React.ChangeEvent<HTMLInputElement>) {
@@ -294,6 +318,34 @@ export function CameraComposer({
         {error}
       </p>
 
+      {/* Asked before recording, not after: on iOS the in-page camera only
+          captures an audio track if the site already holds this permission,
+          so a player who skips it gets a silent clip and no explanation. */}
+      {wantsAudio && !picked && (mic === "prompt" || mic === "denied") && (
+        <div className="flex items-start gap-2 rounded-md bg-info-surface px-3 py-2.5 text-xs text-info">
+          <Mic className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            {mic === "denied" ? (
+              <p>
+                אין הרשאה למיקרופון, אז הסרטון ייצא בלי קול. אפשר לאשר מיקרופון
+                להאתר בהגדרות הדפדפן ואז לנסות שוב.
+              </p>
+            ) : (
+              <>
+                <p>כדי שיהיה קול בסרטון, צריך לאשר מיקרופון פעם אחת.</p>
+                <button
+                  type="button"
+                  onClick={() => void enableMicrophone()}
+                  className="font-bold underline underline-offset-2"
+                >
+                  לאפשר מיקרופון
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* A warning, not a block: some missions genuinely do not need sound. */}
       {silent && !error && (
         <p
@@ -302,8 +354,12 @@ export function CameraComposer({
         >
           <VolumeX className="mt-0.5 size-4 shrink-0" aria-hidden />
           <span>
-            בסרטון הזה אין פס קול. אם התכוונתם שיהיה — טיים-לאפס והילוך איטי
-            מוקלטים בלי סאונד, אז תצלמו רגיל. אפשר גם לשלוח ככה.
+            בסרטון הזה אין פס קול. הסיבה הנפוצה היא שלא אושר מיקרופון לאתר —
+            {" "}
+            {mic === "granted"
+              ? "אבל אצלכם הוא כבר מאושר, אז כנראה שההקלטה עצמה יצאה בלי קול."
+              : "תאשרו מיקרופון ותצלמו שוב."}{" "}
+            אפשר גם לשלוח ככה, אם המשימה לא צריכה קול.
           </span>
         </p>
       )}
