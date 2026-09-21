@@ -58,6 +58,11 @@ export function Sheet({
       className={cn(
         "bg-surface text-foreground shadow-pop backdrop:bg-black/50",
         "open:flex open:flex-col",
+        // WebKit still gives `dialog` the UA default `position: absolute`,
+        // so on iOS a sheet opened from a scrolled page is laid out against
+        // the document instead of the viewport and lands off-screen. Pinning
+        // it ourselves is what Chrome and Firefox already do for :modal.
+        "fixed inset-0",
         // phone: docked to the bottom, full width
         "mt-auto mb-0 ms-0 me-0 max-h-[85dvh] w-full max-w-none rounded-t-xl border-t border-border",
         // tablet+: right drawer, full height
@@ -77,7 +82,9 @@ export function Sheet({
           <X className="size-5" />
         </button>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
+        {children}
+      </div>
       {footer && (
         <footer className="flex items-center justify-end gap-2 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {footer}

@@ -2,6 +2,7 @@
 
 import imageCompression from "browser-image-compression";
 import { api } from "@/lib/api-client";
+import { detectAudioTrack } from "./audio-track";
 
 export const MAX_IMAGE_BYTES = 12 * 1024 * 1024; // 12 MB before compression
 export const MAX_VIDEO_BYTES = 200 * 1024 * 1024; // 200 MB
@@ -18,6 +19,8 @@ export interface UploadedMedia {
   width?: number;
   height?: number;
   durationSec?: number;
+  /** Videos only. Undefined when the container could not be read. */
+  hasAudio?: boolean;
 }
 
 /** Hebrew name for a media kind, for use inside sentences. */
@@ -63,6 +66,7 @@ async function videoMeta(file: File): Promise<{
   width?: number;
   height?: number;
   durationSec?: number;
+  hasAudio?: boolean;
 }> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
@@ -106,6 +110,17 @@ export function validateMedia(file: File, allowed: MediaKind[]) {
 /** No byte moved in this long ⇒ treat the upload as dead rather than pending. */
 const STALL_TIMEOUT_MS = 25_000;
 
+/** Video metadata, plus whether the container carries any audio at all. */
+async function videoWithAudio(file: File) {
+  const [meta, audio] = await Promise.all([videoMeta(file), detectAudioTrack(file)]);
+  return {
+    ...meta,
+    // Left off entirely when the container could not be read, so "we don't
+    // know" never renders as "this video is silent".
+    ...(audio === "unknown" ? {} : { hasAudio: audio === "present" }),
+  };
+}
+
 /**
  * Uploads straight to Cloud Storage with a short-lived signed URL.
  *
@@ -129,7 +144,7 @@ export async function uploadMedia(
     kind === "image"
       ? await imageDimensions(prepared)
       : kind === "video"
-        ? await videoMeta(prepared)
+        ? await videoWithAudio(prepared)
         : {};
 
   const contentType = prepared.type || "application/octet-stream";

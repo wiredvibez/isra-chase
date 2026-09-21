@@ -3,7 +3,7 @@
 import * as React from "react";
 import { collection, query, where } from "firebase/firestore";
 import { toast } from "sonner";
-import { Flag, Heart, Rss } from "lucide-react";
+import { Flag, Heart, Rss, VolumeX } from "lucide-react";
 import { getDb } from "@/lib/firebase/client";
 import { useLiveQuery } from "@/lib/hooks/use-firestore";
 import { byNewest } from "@/lib/format";
@@ -81,13 +81,23 @@ function FeedItem({
         </div>
 
         {media?.kind === "video" ? (
-          <video
-            src={media.url}
-            controls
-            playsInline
-            preload="metadata"
-            className="aspect-square w-full bg-black object-contain"
-          />
+          <div className="relative">
+            <video
+              src={media.url}
+              controls
+              playsInline
+              preload="metadata"
+              className="aspect-square w-full bg-black object-contain"
+            />
+            {media.hasAudio === false && (
+              // Says why it is silent, so nobody hunts for a volume control
+              // that was never going to help.
+              <span className="pointer-events-none absolute bottom-2 end-2 flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">
+                <VolumeX className="size-3.5" aria-hidden />
+                ללא סאונד
+              </span>
+            )}
+          </div>
         ) : media ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

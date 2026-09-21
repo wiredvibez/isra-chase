@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Camera, Image as ImageIcon, Send, X } from "lucide-react";
+import { Camera, Image as ImageIcon, Send, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { apiPost, ApiClientError } from "@/lib/api-client";
 import { kindOf, uploadMedia, validateMedia, type MediaKind } from "@/lib/media/upload";
+import { detectAudioTrack } from "@/lib/media/audio-track";
 import { bytes as fmtBytes } from "@/lib/format";
 import type { CreateSubmissionResponse, PlayMission } from "./types";
 
@@ -75,6 +76,7 @@ export function CameraComposer({
   );
   const [caption, setCaption] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
+  const [silent, setSilent] = React.useState(false);
   const [progress, setProgress] = React.useState<number | null>(null);
   const [sending, setSending] = React.useState(false);
 
@@ -110,6 +112,8 @@ export function CameraComposer({
       return;
     }
 
+    setSilent(false);
+
     if (kindOf(chosen) === "video") {
       const seconds = await videoDuration(chosen);
       if (seconds !== null && seconds > maxVideoSeconds + 0.5) {
@@ -119,6 +123,12 @@ export function CameraComposer({
         );
         return;
       }
+
+      // A time-lapse, a slow-mo or a screen recording has no audio track at
+      // all. Warning beats letting a silent clip reach the organizer looking
+      // like a playback fault — but it is only a warning: plenty of missions
+      // do not need sound.
+      if ((await detectAudioTrack(chosen)) === "absent") setSilent(true);
     }
 
     setError(null);
@@ -283,6 +293,20 @@ export function CameraComposer({
       <p role="alert" aria-live="assertive" className="text-sm font-medium text-danger empty:hidden">
         {error}
       </p>
+
+      {/* A warning, not a block: some missions genuinely do not need sound. */}
+      {silent && !error && (
+        <p
+          role="status"
+          className="flex items-start gap-2 rounded-md bg-warning-surface px-3 py-2 text-xs text-warning"
+        >
+          <VolumeX className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>
+            בסרטון הזה אין פס קול. אם התכוונתם שיהיה — טיים-לאפס והילוך איטי
+            מוקלטים בלי סאונד, אז תצלמו רגיל. אפשר גם לשלוח ככה.
+          </span>
+        </p>
+      )}
 
       <Button
         type="button"

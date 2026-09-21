@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { EyeOff, Flag, Heart, MapPin } from "lucide-react";
+import { EyeOff, Flag, Heart, MapPin, VolumeX } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -68,12 +68,22 @@ export function SubmissionMedia({
 
   if (media.kind === "video") {
     return (
-      <video
-        controls
-        preload="metadata"
-        src={media.url}
-        className={cn("w-full rounded-md bg-black", className)}
-      />
+      <div className="relative">
+        <video
+          controls
+          preload="metadata"
+          src={media.url}
+          className={cn("w-full rounded-md bg-black", className)}
+        />
+        {media.hasAudio === false && (
+          // Judging a clip with no sound is fine; wondering whether your own
+          // speakers are broken is not.
+          <span className="pointer-events-none absolute bottom-2 end-2 flex items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">
+            <VolumeX className="size-3.5" aria-hidden />
+            ללא סאונד
+          </span>
+        )}
+      </div>
     );
   }
 

@@ -188,6 +188,7 @@ export const mediaSchema = z.object({
   width: z.number().int().positive().optional(),
   height: z.number().int().positive().optional(),
   durationSec: z.number().nonnegative().optional(),
+  hasAudio: z.boolean().optional(),
 });
 
 export const createSubmissionSchema = z.object({

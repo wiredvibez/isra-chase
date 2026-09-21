@@ -230,6 +230,13 @@ export interface SubmissionMedia {
   width?: number;
   height?: number;
   durationSec?: number;
+  /**
+   * Videos only, and only when the container could be read. A phone will hand
+   * over a perfectly valid clip with no audio track — a time-lapse or a
+   * slow-mo has none — so this is recorded and shown rather than letting a
+   * silent video look like a playback fault.
+   */
+  hasAudio?: boolean;
 }
 
 export interface Submission {

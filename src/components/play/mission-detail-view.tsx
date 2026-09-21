@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -46,6 +47,7 @@ const TEXT_BADGE_LABEL = {
 } as const;
 
 export function MissionDetailView({ missionId }: { missionId: string }) {
+  const router = useRouter();
   const { chaseId, chase, uid, missions, missionsLoading, refreshMissions } =
     usePlay();
   const mission = missions.find((m) => m.id === missionId) ?? null;
@@ -210,7 +212,10 @@ export function MissionDetailView({ missionId }: { missionId: string }) {
             chaseId={chaseId}
             mission={mission}
             result={result}
-            onDone={() => setResult(null)}
+            // The button says "back to the missions", so it has to go there.
+            // Clearing the result alone left the player parked on the mission
+            // they had just finished.
+            onDone={() => router.push(backHref)}
           />
         ) : mission.completed ? (
           <div className="space-y-3 rounded-lg border border-success/30 bg-success-surface p-4">
