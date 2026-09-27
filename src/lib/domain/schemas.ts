@@ -90,58 +90,99 @@ export const chaseScheduleSchema = z
 
 /* --------------------------------------------------------------- missions */
 
-export const missionInputSchema = z
-  .object({
-    name: z.string().trim().min(1, "Missions need a name.").max(120),
-    description: z.string().trim().min(1, "Missions need a description.").max(4000),
-    points: z.number().int().min(0).max(1_000_000),
-    type: missionTypeSchema,
-    imageUrl: z.string().url().nullable().default(null),
-    linkUrl: z.string().url().nullable().default(null),
-    feedVisibility: z.enum(["shown", "hidden"]),
-    isDraft: z.boolean().default(false),
-    camera: z
-      .object({
-        accepts: z.enum(["photos", "videos", "both"]),
-        sources: z.enum(["live_and_library", "live_only"]),
-        maxVideoSeconds: z.number().int().min(1).max(300).default(30),
-      })
-      .nullable()
-      .default(null),
-    text: z
-      .object({
-        acceptedResponses: z.array(z.string().trim()).max(100).default([]),
-        approximate: z.boolean().default(false),
-      })
-      .nullable()
-      .default(null),
-    gps: z
-      .object({
-        lat: z.number().min(-90).max(90),
-        lng: z.number().min(-180).max(180),
-        radiusM: gpsRadiusSchema,
-        address: z.string().nullable().default(null),
-      })
-      .nullable()
-      .default(null),
-    release: releaseRuleSchema.default({ kind: "chase_start" }),
-    expiry: expiryRuleSchema.default({ kind: "chase_end" }),
-  })
-  .superRefine((value, ctx) => {
-    // Each type must carry exactly its own config block.
-    if (value.type === "camera" && !value.camera) {
-      ctx.addIssue({ code: "custom", path: ["camera"], message: "Camera settings are required." });
-    }
-    if (value.type === "text" && !value.text) {
-      ctx.addIssue({ code: "custom", path: ["text"], message: "Text settings are required." });
-    }
-    if (value.type === "gps" && !value.gps) {
-      ctx.addIssue({ code: "custom", path: ["gps"], message: "Pick a location for this mission." });
-    }
-    // Whether an unlock may require a *correct* answer depends on the TRIGGER
-    // mission's type, not this one's, so it cannot be checked here — the route
-    // handler loads the trigger and validates it (see assertTriggerCanGrade).
+const missionObjectSchema = z.object({
+  name: z.string().trim().min(1, "Missions need a name.").max(120),
+  description: z.string().trim().min(1, "Missions need a description.").max(4000),
+  points: z.number().int().min(0).max(1_000_000),
+  type: missionTypeSchema,
+  imageUrl: z.string().url().nullable().default(null),
+  linkUrl: z.string().url().nullable().default(null),
+  feedVisibility: z.enum(["shown", "hidden"]),
+  isDraft: z.boolean().default(false),
+  camera: z
+    .object({
+      accepts: z.enum(["photos", "videos", "both"]),
+      sources: z.enum(["live_and_library", "live_only"]),
+      maxVideoSeconds: z.number().int().min(1).max(300).default(30),
+    })
+    .nullable()
+    .default(null),
+  text: z
+    .object({
+      acceptedResponses: z.array(z.string().trim()).max(100).default([]),
+      approximate: z.boolean().default(false),
+    })
+    .nullable()
+    .default(null),
+  gps: z
+    .object({
+      lat: z.number().min(-90).max(90),
+      lng: z.number().min(-180).max(180),
+      radiusM: gpsRadiusSchema,
+      address: z.string().nullable().default(null),
+    })
+    .nullable()
+    .default(null),
+  release: releaseRuleSchema.default({ kind: "chase_start" }),
+  expiry: expiryRuleSchema.default({ kind: "chase_end" }),
+});
+
+function addMissionConfigIssues(
+  value: {
+    type?: "camera" | "text" | "gps";
+    camera?: unknown;
+    text?: unknown;
+    gps?: unknown;
+  },
+  addIssue: (path: string, message: string) => void,
+) {
+  // Each type must carry exactly its own config block. Whether an unlock may
+  // require a *correct* answer depends on the TRIGGER mission's type, not this
+  // one's, so it cannot be checked here — the route handler loads the trigger
+  // and validates it (see assertTriggerCanGrade).
+  if (value.type === "camera" && !value.camera) {
+    addIssue("camera", "Camera settings are required.");
+  }
+  if (value.type === "text" && !value.text) {
+    addIssue("text", "Text settings are required.");
+  }
+  if (value.type === "gps" && !value.gps) {
+    addIssue("gps", "Pick a location for this mission.");
+  }
+}
+
+export const missionInputSchema = missionObjectSchema.superRefine((value, ctx) => {
+  addMissionConfigIssues(value, (path, message) => {
+    ctx.addIssue({ code: "custom", path: [path], message });
   });
+});
+
+/**
+ * Edit body. Zod 4 throws if `.partial()` is called on a schema that already
+ * has a refinement, which is what blocked every mission save. The check is
+ * applied here only when `type` is part of the update.
+ *
+ * Omitted keys still come back as their defaults, so callers must persist
+ * `providedFields` — otherwise a name-only edit would null out camera, text,
+ * gps, release and expiry.
+ */
+export const missionPatchSchema = missionObjectSchema.partial().superRefine((value, ctx) => {
+  if (!value.type) return;
+  addMissionConfigIssues(value, (path, message) => {
+    ctx.addIssue({ code: "custom", path: [path], message });
+  });
+});
+
+/** Keys the client actually sent, using the parsed (trimmed) values. */
+export function providedFields<T extends object>(raw: object, parsed: T): Partial<T> {
+  const update: Partial<T> = {};
+  for (const key of Object.keys(raw)) {
+    if (Object.prototype.hasOwnProperty.call(parsed, key)) {
+      update[key as keyof T] = parsed[key as keyof T];
+    }
+  }
+  return update;
+}
 
 export const reorderMissionsSchema = z.object({
   order: z.array(z.string().min(1)).min(1),

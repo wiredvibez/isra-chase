@@ -1,7 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { missionInputSchema } from "@/lib/domain/schemas";
+import { missionPatchSchema, providedFields } from "@/lib/domain/schemas";
 import { requireOrganizer } from "@/lib/server/guards";
-import { handler, notFound, readJson } from "@/lib/server/http";
+import { badRequest, handler, notFound, readJson } from "@/lib/server/http";
 import { missionsRef, submissionsRef } from "@/lib/server/collections";
 import {
   assertTriggerCanGrade,
@@ -19,31 +19,38 @@ export async function PATCH(request: Request, { params }: Params) {
   return handler(async () => {
     const { chaseId, missionId } = await params;
     await requireOrganizer(chaseId, request);
-    const input = missionInputSchema.partial().parse(await readJson(request));
-    if (input.release) await assertTriggerCanGrade(chaseId, input.release);
+    const raw = await readJson<unknown>(request);
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      throw badRequest("הבקשה לא תקינה.");
+    }
+    const input = missionPatchSchema.parse(raw);
+    // Defaults fill every omitted key. Persist only what was sent, or a
+    // one-field edit would blank the rest of the mission.
+    const provided = providedFields(raw, input);
+    if (provided.release) await assertTriggerCanGrade(chaseId, provided.release);
 
     const ref = missionsRef(chaseId).doc(missionId);
     const existing = await ref.get();
     if (!existing.exists) throw notFound("That mission doesn't exist.");
 
     const update: Record<string, unknown> = {
-      ...input,
+      ...provided,
       updatedAt: FieldValue.serverTimestamp(),
     };
-    if (input.release) update.release = releaseFromInput(input.release);
-    if (input.expiry) update.expiry = expiryFromInput(input.expiry);
+    if (provided.release) update.release = releaseFromInput(provided.release);
+    if (provided.expiry) update.expiry = expiryFromInput(provided.expiry);
 
     await ref.update(update);
 
     // feedVisibility is denormalised onto every submission, because the
     // Firestore feed query has no way to join back to the mission.
-    if (input.feedVisibility && input.feedVisibility !== existing.data()?.feedVisibility) {
+    if (provided.feedVisibility && provided.feedVisibility !== existing.data()?.feedVisibility) {
       const affected = await submissionsRef(chaseId)
         .where("missionId", "==", missionId)
         .get();
       const batch = ref.firestore.batch();
       for (const doc of affected.docs) {
-        batch.update(doc.ref, { feedVisible: input.feedVisibility === "shown" });
+        batch.update(doc.ref, { feedVisible: provided.feedVisibility === "shown" });
       }
       if (affected.size) await batch.commit();
     }
